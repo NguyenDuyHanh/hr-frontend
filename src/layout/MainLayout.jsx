@@ -1,0 +1,36 @@
+import React from 'react'
+import LayoutHeader from './components/LayoutHeader'
+import LayoutSidebar from './components/LayoutSidebar'
+import LayoutFooter from './components/LayoutFooter'
+import Breadcrumb from './components/Breadcrumb'
+
+const MainLayout = ({ children }) => {
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* Header - Cố định ở trên đầu */}
+      <header className="sticky top-0 z-50">
+        <LayoutHeader />
+      </header>
+
+      {/* Body - Tự động giãn nở để chiếm phần không gian còn lại */}
+      <div className="flex flex-1">
+        <LayoutSidebar />
+
+        {/* Content - Khu vực nội dung chính */}
+        <main className="flex-1 px-5 overflow-x-hidden flex flex-col">
+          <Breadcrumb />
+          {/* div này sẽ chứa nội dung và co giãn theo nội dung, 
+              nhưng nhờ flex-1 ở cha nên footer vẫn bị đẩy xuống đáy */}
+          <div className="flex-1 pb-8">
+            {children}
+          </div>
+        </main>
+      </div>
+
+      {/* Footer - Luôn nằm ở cuối */}
+      <LayoutFooter />
+    </div>
+  );
+};
+
+export default MainLayout;
