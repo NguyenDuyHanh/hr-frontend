@@ -3,7 +3,7 @@ name: Deploy HRM Frontend
 on:
   push:
     branches:
-      - main
+      - develop
   # Allow manual trigger
   workflow_dispatch:
 
@@ -32,7 +32,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: lint-and-build
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/develop'
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -46,11 +46,11 @@ jobs:
             cd /opt/hrm/hrm-frontend-new
             
             # Pull latest changes
-            git pull origin main
+            git pull origin develop
             
             # Refresh Docker container
             cd /opt/hrm
-            docker compose up -d --build --no-deps frontend-new
+            docker compose up -d --build --no-deps hr-frontend
             
             # Clean up old images
             docker image prune -f
