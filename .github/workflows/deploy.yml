@@ -43,7 +43,7 @@ jobs:
           port: 22
           script: |
             # Navigate to the project directory on VPS
-            cd /opt/hrm/hrm-frontend-new
+            cd /opt/hrm/hr-frontend
             
             # Pull latest changes
             git pull origin develop
