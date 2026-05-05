@@ -216,9 +216,7 @@ const TestComponents = () => {
             <span className="text-white font-bold">LIVE STATE DEBUGGER</span>
             <span className="bg-green-900 text-green-300 px-2 py-0.5 rounded text-[10px]">ACTIVE</span>
           </div>
-          <Formik initialValues={INITIAL_VALUES} onSubmit={() => {}}>
-            {({ values }) => <pre>{JSON.stringify(values, null, 2)}</pre>}
-          </Formik>
+          <pre>{JSON.stringify(INITIAL_VALUES, null, 2)}</pre>
         </div>
       </div>
 

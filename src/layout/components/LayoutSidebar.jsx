@@ -12,7 +12,18 @@ import SecurityIcon from "@mui/icons-material/Security";
 import PersonIcon from "@mui/icons-material/Person";
 import WorkIcon from "@mui/icons-material/Work";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import SettingsIcon from "@mui/icons-material/Settings";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import VerticalSplitIcon from "@mui/icons-material/VerticalSplit";
+import GavelIcon from "@mui/icons-material/Gavel";
+import WalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import TokenIcon from "@mui/icons-material/Token";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 import { navigations } from "@/navigationConfig";
+import useAuthStore from "@/store/useAuthStore";
 
 const IconMapper = memo(({ iconName, ...props }) => {
   const icons = {
@@ -24,6 +35,16 @@ const IconMapper = memo(({ iconName, ...props }) => {
     person: PersonIcon,
     work: WorkIcon,
     chat: ChatIcon,
+    assessment: AssessmentIcon,
+    settings: SettingsIcon,
+    account_tree: AccountTreeIcon,
+    vertical_split: VerticalSplitIcon,
+    gavel: GavelIcon,
+    wallet: WalletIcon,
+    edit_document: EditNoteIcon,
+    token: TokenIcon,
+    bookmark: BookmarkIcon,
+    list_alt: ListAltIcon,
   };
   const IconComponent = icons[iconName];
   return IconComponent ? <IconComponent {...props} /> : null;
@@ -40,7 +61,7 @@ const SidebarItem = memo(({ item, expanded, onToggle }) => {
 
   return (
     <div className="w-full">
-      {item.children ? (
+      {item.children && item.children.length > 0 ? (
         <Accordion
           expanded={isExpanded}
           onChange={(e, isOpened) => onToggle(item.name, isOpened)}
@@ -119,13 +140,44 @@ const SidebarItem = memo(({ item, expanded, onToggle }) => {
 const LayoutSidebar = () => {
   const location = useLocation();
   const [expanded, setExpanded] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  // Lọc menu theo quyền (Sử dụng useMemo và tránh mutate mảng gốc)
+  const filteredNavigations = React.useMemo(() => {
+    return navigations
+      .filter((item) => !item.auth || item.auth.includes(user?.role))
+      .map((item) => {
+        // Nếu có con, tạo bản sao và lọc các con của bản sao đó
+        if (item.children) {
+          return {
+            ...item,
+            children: item.children.filter((child) => !child.auth || child.auth.includes(user?.role)),
+          };
+        }
+        return item;
+      })
+      // Chỉ giữ lại các menu cha có con (nếu ban đầu có con) hoặc menu đơn lẻ
+      .filter((item) => {
+        const originalItem = navigations.find(n => n.name === item.name);
+        if (originalItem?.children && item.children?.length === 0) return false;
+        return true;
+      });
+  }, [user?.role]);
+
+  // Sử dụng useRef để theo dõi pathname trước đó
+  const lastPathname = React.useRef(location.pathname);
 
   useEffect(() => {
-    const activeItem = navigations.find(item => 
-      item.children && item.children.some(child => location.pathname.startsWith(child.path))
-    );
-    if (activeItem) setExpanded(activeItem.name);
-  }, [location.pathname]);
+    // Chỉ tự động mở rộng khi đường dẫn thực sự thay đổi (chuyển trang)
+    if (lastPathname.current !== location.pathname) {
+      const activeItem = filteredNavigations.find(item => 
+        item.children && item.children.some(child => location.pathname.startsWith(child.path))
+      );
+      if (activeItem) {
+        setExpanded(activeItem.name);
+      }
+      lastPathname.current = location.pathname;
+    }
+  }, [location.pathname, filteredNavigations]);
 
   const handleToggle = useCallback((panel, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
@@ -136,7 +188,7 @@ const LayoutSidebar = () => {
       <div className="sticky top-[48px] h-[calc(100vh-48px-40px)] text-white flex flex-col">
         <div className="flex-1 overflow-y-auto no-scrollbar">
           <nav className="flex flex-col">
-            {navigations.map((item, index) => (
+            {filteredNavigations.map((item, index) => (
               <SidebarItem key={index} item={item} expanded={expanded} onToggle={handleToggle} />
             ))}
           </nav>

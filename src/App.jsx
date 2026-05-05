@@ -1,58 +1,86 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
 import TestComponents from "./pages/TestComponents";
+import AuthGuard from "./components/auth/AuthGuard";
+import { navigations } from "./navigationConfig";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 min-h-[400px] flex flex-col items-center justify-center text-center">
-    <h2 className="text-2xl font-medium text-primary mb-2 uppercase">{title}</h2>
-    <div className="w-16 h-1 bg-secondary rounded-full mb-6"></div>
-    <p className="text-gray-400">Trang này đang được phát triển...</p>
+    <div className="mb-4 p-4 rounded-full bg-primary/5 text-primary">
+       <h2 className="text-2xl font-semibold uppercase tracking-wider">{title}</h2>
+    </div>
+    <div className="w-20 h-1 bg-secondary rounded-full mb-6"></div>
+    <p className="text-gray-400 italic">Trang này đang được phát triển trong hệ thống HRM mới...</p>
+    <p className="text-xs text-gray-300 mt-4">Path: {window.location.pathname}</p>
+  </div>
+);
+
+// Login Placeholder
+const LoginPage = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
+      <h1 className="text-2xl font-bold mb-6 text-primary">HRM Login</h1>
+      <p className="text-gray-600 mb-8">Trang đăng nhập đang được xây dựng...</p>
+      <div className="p-4 bg-blue-50 text-blue-700 rounded-lg text-sm italic">
+        (Hệ thống đang sử dụng tài khoản Admin mặc định để test)
+      </div>
+    </div>
   </div>
 );
 
 function App() {
+  // Hàm làm phẳng danh sách menu để tạo Route tự động
+  const flattenNavigations = (items) => {
+    let flat = [];
+    items.forEach(item => {
+      if (item.path && !item.external) {
+        flat.push(item);
+      }
+      if (item.children) {
+        flat = [...flat, ...flattenNavigations(item.children)];
+      }
+    });
+    return flat;
+  };
+
+  const allRoutes = flattenNavigations(navigations);
+
+  // Map các component đặc biệt
+  const componentMap = {
+    "/test": <TestComponents />,
+    "/dashboard": <PagePlaceholder title="Bảng điều khiển" />,
+  };
+
   return (
-    <MainLayout>
-      <Routes>
+    <Routes>
+      {/* Route công khai (Public) */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Routes được bảo vệ (Protected) */}
+      <Route element={<MainLayout />}>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<PagePlaceholder title="Bảng điều khiển (Dashboard)" />} />
-
-        {/* Nhân viên */}
-        <Route path="/employee/list" element={<PagePlaceholder title="Danh sách nhân viên" />} />
-        <Route path="/employee/add" element={<PagePlaceholder title="Thêm mới nhân viên" />} />
-
-        {/* Chấm công */}
-        <Route path="/timesheet" element={<PagePlaceholder title="Chấm công" />} />
-        <Route path="/timesheet/shift" element={<PagePlaceholder title="Bảng phân ca" />} />
-        <Route path="/timesheet/statistics" element={<PagePlaceholder title="Thống kê công" />} />
-        <Route path="/timesheet/board" element={<PagePlaceholder title="Bảng chấm công" />} />
-        <Route path="/timesheet/device" element={<PagePlaceholder title="Thiết bị chấm công" />} />
-        <Route path="/timesheet/overtime" element={<PagePlaceholder title="Xác nhận làm thêm giờ" />} />
-        <Route path="/timesheet/leave" element={<PagePlaceholder title="Yêu cầu nghỉ phép" />} />
-        <Route path="/timesheet/result" element={<PagePlaceholder title="Xác nhận kết quả" />} />
-
-        {/* Lương thưởng */}
-        <Route path="/salary/list" element={<PagePlaceholder title="Bảng lương" />} />
-        <Route path="/salary/bonus" element={<PagePlaceholder title="Thưởng" />} />
-
-        {/* Bảo hiểm */}
-        <Route path="/insurance/social" element={<PagePlaceholder title="Bảo hiểm xã hội" />} />
-        <Route path="/insurance/health" element={<PagePlaceholder title="Bảo hiểm y tế" />} />
-
-        {/* Cá nhân */}
-        <Route path="/personal/info" element={<PagePlaceholder title="Thông tin cá nhân" />} />
-
-        {/* Công việc */}
-        <Route path="/work/list" element={<PagePlaceholder title="Danh sách công việc" />} />
         
-        {/* Test Components */}
+        {/* Tự động tạo Route từ cấu hình Menu */}
+        {allRoutes.map((route, index) => (
+          <Route 
+            key={index} 
+            path={route.path} 
+            element={
+              <AuthGuard roles={route.auth}>
+                {componentMap[route.path] || <PagePlaceholder title={route.name} />}
+              </AuthGuard>
+            } 
+          />
+        ))}
+
+        {/* Route Test không cần auth (hoặc có thể thêm auth nếu muốn) */}
         <Route path="/test" element={<TestComponents />} />
-        
+
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </MainLayout>
+      </Route>
+    </Routes>
   );
 }
 
