@@ -13,7 +13,7 @@ const ConstantList = {
     AUTH_MODE: window.Configs?.AUTH_MODE || "Keycloak",
     ROOT_PATH: window.Configs?.ROOT_PATH || APPLICATION_PATH,
     ACTIVE_LAYOUT: window.Configs?.ACTIVE_LAYOUT || "layout1",
-    API_ENPOINT: window.Configs?.API_ENPOINT || "http://localhost:8075",
+    API_ENPOINT: window.Configs?.API_ENPOINT || "http://localhost:8080",
     LOGIN_PAGE: APPLICATION_PATH + "session/signin",
     HOME_PAGE: APPLICATION_PATH + "home",
     LOGOUT_URL: window.Configs?.LOGOUT_URL,

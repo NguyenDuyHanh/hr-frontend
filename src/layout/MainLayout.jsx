@@ -3,8 +3,9 @@ import LayoutHeader from './components/LayoutHeader'
 import LayoutSidebar from './components/LayoutSidebar'
 import LayoutFooter from './components/LayoutFooter'
 import Breadcrumb from './components/Breadcrumb'
+import { Outlet } from 'react-router-dom'
 
-const MainLayout = ({ children }) => {
+const MainLayout = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header - Cố định ở trên đầu */}
@@ -22,7 +23,7 @@ const MainLayout = ({ children }) => {
           {/* div này sẽ chứa nội dung và co giãn theo nội dung, 
               nhưng nhờ flex-1 ở cha nên footer vẫn bị đẩy xuống đáy */}
           <div className="flex-1 pb-8">
-            {children}
+            <Outlet />
           </div>
         </main>
       </div>
