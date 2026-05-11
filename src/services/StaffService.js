@@ -1,0 +1,29 @@
+import axios from './HttpService';
+import ConstantList from '../appConfig';
+
+const API_PATH = ConstantList.API_ENPOINT + '/api/staffs';
+
+export const getStaffs = async () => {
+    const response = await axios.get(API_PATH);
+    return response.data;
+};
+
+export const getStaffById = async (id) => {
+    const response = await axios.get(`${API_PATH}/${id}`);
+    return response.data;
+};
+
+export const saveStaff = async (staff) => {
+    if (staff.id) {
+        const response = await axios.put(`${API_PATH}/${staff.id}`, staff);
+        return response.data;
+    } else {
+        const response = await axios.post(API_PATH, staff);
+        return response.data;
+    }
+};
+
+export const deleteStaff = async (id) => {
+    const response = await axios.delete(`${API_PATH}/${id}`);
+    return response.data;
+};

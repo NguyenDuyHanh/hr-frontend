@@ -151,6 +151,7 @@ function UiTable(props) {
     mobileBreakpoint = 768,
     mobileTitleField,
     mobileVisibleFields,
+    options: customOptions = {},
   } = props;
 
   const totalPages = useMemo(() => {
@@ -265,12 +266,19 @@ function UiTable(props) {
           toolbar: false,
           draggable: false,
           maxBodyHeight: maxHeight || "unset",
+          cellStyle: {
+            fontSize: "14px",
+          },
           headerStyle: {
             padding: "8px",
             textAlign: "center",
+            fontSize: "14px",
+            whiteSpace: "nowrap",
+            fontWeight: "bold",
           },
           defaultExpanded,
           detailPanelType: detailPanel ? "single" : undefined,
+          ...customOptions,
         }}
         onSelectionChange={handleSelectList}
         onRowClick={onRowClick ? (event, rowData) => onRowClick(rowData) : undefined}

@@ -195,7 +195,7 @@ const MyDateTimePicker = React.forwardRef(({
             htmlFor={name} 
             className="block text-sm font-semibold mb-1.5 text-gray-700"
           >
-            {label} {(validate || required) && <span className="text-red-500 font-bold ml-1">*</span>}
+            {label} {(validate || required) && <span style={{ color: 'red' }} className="font-bold ml-1">*</span>}
           </label>
         )}
 

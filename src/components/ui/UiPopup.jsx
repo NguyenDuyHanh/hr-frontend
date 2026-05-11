@@ -5,7 +5,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
-import Icon from "@mui/material/Icon";
+import CloseIcon from "@mui/icons-material/Close";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
 import PropTypes from "prop-types";
@@ -45,13 +45,18 @@ function UiPopup({
   ...otherProps
 }) {
   const { t } = useTranslation();
+  
+  // Rule: Stabilize PaperComponent to prevent Dialog remount and focus loss
+  const MemoizedPaperComponent = React.useMemo(() => {
+    return (props) => <PaperComponent {...props} popupId={popupId} />;
+  }, [popupId]);
 
   return (
     <Dialog
       fullWidth
       open={open}
       onClose={onClosePopup}
-      PaperComponent={(props) => <PaperComponent {...props} popupId={popupId} />}
+      PaperComponent={MemoizedPaperComponent}
       scroll={scroll}
       maxWidth={size}
       aria-labelledby={popupId || "ui-draggable-dialog-title"}
@@ -83,7 +88,7 @@ function UiPopup({
               }}
               size="small"
             >
-              <Icon title={t("general.close")}>close</Icon>
+              <CloseIcon fontSize="small" />
             </IconButton>
           </DialogTitle>
         </>
@@ -92,7 +97,8 @@ function UiPopup({
       {!noDialogContent ? (
         <DialogContent 
           sx={{ 
-            p: 2, 
+            p: 2,
+            pt: '16px !important',
             overflowY: "auto", 
             maxHeight: "75vh", 
             ...styleContent 

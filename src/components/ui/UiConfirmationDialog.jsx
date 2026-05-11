@@ -67,7 +67,7 @@ const UiConfirmationDialog = React.forwardRef(({
       aria-labelledby="draggable-confirm-dialog-title"
       sx={{
         '& .MuiPaper-root': {
-          borderRadius: '12px',
+          borderRadius: '4px',
           overflow: 'hidden',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
         }
