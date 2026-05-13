@@ -27,3 +27,8 @@ export const deleteStaff = async (id) => {
     const response = await axios.delete(`${API_PATH}/${id}`);
     return response.data;
 };
+
+export const generateStaffCode = async () => {
+    const response = await axios.get(`${API_PATH}/generate-staff-code`);
+    return response.data;
+};

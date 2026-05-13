@@ -108,7 +108,7 @@ const UiConfirmationDialog = React.forwardRef(({
         </p>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2, pt: 1, justifyContent: 'flex-end', gap: 1 }}>
+      <DialogActions sx={{ px: 3, pb: 2, pt: 1, justifyContent: 'flex-end' }}>
         <Button
           variant="outlined"
           color="inherit"

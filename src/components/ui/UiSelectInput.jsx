@@ -126,6 +126,10 @@ const MySelectInput = React.forwardRef(({
         boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
       }
     },
+    '& .MuiFormHelperText-root': {
+      marginLeft: "0 !important",
+      marginRight: "0 !important",
+    },
     ...otherProps.sx
   }), [readOnly, otherProps.sx]);
 

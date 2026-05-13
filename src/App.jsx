@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import 'nprogress/nprogress.css';
+
 import MainLayout from "./layout/MainLayout";
 import TestComponents from "./pages/TestComponents";
 import AuthGuard from "./components/auth/AuthGuard";
@@ -7,7 +9,6 @@ import StaffList from "./pages/Staff/StaffList";
 import UserList from "./pages/User/UserList";
 import useUiStore from "./store/uiStore";
 import UiLoading from "./components/ui/UiLoading";
-import 'nprogress/nprogress.css';
 import GlobalLoadingHandler from "./components/common/GlobalLoadingHandler";
 
 // Placeholder component for pages

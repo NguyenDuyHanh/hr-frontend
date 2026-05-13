@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { Grid, Button } from '@mui/material';
@@ -8,7 +8,7 @@ import UiSelectInput from '../../components/ui/UiSelectInput';
 import UiDateTimePicker from '../../components/ui/UiDateTimePicker';
 import UiPopup from '../../components/ui/UiPopup';
 import { WorkingStatusOptions } from '../../LocalConstants';
-import { getNextStaffCode, incrementStaffCode } from '../../LocalFunction';
+import { generateStaffCode } from '../../services/StaffService';
 import { format } from 'date-fns';
 
 const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
@@ -16,7 +16,7 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
 
     const initialValues = useMemo(() => ({
         id: staffData?.id || null,
-        staffCode: staffData?.staffCode || getNextStaffCode(),
+        staffCode: staffData?.staffCode || '',
         displayName: staffData?.displayName || '',
         startDate: staffData?.startDate ? new Date(staffData.startDate) : new Date(),
         workingStatus: staffData?.workingStatus || '',
@@ -43,12 +43,24 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
                 await modifyStaff(values.id, submitValues);
             } else {
                 await addStaff(submitValues);
-                // Increment the counter only on successful save of a new staff
-                incrementStaffCode();
             }
             if (onSaveSuccess) onSaveSuccess();
         },
     });
+    
+    useEffect(() => {
+        if (open && !staffData) {
+            const fetchCode = async () => {
+                try {
+                    const code = await generateStaffCode();
+                    formik.setFieldValue('staffCode', code);
+                } catch (error) {
+                    console.error("Failed to generate staff code", error);
+                }
+            };
+            fetchCode();
+        }
+    }, [open, staffData]);
 
     const action = (
         <>
@@ -78,6 +90,7 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
                         <UiTextField 
                             label="Mã nhân viên" 
                             name="staffCode" 
+                            disabled
                             required
                         />
                     </Grid>
