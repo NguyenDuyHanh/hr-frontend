@@ -4,7 +4,7 @@ import { CircularProgress, Box } from '@mui/material';
 const UiLoading = ({ 
   overlay = true, 
   fixed = false,
-  size = 60,
+  size = 70,
 }) => {
   return (
     <Box
@@ -15,7 +15,7 @@ const UiLoading = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: overlay || fixed ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+        // backgroundColor: overlay || fixed ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
         backdropFilter: 'none',
         transition: 'all 0.3s ease',
       }}
@@ -29,7 +29,7 @@ const UiLoading = ({
           justifyContent: 'center' 
         }}
       >
-        <CircularProgress size={size} thickness={2} color="primary" />
+        <CircularProgress size={size} thickness={1.2} color="primary" />
       </Box>
     </Box>
   );

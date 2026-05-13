@@ -146,6 +146,14 @@ const MyTextField = React.forwardRef(({
     '& .MuiInputBase-root': {
       backgroundColor: readOnly ? '#f5f5f5 !important' : 'inherit',
       transition: 'all 0.2s ease-in-out',
+      '&.Mui-disabled': {
+        color: 'rgba(0, 0, 0, 0.87) !important',
+        WebkitTextFillColor: 'rgba(0, 0, 0, 0.87) !important',
+        '& .MuiInputBase-input': {
+          color: 'rgba(0, 0, 0, 0.87) !important',
+          WebkitTextFillColor: 'rgba(0, 0, 0, 0.87) !important',
+        }
+      },
       '&.Mui-error .MuiOutlinedInput-notchedOutline': {
         borderColor: '#d1d5db !important',
       },
@@ -176,6 +184,10 @@ const MyTextField = React.forwardRef(({
         backgroundColor: '#ffffff',
         boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
       }
+    },
+    '& .MuiFormHelperText-root': {
+      marginLeft: "0 !important",
+      marginRight: "0 !important",
     },
     ...sxProp,
   }), [readOnly, multiline, isTextArea, sxProp]);

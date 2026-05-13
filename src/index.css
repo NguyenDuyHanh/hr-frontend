@@ -40,3 +40,12 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Tối ưu NProgress: Hiện trên cùng Modal và bỏ bóng đổ */
+#nprogress .bar {
+  z-index: 99999 !important;
+}
+
+#nprogress .peg {
+  box-shadow: none !important;
+}
