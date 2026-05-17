@@ -10,12 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ai-sdk/react": "^1.1.21",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@material-table/core": "6.2.0",
     "@mui/icons-material": "5.17.0",
     "@mui/material": "5.17.0",
     "@mui/x-date-pickers": "^7.2.0",
+    "ai": "^4.1.25",
     "axios": "^1.16.0",
     "dayjs": "^1.11.10",
     "formik": "^2.4.5",
@@ -23,6 +25,7 @@
     "nprogress": "^0.2.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "react-markdown": "^9.0.1",
     "react-draggable": "^4.5.0",
     "react-i18next": "^14.1.0",
     "react-number-format": "^5.4.5",
