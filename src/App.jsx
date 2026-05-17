@@ -10,6 +10,7 @@ import UserList from "./pages/User/UserList";
 import useUiStore from "./store/uiStore";
 import UiLoading from "./components/ui/UiLoading";
 import GlobalLoadingHandler from "./components/common/GlobalLoadingHandler";
+import AiChatbotWidget from "./components/ui/AiChatbotWidget";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -70,6 +71,9 @@ function App() {
       
       {/* Vòng xoay trung tâm điều khiển bởi showLoading */}
       {showLoading && <UiLoading fixed />}
+      
+      {/* Widget Trợ lý AI */}
+      <AiChatbotWidget />
 
       <Routes>
         {/* Route công khai (Public) */}
