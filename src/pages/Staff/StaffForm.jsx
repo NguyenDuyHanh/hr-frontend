@@ -52,7 +52,8 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
         if (open && !staffData) {
             const fetchCode = async () => {
                 try {
-                    const code = await generateStaffCode();
+                    const response = await generateStaffCode();
+                    const code = response?.data || '';
                     formik.setFieldValue('staffCode', code);
                 } catch (error) {
                     console.error("Failed to generate staff code", error);

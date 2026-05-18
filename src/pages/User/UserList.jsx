@@ -1,29 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Grid, IconButton } from '@mui/material';
+import { Button, Grid, IconButton, TextField, Paper } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 import UiTable from '../../components/ui/UiTable';
-import { getUsers, deleteUser } from '../../services/UserService';
+import useUserStore from '../../store/userStore';
 import UserForm from './UserForm';
 
 const UserList = () => {
-    const [users, setUsers] = useState([]);
-    const [openForm, setOpenForm] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
 
-    const loadData = async () => {
-        try {
-            const data = await getUsers();
-            setUsers(data);
-        } catch (error) {
-            console.error('Error fetching users', error);
-        }
-    };
+    const {
+        users,
+        totalElements,
+        page,
+        setPage,
+        pageSize,
+        setPageSize,
+        keyword,
+        setKeyword,
+        selectedUser,
+        setSelectedUser,
+        openForm,
+        setOpenForm,
+        loadUsers,
+        removeUser,
+    } = useUserStore();
 
     useEffect(() => {
-        loadData();
-    }, []);
+        loadUsers();
+    }, [page, pageSize, keyword]);
 
     const handleAdd = () => {
         setSelectedUser(null);
@@ -38,8 +44,7 @@ const UserList = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this user?')) {
             try {
-                await deleteUser(id);
-                loadData();
+                await removeUser(id);
             } catch (error) {
                 console.error('Error deleting user', error);
             }
@@ -68,17 +73,50 @@ const UserList = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                <h2>User Management</h2>
-                <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleAdd}>
-                    Add User
-                </Button>
-            </div>
-            
-            <UiTable 
-                columns={columns} 
-                data={users} 
-            />
+            <Paper elevation={0} className="p-4 border border-gray-200" style={{ padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                    <h2>User Management</h2>
+                    <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleAdd}>
+                        Add User
+                    </Button>
+                </div>
+
+                {/* Search Area */}
+                <Grid container spacing={1} alignItems="center" style={{ marginBottom: '20px' }}>
+                    <Grid item xs={12} sm={8} md={8}>
+                        <TextField 
+                            fullWidth
+                            size="small"
+                            placeholder="Search by username or email..."
+                            variant="outlined"
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4} md={4}>
+                        <Button 
+                            variant="contained" 
+                            color="primary"
+                            size="small" 
+                            startIcon={<SearchIcon />} 
+                            style={{ height: '32px', whiteSpace: 'nowrap' }}
+                            onClick={() => loadUsers()}
+                        >
+                            Search
+                        </Button>
+                    </Grid>
+                </Grid>
+                
+                <UiTable 
+                    columns={columns} 
+                    data={users} 
+                    totalElements={totalElements}
+                    page={page}
+                    pageSize={pageSize}
+                    handleChangePage={(e, p) => setPage(p)}
+                    setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
+                />
+            </Paper>
 
             {openForm && (
                 <UserForm 
@@ -87,7 +125,6 @@ const UserList = () => {
                     userData={selectedUser}
                     onSaveSuccess={() => {
                         setOpenForm(false);
-                        loadData();
                     }}
                 />
             )}

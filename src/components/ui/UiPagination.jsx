@@ -48,7 +48,7 @@ function UiPagination(props) {
 
   const totalElementsText = useMemo(() => (
     <Typography variant="body2" sx={{ display: "flex", alignItems: "center" }}>
-      {t("general.totalRows")}
+      {"Tổng số bản ghi: "}
       <Box component="span" sx={{ 
         ml: 1.5, 
         mr: 1.5, 
@@ -77,7 +77,7 @@ function UiPagination(props) {
             {totalElementsText}
             
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography variant="body2">{t("general.rowsPerPage")}</Typography>
+              <Typography variant="body2">Số bản ghi / trang: </Typography>
               <TextField
                 select
                 value={pageSize}

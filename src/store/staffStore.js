@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getStaffs, deleteStaff, saveStaff } from '../services/StaffService';
+import { getStaffs, deleteStaff, saveStaff, pagingStaffs } from '../services/StaffService';
 
 const useStaffStore = create((set, get) => ({
     staffs: [],
@@ -7,23 +7,25 @@ const useStaffStore = create((set, get) => ({
     totalElements: 0,
     page: 1,
     pageSize: 10,
+    keyword: '',
     selectedStaff: null,
     openForm: false,
 
     // Actions
     setPage: (page) => set({ page }),
     setPageSize: (pageSize) => set({ pageSize, page: 1 }),
+    setKeyword: (keyword) => set({ keyword, page: 1 }),
     setOpenForm: (open) => set({ openForm: open }),
     setSelectedStaff: (staff) => set({ selectedStaff: staff }),
 
     loadStaffs: async () => {
         set({ loading: true });
         try {
-            // Lưu ý: Nếu service hỗ trợ phân trang, hãy truyền params vào đây
-            const data = await getStaffs();
+            const { page, pageSize, keyword } = get();
+            const response = await pagingStaffs({ pageIndex: page, pageSize, keyword });
             set({ 
-                staffs: data || [], 
-                totalElements: data?.length || 0,
+                staffs: response?.data?.content || [], 
+                totalElements: response?.data?.totalElements || 0,
                 loading: false 
             });
         } catch (error) {

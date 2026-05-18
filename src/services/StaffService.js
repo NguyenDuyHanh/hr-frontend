@@ -8,6 +8,11 @@ export const getStaffs = async () => {
     return response.data;
 };
 
+export const pagingStaffs = async (searchDto) => {
+    const response = await axios.post(`${API_PATH}/paging`, searchDto || {});
+    return response.data;
+};
+
 export const getStaffById = async (id) => {
     const response = await axios.get(`${API_PATH}/${id}`);
     return response.data;
