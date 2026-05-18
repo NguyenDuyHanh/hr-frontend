@@ -5,17 +5,28 @@ import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import AppsIcon from '@mui/icons-material/Apps'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
+import useSidebarStore from '@/store/sidebarStore'
 
 const LayoutHeader = () => {
+  const { toggleCollapsed, toggleMobileOpen } = useSidebarStore();
+
+  const handleToggle = () => {
+    if (window.innerWidth < 768) {
+      toggleMobileOpen();
+    } else {
+      toggleCollapsed();
+    }
+  };
+
   return (
     <div className='bg-primary-dark h-[48px] flex items-center justify-between px-4 text-white shadow-md'>
       {/* Left side: Logo and Toggle */}
-      <div className='flex items-center ml-10 space-x-6'>
-        <NavLink to="/dashboard" className='bg-gradient-to-r from-[#8d6134] to-[#0073be] text-white px-4 py-1 rounded-sm font-normal text-[20px] no-underline'>
+      <div className='flex items-center md:ml-10 space-x-6'>
+        <NavLink to="/dashboard" className='bg-gradient-to-r from-[#8d6134] to-[#0073be] text-white px-4 py-1 rounded-sm font-normal text-[20px] no-underline hidden md:block'>
           H R M
         </NavLink>
 
-        <IconButton color="inherit" size="small">
+        <IconButton color="inherit" size="small" className='!ml-0 md:!ml-6' onClick={handleToggle}>
           <MenuOutlinedIcon fontSize="medium" />
         </IconButton>
 
