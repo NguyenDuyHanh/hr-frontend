@@ -335,7 +335,7 @@ const LayoutSidebar = () => {
                     item={item}
                     expanded={expanded}
                     onToggle={handleToggle}
-                    isCollapsed={isCollapsed}
+                    isCollapsed={isMobileOpen ? false : isCollapsed}
                     onExpandSidebar={() => handleItemClick(item.name)}
                   />
                 ))}
