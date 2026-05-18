@@ -4,8 +4,11 @@ import UiTextField from '../../components/ui/UiTextField';
 import { saveUser } from '../../services/UserService';
 import { getStaffs } from '../../services/StaffService';
 import UiSelectInput from '../../components/ui/UiSelectInput';
+import useUserStore from '../../store/userStore';
 
 const UserForm = ({ open, onClose, userData, onSaveSuccess }) => {
+    const { addUser, modifyUser } = useUserStore();
+
     const [formData, setFormData] = useState({
         username: '',
         password: '',
@@ -25,7 +28,9 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess }) => {
 
     const fetchStaffs = async () => {
         try {
-            const staffs = await getStaffs();
+            const response = await getStaffs();
+            // response is ApiResponse, response.data is the list of active staff
+            const staffs = response?.data || [];
             const options = staffs.map(staff => ({
                 value: staff.id,
                 label: staff.displayName + ' (' + staff.staffCode + ')',
@@ -51,7 +56,11 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess }) => {
 
     const handleSave = async () => {
         try {
-            await saveUser(formData);
+            if (userData?.id) {
+                await modifyUser(userData.id, formData);
+            } else {
+                await addUser(formData);
+            }
             if (onSaveSuccess) onSaveSuccess();
         } catch (error) {
             console.error('Error saving user', error);

@@ -33,11 +33,13 @@ const StaffList = () => {
         openForm, 
         setSelectedStaff, 
         selectedStaff,
+        keyword,
+        setKeyword,
     } = useStaffStore();
 
     useEffect(() => {
         loadStaffs();
-    }, [page, pageSize]);
+    }, [page, pageSize, keyword]);
 
     const handleAdd = () => {
         setSelectedStaff(null);
@@ -208,6 +210,8 @@ const StaffList = () => {
                             size="small"
                             placeholder="Tìm kiếm theo tên, mã nhân viên, email, số điện thoại..."
                             variant="outlined"
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
                         />
                     </Grid>
                     <Grid item xs={12} sm={4} md={4}>
@@ -217,6 +221,7 @@ const StaffList = () => {
                                 size="small" 
                                 startIcon={<SearchIcon />} 
                                 sx={{ textTransform: 'none', height: '32px', whiteSpace: 'nowrap' }}
+                                onClick={() => loadStaffs()}
                             >
                                 Tìm kiếm
                             </Button>

@@ -8,6 +8,11 @@ export const getUsers = async () => {
     return response.data;
 };
 
+export const pagingUsers = async (searchDto) => {
+    const response = await axios.post(`${API_PATH}/paging`, searchDto || {});
+    return response.data;
+};
+
 export const getUserById = async (id) => {
     const response = await axios.get(`${API_PATH}/${id}`);
     return response.data;
