@@ -37,3 +37,13 @@ export const generateStaffCode = async () => {
     const response = await axios.get(`${API_PATH}/generate-staff-code`);
     return response.data;
 };
+
+export const getDepartments = async () => {
+    const response = await axios.get(`${API_PATH}/departments`);
+    return response.data;
+};
+
+export const getPositions = async () => {
+    const response = await axios.get(`${API_PATH}/positions`);
+    return response.data;
+};

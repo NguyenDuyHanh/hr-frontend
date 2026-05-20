@@ -28,6 +28,8 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 4,
+          height: '32px',
+          textTransform: 'none',
         },
       },
     },
