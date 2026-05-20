@@ -1,95 +1,137 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, FormControlLabel, Checkbox } from '@mui/material';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Button, Grid, TextField } from '@mui/material';
+import { useFormik, FormikProvider } from 'formik';
+import * as Yup from 'yup';
 import UiTextField from '../../components/ui/UiTextField';
-import { saveUser } from '../../services/UserService';
-import { getStaffs } from '../../services/StaffService';
-import UiSelectInput from '../../components/ui/UiSelectInput';
+import UiCheckBox from '../../components/ui/UiCheckBox';
+import UiPagingAutocomplete from '../../components/ui/UiPagingAutocomplete';
+import UiAutocomplete from '../../components/ui/UiAutocomplete';
+import UiPopup from '../../components/ui/UiPopup';
+import { pagingStaffs } from '../../services/StaffService';
 import useUserStore from '../../store/userStore';
 
-const UserForm = ({ open, onClose, userData, onSaveSuccess }) => {
-    const { addUser, modifyUser } = useUserStore();
-
-    const [formData, setFormData] = useState({
-        username: '',
-        password: '',
-        email: '',
-        active: true,
-        staff: null,
-    });
-    
-    const [staffList, setStaffList] = useState([]);
+const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) => {
+    const { addUser, modifyUser, roles: allRoles, loadRoles } = useUserStore();
 
     useEffect(() => {
-        if (userData) {
-            setFormData(userData);
-        }
-        fetchStaffs();
-    }, [userData]);
+        loadRoles();
+    }, [loadRoles]);
 
-    const fetchStaffs = async () => {
-        try {
-            const response = await getStaffs();
-            // response is ApiResponse, response.data is the list of active staff
-            const staffs = response?.data || [];
-            const options = staffs.map(staff => ({
-                value: staff.id,
-                label: staff.displayName + ' (' + staff.staffCode + ')',
-                original: staff
-            }));
-            setStaffList(options);
-        } catch (error) {
-            console.error('Failed to load staffs', error);
-        }
-    }
+    const initialValues = useMemo(() => ({
+        id: userData?.id || null,
+        username: userData?.username || '',
+        password: userData?.password || '',
+        email: userData?.email || '',
+        active: userData?.active !== undefined ? userData.active : true,
+        roles: userData?.roles || [],
+        staff: userData?.staffId ? { id: userData.staffId, displayName: userData.staffName, staffCode: '' } : null,
+    }), [userData]);
 
-    const handleChange = (e) => {
-        const { name, value, checked, type } = e.target;
-        setFormData(prev => ({ 
-            ...prev, 
-            [name]: type === 'checkbox' ? checked : value 
-        }));
-    };
+    const validationSchema = Yup.object({
+        username: Yup.string().required('Tên đăng nhập không được để trống'),
+        password: userData?.id ? Yup.string().nullable() : Yup.string().required('Mật khẩu không được để trống'),
+        email: Yup.string().email('Email không hợp lệ').nullable(),
+    });
 
-    const handleStaffChange = (selectedOption) => {
-        setFormData(prev => ({ ...prev, staff: selectedOption ? selectedOption.original : null }));
-    }
-
-    const handleSave = async () => {
-        try {
-            if (userData?.id) {
-                await modifyUser(userData.id, formData);
-            } else {
-                await addUser(formData);
+    const formik = useFormik({
+        initialValues: initialValues,
+        enableReinitialize: true,
+        validationSchema: validationSchema,
+        onSubmit: async (values) => {
+            try {
+                const payload = {
+                    id: values.id,
+                    username: values.username,
+                    password: values.password || undefined,
+                    email: values.email || null,
+                    active: values.active,
+                    roles: values.roles,
+                    staffId: values.staff?.id || null,
+                };
+                if (values.id) {
+                    await modifyUser(values.id, payload);
+                } else {
+                    await addUser(payload);
+                }
+                if (onSaveSuccess) onSaveSuccess();
+            } catch (error) {
+                console.error('Error saving user', error);
             }
-            if (onSaveSuccess) onSaveSuccess();
-        } catch (error) {
-            console.error('Error saving user', error);
-        }
-    };
+        },
+    });
+
+    const action = (
+        <>
+            <Button 
+                onClick={onClose} 
+                variant="outlined" 
+                color="inherit"
+                style={{ 
+                    textTransform: 'none',
+                    borderColor: '#d1d5db',
+                    color: '#4b5563',
+                    backgroundColor: '#f9fafb',
+                    height: '32px',
+                    fontSize: '0.8125rem'
+                }}
+                sx={{
+                    '&:hover': {
+                        backgroundColor: '#f3f4f6 !important',
+                        borderColor: '#9ca3af !important',
+                        color: '#1f2937 !important'
+                    }
+                }}
+            >
+                {isView ? 'Đóng' : 'Hủy bỏ'}
+            </Button>
+            {!isView && (
+                <Button 
+                    onClick={formik.handleSubmit} 
+                    color="primary" 
+                    variant="contained"
+                    style={{ 
+                        textTransform: 'none',
+                        height: '32px',
+                        fontSize: '0.8125rem',
+                        paddingLeft: '24px',
+                        paddingRight: '24px',
+                        marginLeft: '8px'
+                    }}
+                >
+                    Lưu lại
+                </Button>
+            )}
+        </>
+    );
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{userData ? 'Edit User' : 'Add User'}</DialogTitle>
-            <DialogContent dividers>
+        <UiPopup
+            open={open}
+            onClosePopup={onClose}
+            title={isView ? 'Chi tiết tài khoản' : (userData ? 'Cập nhật tài khoản' : 'Thêm tài khoản')}
+            size="sm"
+            action={action}
+        >
+            <FormikProvider value={formik}>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
                         <UiTextField 
-                            label="Username" 
+                            label="Tên đăng nhập" 
                             name="username" 
-                            value={formData.username} 
-                            onChange={handleChange} 
+                            required
                             fullWidth 
+                            disabled={isView}
                         />
                     </Grid>
                     {!userData && (
                         <Grid item xs={12}>
                             <UiTextField 
-                                label="Password" 
+                                label="Mật khẩu" 
                                 name="password" 
                                 type="password"
-                                value={formData.password} 
-                                onChange={handleChange} 
+                                required
                                 fullWidth 
+                                disabled={isView}
                             />
                         </Grid>
                     )}
@@ -97,44 +139,51 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess }) => {
                         <UiTextField 
                             label="Email" 
                             name="email" 
-                            value={formData.email} 
-                            onChange={handleChange} 
                             fullWidth 
+                            disabled={isView}
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <FormControlLabel
-                            control={
-                                <Checkbox 
-                                    checked={formData.active} 
-                                    onChange={handleChange} 
-                                    name="active" 
-                                />
-                            }
-                            label="Active"
+                        <UiPagingAutocomplete 
+                            label="Nhân viên liên kết" 
+                            name="staff"
+                            api={pagingStaffs}
+                            disabled={isView}
+                            getOptionLabel={(option) => {
+                                if (!option) return "";
+                                const codePart = option.staffCode ? ` (${option.staffCode})` : "";
+                                return `${option.displayName || option.staffName || ''}${codePart}`;
+                            }}
+                            onChange={(event, value) => {
+                                formik.setFieldValue('staff', value);
+                                
+                                // Auto-populate email and username if selecting a staff for a new user
+                                if (value && !userData) {
+                                    if (value.email && !formik.values.email) {
+                                        formik.setFieldValue('email', value.email);
+                                    }
+                                    if (value.staffCode && !formik.values.username) {
+                                        formik.setFieldValue('username', value.staffCode);
+                                    }
+                                }
+                            }}
                         />
                     </Grid>
-                    {/* Add Staff Linkage Component */}
                     <Grid item xs={12}>
-                         {/* Replace with UiPagingAutocomplete if available */}
-                         <UiSelectInput 
-                             label="Linked Staff" 
-                             options={staffList} 
-                             value={formData.staff ? formData.staff.id : ''} 
-                             onChange={(e) => {
-                                 const selectedId = e.target.value;
-                                 const staff = staffList.find(s => s.value === selectedId)?.original || null;
-                                 handleStaffChange({ original: staff });
-                             }}
-                         />
+                        <UiAutocomplete
+                            multiple
+                            name="roles"
+                            label="Vai trò (Quyền)"
+                            placeholder="Chọn vai trò..."
+                            options={allRoles}
+                            getOptionLabel={(option) => option.description || option.name || ''}
+                            disableCloseOnSelect
+                            disabled={isView}
+                        />
                     </Grid>
                 </Grid>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} color="inherit">Cancel</Button>
-                <Button onClick={handleSave} color="primary" variant="contained">Save</Button>
-            </DialogActions>
-        </Dialog>
+            </FormikProvider>
+        </UiPopup>
     );
 };
 
