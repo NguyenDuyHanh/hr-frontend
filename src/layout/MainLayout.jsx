@@ -7,7 +7,7 @@ import { Outlet } from 'react-router-dom'
 
 const MainLayout = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-200">
       {/* Header - Cố định ở trên đầu */}
       <header className="sticky top-0 z-50">
         <LayoutHeader />

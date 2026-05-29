@@ -47,13 +47,14 @@ function UiPagination(props) {
   const handleClosePopup = useCallback(() => setOpenPopup(false), []);
 
   const totalElementsText = useMemo(() => (
-    <Typography variant="body2" sx={{ display: "flex", alignItems: "center" }}>
+    <Typography variant="body2" sx={{ display: "flex", alignItems: "center", color: "text.primary" }}>
       {"Tổng số bản ghi: "}
       <Box component="span" sx={{ 
         ml: 1.5, 
         mr: 1.5, 
         pr: 1.5, 
-        borderRight: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.15)",
+        borderRight: isMobile ? "none" : "1px solid",
+        borderColor: "divider",
         fontWeight: 600 
       }}>
         {totalElements}
@@ -77,7 +78,7 @@ function UiPagination(props) {
             {totalElementsText}
             
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography variant="body2">Số bản ghi / trang: </Typography>
+              <Typography variant="body2" sx={{ color: "text.primary" }}>Số bản ghi / trang: </Typography>
               <TextField
                 select
                 value={pageSize}
@@ -89,7 +90,8 @@ function UiPagination(props) {
                     "& .MuiInput-root:after": { borderBottom: "none" },
                     "& .MuiInput-root:hover:not(.Mui-disabled):before": { borderBottom: "none" },
                     width: "50px",
-                    textAlign: "center"
+                    textAlign: "center",
+                    "& .MuiSelect-select": { color: "text.primary" }
                 }}
                 InputProps={{
                     sx: { fontSize: "14px" }
@@ -117,10 +119,11 @@ function UiPagination(props) {
             size="small"
             sx={{
                 "& .MuiPaginationItem-root": {
-                    bgcolor: "white",
+                    bgcolor: "background.paper",
+                    color: "text.primary",
                     "&.Mui-selected": {
                         bgcolor: "primary.main",
-                        color: "white",
+                        color: "primary.contrastText",
                         "&:hover": {
                             bgcolor: "primary.dark",
                         }
@@ -158,7 +161,8 @@ function UiPagination(props) {
             sx={{ 
                 "& ul": { justifyContent: "center" },
                 "& .MuiPaginationItem-root": {
-                    bgcolor: "white",
+                    bgcolor: "background.paper",
+                    color: "text.primary",
                 }
             }}
           />

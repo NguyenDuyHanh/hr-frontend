@@ -72,29 +72,33 @@ const SubSidebarItem = memo(({ child }) => {
     <li>
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-[#4a83b6] text-white transition-colors duration-150 ${
-          hasActiveSubChild ? "bg-primary-light" : "bg-primary hover:bg-primary-light"
+        className={`flex items-center justify-between pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border transition-[background-color,color] duration-150 ${
+          hasActiveSubChild 
+            ? "bg-sidebar-accent/60 text-sidebar-accent-foreground font-semibold" 
+            : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
         }`}
       >
         <span>{child.name}</span>
         <ExpandMoreIcon 
           sx={{ 
             fontSize: "18px", 
-            color: "white", 
+            color: "currentColor", 
             transition: "transform 0.2s",
             transform: isOpen ? "rotate(180deg)" : "rotate(0deg)"
           }} 
         />
       </div>
       {isOpen && (
-        <ul className="list-none p-0 m-0 bg-primary">
+        <ul className="list-none p-0 m-0 bg-sidebar">
           {child.children.map((subChild, sIdx) => (
             <li key={sIdx}>
               <NavLink
                 to={subChild.path}
                 className={({ isActive }) =>
-                  `flex items-center pl-16 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-[#4a83b6]/50 no-underline text-white transition-colors duration-150 
-                  ${isActive ? "bg-primary-light" : "bg-primary hover:bg-primary-light"}`
+                  `flex items-center pl-16 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border/50 no-underline transition-[background-color,color] duration-150 
+                  ${isActive 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold" 
+                    : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/30 hover:text-sidebar-accent-foreground"}`
                 }
               >
                 {subChild.name}
@@ -123,7 +127,11 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
     const itemContent = item.children && item.children.length > 0 ? (
       <div
         onClick={onExpandSidebar}
-        className={`flex items-center justify-center py-[12px] cursor-pointer border-b border-[#4a83b6] text-white hover:bg-[#4a83b6] ${hasActiveChild ? "bg-[#c94a38] hover:bg-[#c94a38]" : ""}`}
+        className={`flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border transition-[background-color,color] duration-150 ${
+          hasActiveChild 
+            ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
+            : "text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
+        }`}
       >
         <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
       </div>
@@ -132,7 +140,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
         href={item.path}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center py-[12px] cursor-pointer border-b border-[#4a83b6] no-underline text-white hover:bg-[#4a83b6]"
+        className="flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border no-underline text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground transition-[background-color,color] duration-150"
       >
         <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
       </a>
@@ -140,8 +148,10 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
       <NavLink
         to={item.path}
         className={({ isActive }) =>
-          `flex items-center justify-center py-[12px] cursor-pointer border-b border-[#4a83b6] no-underline text-white
-          ${isActive ? "bg-[#c94a38]" : ""} hover:bg-[#4a83b6]`
+          `flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border no-underline transition-[background-color,color] duration-150
+          ${isActive 
+            ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
+            : "text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
         }
       >
         <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
@@ -163,25 +173,26 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
           onChange={(e, isOpened) => onToggle(item.name, isOpened)}
           disableGutters
           square
-          className="bg-transparent text-white border-none shadow-none before:hidden"
+          className="bg-transparent text-sidebar-foreground border-none shadow-none before:hidden"
           sx={{
             "& .MuiAccordionSummary-root": {
               minHeight: "unset",
               px: "12px",
               py: "10px",
-              borderBottom: "1px solid #4a83b6",
-              backgroundColor: hasActiveChild ? "#c94a38" : "transparent",
-              color: "#fff",
+              borderBottom: "1px solid var(--sidebar-border)",
+              backgroundColor: hasActiveChild ? "var(--sidebar-accent)" : "transparent",
+              color: hasActiveChild ? "hsl(var(--sidebar-accent-foreground))" : "hsl(var(--sidebar-foreground))",
               "&:hover": {
-                backgroundColor: hasActiveChild ? "#c94a38" : "#397fae",
+                backgroundColor: hasActiveChild ? "var(--sidebar-accent)" : "hsl(var(--sidebar-accent) / 0.4)",
+                color: "hsl(var(--sidebar-accent-foreground))",
               },
             },
             "& .MuiAccordionSummary-content": { margin: 0, display: "flex", alignItems: "center" },
-            "& .MuiAccordionSummary-expandIconWrapper": { color: "#d6e7f2" },
-            "& .MuiAccordionDetails-root": { padding: 0, backgroundColor: "#4276a4" },
+            "& .MuiAccordionSummary-expandIconWrapper": { color: "hsl(var(--sidebar-foreground) / 0.7)" },
+            "& .MuiAccordionDetails-root": { padding: 0, backgroundColor: "transparent" },
           }}
         >
-          <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ fontSize: "18px", color: "white" }} />}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ fontSize: "18px", color: "currentColor" }} />}>
             <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
             <span className="flex-1 font-normal text-[14px]">{item.name}</span>
           </AccordionSummary>
@@ -195,8 +206,10 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
                     <NavLink
                       to={child.path}
                       className={({ isActive }) =>
-                        `flex items-center pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-[#4a83b6] no-underline text-white 
-                        ${isActive ? "bg-primary-light" : "bg-primary hover:bg-primary-light"}`
+                        `flex items-center pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border no-underline transition-[background-color,color] duration-150 
+                        ${isActive 
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold" 
+                          : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
                       }
                     >
                       {child.name}
@@ -214,7 +227,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
               href={item.path}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center px-3 py-[10px] cursor-pointer border-b border-[#4a83b6] no-underline text-[#fff] hover:bg-[#4a83b6]"
+              className="flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground transition-[background-color,color] duration-150"
             >
               <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
               <span className="flex-1 font-normal text-[14px]">{item.name}</span>
@@ -223,8 +236,10 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
             <NavLink
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center px-3 py-[10px] cursor-pointer border-b border-[#4a83b6] no-underline text-[#fff]
-                ${isActive ? "bg-[#c94a38]" : ""} hover:bg-[#4a83b6]`
+                `flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline transition-[background-color,color] duration-150
+                ${isActive 
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold shadow-sm" 
+                  : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
               }
             >
               <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
@@ -304,26 +319,26 @@ const LayoutSidebar = () => {
       )}
 
       <div
-        className={`md:bg-primary transition-[width,min-width] duration-300 flex-shrink-0
+        className={`md:bg-sidebar transition-[width,min-width] duration-300 flex-shrink-0
           ${isCollapsed ? "md:w-[50px] md:min-w-[50px]" : "md:w-[220px] md:min-w-[220px]"}
           w-0`}
       >
         <aside
-          className={`fixed md:sticky top-0 md:top-[48px] z-[60] md:z-40 bg-primary select-none transition-[width,min-width,transform] duration-300
+          className={`fixed md:sticky top-0 md:top-[48px] z-[60] md:z-40 bg-sidebar select-none transition-[width,min-width,transform] duration-300
             h-screen md:h-[calc(100vh-48px-40px)]
             ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
             ${isCollapsed ? "md:w-[50px] md:min-w-[50px]" : "md:w-[220px] md:min-w-[220px]"}
             w-[240px] min-w-[240px] md:w-full md:min-w-full`}
         >
-          <div className="h-full text-white flex flex-col">
+          <div className="h-full text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-[background-color,color] duration-200">
             {/* Mobile Header Logo inside Sidebar */}
-            <div className="h-[48px] flex items-center justify-between px-4 bg-primary-dark border-b border-[#4a83b6] md:hidden">
-              <NavLink to="/dashboard" className='bg-gradient-to-r from-[#8d6134] to-[#0073be] text-white px-4 py-1 rounded-sm font-normal text-[20px] no-underline'>
+            <div className="h-[48px] flex items-center justify-between px-4 bg-card border-b border-sidebar-border md:hidden">
+              <NavLink to="/dashboard" className='bg-gradient-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline'>
                 H R M
               </NavLink>
 
               <IconButton color="inherit" size="small" onClick={() => setMobileOpen(false)}>
-                <CloseIcon fontSize="small" />
+                <CloseIcon fontSize="small" sx={{ color: 'hsl(var(--foreground))' }} />
               </IconButton>
             </div>
 

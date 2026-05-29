@@ -176,7 +176,7 @@ const StaffList = () => {
 
     return (
         <>
-            <Paper elevation={0} className="p-4 border border-gray-200">
+            <Paper elevation={0} className="p-4 border border-border">
                 {/* Toolbar buttons */}
                 <div className="flex flex-wrap gap-2 mb-5">
                     <Button 
