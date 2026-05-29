@@ -40,6 +40,8 @@ const shouldComponentUpdate = (nextProps, currentProps) => {
     nextProps.disabled !== currentProps.disabled ||
     nextProps.rows !== currentProps.rows ||
     nextProps.readOnly !== currentProps.readOnly ||
+    nextProps.type !== currentProps.type ||
+    nextProps.endAdornment !== currentProps.endAdornment ||
     nextProps.formik.isSubmitting !== currentProps.formik.isSubmitting ||
     Object.keys(nextProps).length !== Object.keys(currentProps).length ||
     getIn(nextProps.formik.values, currentProps.name) !==

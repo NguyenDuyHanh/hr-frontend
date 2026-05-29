@@ -15,14 +15,14 @@ import PropTypes from "prop-types";
 const TableWrapper = styled(Box)(({ theme }) => ({
   width: "100%",
   "& .MuiTableCell-root": {
-    border: "1px solid #ccc",
+    border: "1px solid hsl(var(--border))",
     padding: "4px 8px",
     fontSize: "13px",
   },
   "& .MuiTableHead-root .MuiTableCell-root": {
     fontWeight: "600",
-    color: "#000",
-    backgroundColor: "#f5f5f5",
+    color: "hsl(var(--foreground))",
+    backgroundColor: "hsl(var(--muted))",
     textAlign: "center",
   },
   "& .MuiPaper-root": {

@@ -252,7 +252,7 @@ const UserList = () => {
 
     return (
         <div>
-            <Paper elevation={0} className="py-4 px-2 md:px-4 border border-gray-200">
+            <Paper elevation={0} className="py-4 px-2 md:px-4 border border-border">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     <Box display="flex" gap={1}>
                         <Button 
