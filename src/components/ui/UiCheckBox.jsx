@@ -57,7 +57,6 @@ const MyCheckBox = React.forwardRef(({
   meta,
   ...otherProps
 }, ref) => {
-  console.log(`%c[Render] UiCheckBox: ${name}`, 'color: #6366f1; font-weight: bold');
 
   const handleExternalChange = (evt) => {
     if (readOnly) return;

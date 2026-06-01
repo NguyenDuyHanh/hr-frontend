@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import 'nprogress/nprogress.css';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from 'sonner';
 
 import MainLayout from "./layout/MainLayout";
 import TestComponents from "./pages/TestComponents";
@@ -66,7 +65,7 @@ function App() {
 
   return (
     <>
-      <ToastContainer position="bottom-right" autoClose={3000} closeOnClick pauseOnHover />
+      <Toaster position="bottom-right" richColors closeButton />
 
       {/* Người quan sát điều khiển thanh NProgress */}
       <GlobalLoadingHandler />

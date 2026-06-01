@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import useUiStore from '../store/uiStore';
 import useAuthStore from '../store/useAuthStore';
 import ConstantList from '../appConfig';

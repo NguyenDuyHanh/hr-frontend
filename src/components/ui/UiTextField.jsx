@@ -81,8 +81,6 @@ const MyTextField = React.forwardRef(({
   className: classNameProp,
   ...otherProps
 }, ref) => {
-  // Debug log for standardizing verification
-  console.log(`%c[Render] UiTextField: ${name}`, 'color: #3b82f6; font-weight: bold');
 
   const [internalValue, setInternalValue] = useState(field.value ?? "");
   const timerRef = useRef(null);

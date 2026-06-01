@@ -71,7 +71,6 @@ const MyAsyncAutocomplete = React.forwardRef(({
   setFieldValue,
   ...otherProps
 }, ref) => {
-  console.log(`%c[Render] UiAsyncAutocomplete: ${name}`, 'color: #10b981; font-weight: bold');
 
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);

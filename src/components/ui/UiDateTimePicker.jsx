@@ -76,7 +76,6 @@ const MyDateTimePicker = React.forwardRef(({
   notDelay = false,
   ...otherProps
 }, ref) => {
-  console.log(`%c[Render] UiDateTimePicker: ${name}`, 'color: #ec4899; font-weight: bold');
 
   const [value, setValue] = useState(field.value || null);
   const timerRef = useRef(null);

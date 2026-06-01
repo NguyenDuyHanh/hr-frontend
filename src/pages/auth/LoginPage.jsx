@@ -10,7 +10,7 @@ import {
   VisibilityOff,
   Shield
 } from '@mui/icons-material';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import useAuthStore from '../../store/useAuthStore';
 import UiTextField from '../../components/ui/UiTextField';
 import UiCheckBox from '../../components/ui/UiCheckBox';
