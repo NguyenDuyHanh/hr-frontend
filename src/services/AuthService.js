@@ -2,7 +2,7 @@ import axios from './HttpService';
 import axiosDirect from 'axios';
 import ConstantList from '../appConfig';
 
-const API_PATH = ConstantList.API_ENPOINT + '/api/auth';
+const API_PATH = ConstantList.API_ENPOINT + '/auth';
 
 /**
  * AuthService - Quản lý các cuộc gọi API liên quan đến Xác thực

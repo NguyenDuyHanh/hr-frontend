@@ -48,7 +48,7 @@ const AiChatbotWidget = () => {
 
   // Configure useChat hook natively
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
-    api: ConstantList.API_ENPOINT + '/api/chat',
+    api: ConstantList.API_ENPOINT + '/chat',
     body: { apiKey, model }
   });
 

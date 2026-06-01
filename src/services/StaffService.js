@@ -1,7 +1,7 @@
 import axios from './HttpService';
 import ConstantList from '../appConfig';
 
-const API_PATH = ConstantList.API_ENPOINT + '/api/staffs';
+const API_PATH = ConstantList.API_ENPOINT + '/staffs';
 
 export const getStaffs = async () => {
     const response = await axios.get(API_PATH);
