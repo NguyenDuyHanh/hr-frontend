@@ -70,7 +70,6 @@ const MyAutocomplete = React.forwardRef(({
   placeholder = "",
   ...otherProps
 }, ref) => {
-  console.log(`%c[Render] UiAutocomplete: ${name}`, 'color: #f59e0b; font-weight: bold');
 
   const [open, setOpen] = useState(false);
 

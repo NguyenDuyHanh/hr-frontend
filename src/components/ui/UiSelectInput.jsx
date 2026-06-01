@@ -76,7 +76,6 @@ const MySelectInput = React.forwardRef(({
   meta,
   ...otherProps
 }, ref) => {
-  console.log(`%c[Render] UiSelectInput: ${name}`, 'color: #8b5cf6; font-weight: bold');
 
   const handleChange = (evt) => {
     if (readOnly) return;
