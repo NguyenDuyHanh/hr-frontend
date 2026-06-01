@@ -9,8 +9,8 @@ export const getSystemConfig = (key) => {
 };
 
 const ConstantList = {
-    ROOT_PATH: window.Configs?.ROOT_PATH || APPLICATION_PATH,
-    API_ENPOINT: window.Configs?.API_ENPOINT || "http://localhost:8080",
+    ROOT_PATH: import.meta.env.VITE_ROOT_PATH || APPLICATION_PATH,
+    API_ENPOINT: import.meta.env.VITE_API_ENDPOINT || "http://localhost:8080",
 };
 
 export default ConstantList;

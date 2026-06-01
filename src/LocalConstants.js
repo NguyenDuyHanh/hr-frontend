@@ -1,8 +1,3 @@
-export const SystemConfigCode = {
-    // Standard system configuration codes
-    API_ENPOINT: "API_ENPOINT",
-    AUTH_MODE: "AUTH_MODE",
-};
 
 export const WorkingStatusOptions = [
     { value: 1, name: 'Chờ nhận việc' },
@@ -16,7 +11,6 @@ export const WorkingStatusOptions = [
 ];
 
 const LocalConstants = {
-    SystemConfigCode,
     WorkingStatusOptions
 };
 
