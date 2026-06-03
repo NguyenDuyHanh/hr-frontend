@@ -10,7 +10,7 @@ const Breadcrumb = () => {
 
   return (
     <div className="flex items-center justify-between h-15 py-4 bg-transparent">
-      <div className="text-[18px] text-[#555] uppercase font-normal">
+      <div className="text-[18px] text-primary uppercase font-normal">
         {displayTitle}
       </div>
 
@@ -20,11 +20,11 @@ const Breadcrumb = () => {
           routeSegments.map((route, index) => (
             <Fragment key={index}>
               {index > 0 && (
-                <span className="flex items-center text-[#ccc] mx-1">
+                <span className="flex items-center text-muted-foreground/40 mx-1">
                   <ChevronRightIcon style={{ fontSize: "16px" }} />
                 </span>
               )}
-              <span className={`font-normal ${index === 0 ? "text-[#333]" : "text-primary"}`}>
+              <span className={`font-normal ${index === 0 ? "text-primary" : "text-primary"}`}>
                 {route.name}
               </span>
             </Fragment>

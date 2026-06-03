@@ -65,7 +65,7 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
 
     const action = (
         <>
-            <Button onClick={onClose} variant="outlined" color="inherit" sx={{ textTransform: 'none' }}>Hủy bỏ</Button>
+            <Button onClick={onClose} variant="outlined" color="inherit" sx={{ color: 'text.secondary', textTransform: 'none' }}>Hủy bỏ</Button>
             <Button onClick={formik.handleSubmit} color="primary" variant="contained" sx={{ textTransform: 'none', px: 4, ml: 1 }}>Lưu lại</Button>
         </>
     );
@@ -91,7 +91,7 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
                         <UiTextField 
                             label="Mã nhân viên" 
                             name="staffCode" 
-                            disabled
+                            readOnly
                             required
                         />
                     </Grid>

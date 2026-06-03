@@ -119,10 +119,6 @@ const UiConfirmationDialog = React.forwardRef(({
             fontWeight: 600,
             color: 'text.secondary',
             borderColor: 'divider',
-            '&:hover': {
-              bgcolor: 'grey.100',
-              borderColor: 'grey.400',
-            }
           }}
         >
           {cancel}
@@ -135,9 +131,6 @@ const UiConfirmationDialog = React.forwardRef(({
             textTransform: 'none',
             fontWeight: 600,
             boxShadow: 'none',
-            '&:hover': {
-              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-            }
           }}
         >
           {agree}

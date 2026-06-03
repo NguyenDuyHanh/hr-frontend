@@ -144,14 +144,16 @@ const MyTextField = React.forwardRef(({
 
   const sxMemo = useMemo(() => ({
     '& .MuiInputBase-root': {
-      backgroundColor: readOnly ? '#f5f5f5 !important' : 'inherit',
+      backgroundColor: (theme) => readOnly 
+        ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') 
+        : 'inherit',
       transition: 'all 0.2s ease-in-out',
       '&.Mui-disabled': {
-        color: 'rgba(0, 0, 0, 0.87) !important',
-        WebkitTextFillColor: 'rgba(0, 0, 0, 0.87) !important',
+        color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.87) !important' : 'rgba(255, 255, 255, 0.38) !important',
+        WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.87) !important' : 'rgba(255, 255, 255, 0.38) !important',
         '& .MuiInputBase-input': {
-          color: 'rgba(0, 0, 0, 0.87) !important',
-          WebkitTextFillColor: 'rgba(0, 0, 0, 0.87) !important',
+          color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.87) !important' : 'rgba(255, 255, 255, 0.38) !important',
+          WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.87) !important' : 'rgba(255, 255, 255, 0.38) !important',
         }
       },
       '&.Mui-error .MuiOutlinedInput-notchedOutline': {
@@ -161,28 +163,32 @@ const MyTextField = React.forwardRef(({
         borderColor: '#9ca3af !important',
       },
       '&.Mui-error.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#1976d2 !important',
+        borderColor: (theme) => theme.palette.primary.main + ' !important',
       },
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#d1d5db',
+        borderColor: (theme) => theme.palette.mode === 'light' ? '#d1d5db' : 'rgba(255, 255, 255, 0.15)',
         transition: 'border-color 0.2s shadow 0.2s',
       },
       '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#9ca3af',
+        borderColor: (theme) => theme.palette.mode === 'light' ? '#9ca3af' : 'rgba(255, 255, 255, 0.3)',
       },
       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#1976d2',
+        borderColor: (theme) => theme.palette.primary.main,
       },
       ...(multiline || isTextArea ? {
         height: 'unset !important',
         padding: '10px !important'
       } : {}),
       '&:hover': {
-        backgroundColor: readOnly ? '#f5f5f5 !important' : '#ffffff',
+        backgroundColor: (theme) => readOnly 
+          ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') 
+          : (theme.palette.mode === 'light' ? '#ffffff' : 'inherit'),
       },
       '&.Mui-focused': {
-        backgroundColor: '#ffffff',
-        boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+        backgroundColor: (theme) => theme.palette.mode === 'light' ? '#ffffff' : 'rgba(255, 255, 255, 0.02)',
+        boxShadow: (theme) => theme.palette.mode === 'light'
+          ? '0 0 0 2px rgba(25, 118, 210, 0.1)'
+          : `0 0 0 2px ${theme.palette.primary.main}26`,
       }
     },
     '& .MuiFormHelperText-root': {

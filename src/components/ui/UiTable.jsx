@@ -14,15 +14,18 @@ import PropTypes from "prop-types";
 
 const TableWrapper = styled(Box)(({ theme }) => ({
   width: "100%",
-  "& .MuiTableCell-root": {
+  "& td, & th": {
     border: "1px solid hsl(var(--border))",
     padding: "4px 8px",
     fontSize: "13px",
   },
-  "& .MuiTableHead-root .MuiTableCell-root": {
+  "& tbody td": {
+    color: "hsl(var(--foreground) / 0.8) !important",
+  },
+  "& thead th": {
     fontWeight: "600",
-    color: "hsl(var(--foreground))",
-    backgroundColor: "hsl(var(--muted))",
+    color: "hsl(var(--foreground)) !important",
+    backgroundColor: "hsl(var(--muted)) !important",
     textAlign: "center",
   },
   "& .MuiPaper-root": {
@@ -268,6 +271,7 @@ function UiTable(props) {
           maxBodyHeight: maxHeight || "unset",
           cellStyle: {
             fontSize: "14px",
+            color: "hsl(var(--foreground) / 0.75)",
           },
           headerStyle: {
             padding: "8px",

@@ -70,7 +70,9 @@ function UiPopup({
             sx={{ 
               cursor: "move", 
               bgcolor: "primary.main", 
-              color: "white",
+              color: "primary.contrastText",
+              borderBottom: (theme) => theme.palette.mode === 'light' ? 'none' : '1px solid',
+              borderColor: 'divider',
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",

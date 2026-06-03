@@ -229,7 +229,6 @@ const StaffList = () => {
                                 variant="outlined" 
                                 size="small" 
                                 startIcon={<FilterListIcon />} 
-                                sx={{ textTransform: 'none', color: '#333', borderColor: '#ccc', height: '32px', whiteSpace: 'nowrap' }}
                             >
                                 Bộ lọc
                             </Button>

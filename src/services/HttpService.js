@@ -14,8 +14,15 @@ HttpService.interceptors.request.use(
     (config) => {
         useUiStore.getState().startLoading();
         const token = useAuthStore.getState().accessToken;
+        
+        // Don't send Authorization header for login and refresh endpoints
+        const isAuthUrl = config.url && (
+            config.url.includes('/api/auth/login') ||
+            config.url.includes('/api/auth/refresh')
+        );
+
         console.log(`[HttpService Request] URL: ${config.url}, HasToken: ${!!token}, Token: ${token ? token.substring(0, 15) + '...' : 'none'}`);
-        if (token) {
+        if (token && !isAuthUrl) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
         return config;

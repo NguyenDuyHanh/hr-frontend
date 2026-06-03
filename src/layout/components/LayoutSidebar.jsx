@@ -74,7 +74,7 @@ const SubSidebarItem = memo(({ child }) => {
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center justify-between pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border transition-[background-color,color] duration-150 ${
           hasActiveSubChild 
-            ? "bg-sidebar-accent/60 text-sidebar-accent-foreground font-semibold" 
+            ? "bg-sidebar-accent/60 text-sidebar-accent-foreground" 
             : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
         }`}
       >
@@ -97,7 +97,7 @@ const SubSidebarItem = memo(({ child }) => {
                 className={({ isActive }) =>
                   `flex items-center pl-16 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border/50 no-underline transition-[background-color,color] duration-150 
                   ${isActive 
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold" 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                     : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/30 hover:text-sidebar-accent-foreground"}`
                 }
               >
@@ -208,7 +208,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
                       className={({ isActive }) =>
                         `flex items-center pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border no-underline transition-[background-color,color] duration-150 
                         ${isActive 
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold" 
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                           : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
                       }
                     >
@@ -238,7 +238,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
               className={({ isActive }) =>
                 `flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline transition-[background-color,color] duration-150
                 ${isActive 
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold shadow-sm" 
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
                   : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
               }
             >

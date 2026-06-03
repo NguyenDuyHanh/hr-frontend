@@ -5,57 +5,79 @@
 @layer base {
   :root {
     /* Brand Colors - Material UI (MUI) Premium Blue (Light Mode) */
-    --primary: 210 79% 46%;            /* MUI Classical Blue #1976d2 */
-    --primary-light: 210 79% 56%;      /* #42a5f5 */
-    --primary-dark: 210 79% 38%;       /* #1565c0 */
-    --primary-glow: 210 79% 85%;       /* Light Blue Glow */
-    --primary-foreground: 0 0% 100%;   /* White text on primary */
+    --primary: 210 79% 46%;
+    /* MUI Classical Blue #1976d2 */
+    --primary-light: 210 79% 56%;
+    /* #42a5f5 */
+    --primary-dark: 210 79% 38%;
+    /* #1565c0 */
+    --primary-glow: 210 79% 85%;
+    /* Light Blue Glow */
+    --primary-foreground: 0 0% 100%;
+    /* White text on primary */
 
-    --secondary: 8 70% 50%;            /* Vibrant Coral/Orange-Red */
+    --secondary: 8 70% 50%;
+    /* Vibrant Coral/Orange-Red */
     --secondary-hover: 8 70% 42%;
     --secondary-foreground: 0 0% 100%;
 
     /* Layout Colors - MUI Light Mode */
-    --background: 210 20% 99%;         /* Extremely clean off-white #f8fafc */
-    --foreground: 210 20% 13%;         /* MUI Dark Slate Text #1A2027 */
-    
-    --card: 0 0% 100%;                 /* Pure White #ffffff */
+    --background: 210 20% 99%;
+    /* Extremely clean off-white #f8fafc */
+    --foreground: 210 20% 13%;
+    /* MUI Dark Slate Text #1A2027 */
+
+    --card: 0 0% 100%;
+    /* Pure White #ffffff */
     --card-foreground: 210 20% 13%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 210 20% 13%;
 
-    --muted: 210 20% 96%;              /* Soft Gray-Blue #f3f6f9 */
-    --muted-foreground: 210 13% 46%;   /* Slate Muted Text #5f6c7d */
+    --muted: 210 20% 96%;
+    /* Soft Gray-Blue #f3f6f9 */
+    --muted-foreground: 210 13% 46%;
+    /* Slate Muted Text #5f6c7d */
 
-    --accent: 195 100% 40%;            /* Vibrant Cyan Accent */
+    --accent: 195 100% 40%;
+    /* Vibrant Cyan Accent */
     --accent-foreground: 0 0% 100%;
 
     /* Warnings, Info & Statuses */
-    --warning: 38 95% 50%;             /* MUI Warning Orange */
+    --warning: 38 95% 50%;
+    /* MUI Warning Orange */
     --warning-foreground: 0 0% 100%;
 
-    --info: 200 95% 48%;               /* MUI Info Blue */
+    --info: 200 95% 48%;
+    /* MUI Info Blue */
     --info-foreground: 0 0% 100%;
 
-    --destructive: 354 70% 50%;        /* MUI Error Red */
+    --destructive: 354 70% 50%;
+    /* MUI Error Red */
     --destructive-foreground: 0 0% 100%;
 
-    --online: 142 70% 45%;             /* MUI Success Green */
+    --online: 142 70% 45%;
+    /* MUI Success Green */
     --offline: 0 0% 70%;
 
     /* Borders & Inputs */
-    --border: 215 15% 92%;            /* Soft Blue-Gray Border #e5eaf2 */
+    --border: 215 15% 92%;
+    /* Soft Blue-Gray Border #e5eaf2 */
     --input: 218 30% 92%;
-    --ring: 210 79% 46%;              /* MUI Classical Blue */
+    --ring: 210 79% 46%;
+    /* MUI Classical Blue */
 
     /* Sidebar Theme - Clean Light Sidebar */
-    --sidebar-background: 0 0% 100%;   /* Pure White */
-    --sidebar-foreground: 210 20% 13%;  /* Dark Slate */
+    --sidebar-background: 0 0% 100%;
+    /* Pure White */
+    --sidebar-foreground: 210 20% 13%;
+    /* Dark Slate */
     --sidebar-primary: 210 79% 46%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 100% 96%;    /* Soft Light Blue active bg #ecf4fc */
-    --sidebar-accent-foreground: 210 79% 38%; /* Primary Dark Blue active text */
+    --sidebar-accent: 210 100% 96%;
+    /* Soft Light Blue active bg #ecf4fc */
+    --sidebar-accent-foreground: 210 79% 38%;
+    /* Primary Dark Blue active text */
     --sidebar-border: 215 15% 92%;
     --sidebar-ring: 210 79% 90%;
 
@@ -63,26 +85,18 @@
     --radius: 0.5rem;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary-light))
-    );
-    --gradient-accent: linear-gradient(
-      90deg,
-      hsl(var(--accent)),
-      hsl(195, 100% , 60%)
-    );
-    --gradient-glass: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.8) 0%,
-      rgba(255, 255, 255, 0.4) 100%
-    );
-    --gradient-purple: radial-gradient(
-      125% 125% at 50% 10%,
-      hsla(0, 0%, 100%, 1) 40%,
-      hsla(210, 100%, 50%, 0.08) 100%
-    );
+    --gradient-primary: linear-gradient(135deg,
+        hsl(var(--primary)),
+        hsl(var(--primary-light)));
+    --gradient-accent: linear-gradient(90deg,
+        hsl(var(--accent)),
+        hsl(195, 100%, 60%));
+    --gradient-glass: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0.4) 100%);
+    --gradient-purple: radial-gradient(125% 125% at 50% 10%,
+        hsla(0, 0%, 100%, 1) 40%,
+        hsla(210, 100%, 50%, 0.08) 100%);
 
     /* Shadows (Matching MUI Soft Elevation) */
     --shadow-soft: 0 8px 32px -8px rgba(0, 127, 255, 0.12);
@@ -96,28 +110,37 @@
 
   .dark {
     /* Brand Colors - MUI Dark Mode Neon Blue */
-    --primary: 210 100% 70%;            /* Vibrant Neon Blue #66b3ff */
+    --primary: 210 100% 70%;
+    /* Vibrant Neon Blue #66b3ff */
     --primary-light: 210 100% 80%;
     --primary-dark: 210 100% 50%;
     --primary-glow: 210 100% 85%;
-    --primary-foreground: 210 20% 13%;  /* Dark Slate on active/bright item */
+    --primary-foreground: 210 20% 13%;
+    /* Dark Slate on active/bright item */
 
-    --secondary: 8 80% 65%;            /* Neon Red-Orange */
+    --secondary: 8 80% 65%;
+    /* Neon Red-Orange */
     --secondary-hover: 8 80% 75%;
     --secondary-foreground: 0 0% 100%;
 
     /* Layout Colors - MUI Charcoal Dark Mode */
-    --background: 210 11% 7% / 0.8;    /* Deep Dark Charcoal hsl(210, 11%, 7% / 0.8) */
-    --foreground: 210 40% 98%;         /* Clean white-blue #f8fafc */
+    --background: 204 14% 6.86% / 0.8;
+    /* Deep Dark Charcoal #0F1214CC */
+    --foreground: 210 40% 98%;
+    /* Clean white-blue #f8fafc */
 
-    --card: 210 14% 11%;               /* Lighter Charcoal Background #181c20 */
+    --card: 204 14% 6.86% / 0.8;
+    /* Deep Dark Charcoal #0F1214CC */
     --card-foreground: 210 40% 98%;
 
-    --popover: 210 14% 11%;
+    --popover: 210 14% 14%;
+    /* Solid Charcoal #1f2327 for menus/popups */
     --popover-foreground: 210 40% 98%;
 
-    --muted: 210 14% 15%;              /* Muted Charcoal #21262d */
-    --muted-foreground: 215 16% 65%;   /* Slate Gray-Blue #94a3b8 */
+    --muted: 210 14% 15%;
+    /* Muted Charcoal #21262d */
+    --muted-foreground: 215 16% 65%;
+    /* Slate Gray-Blue #94a3b8 */
 
     --accent: 195 100% 45%;
     --accent-foreground: 210 20% 13%;
@@ -130,41 +153,38 @@
     --offline: 0 0% 50%;
 
     /* Borders & Inputs */
-    --border: 210 14% 28% / 0.3;           /* Dark Navy Border #173a5e */
+    --border: 210 14% 28% / 0.3;
+    /* Dark Navy Border #173a5e */
     --input: 210 60% 23%;
     --ring: 210 100% 70%;
 
     /* Sidebar Theme - Dark Navy Sidebar */
-    --sidebar-background: 210 11% 7% / 0.8; /* Match deep dark charcoal with glass blur */
-    --sidebar-foreground: 0 0% 100%;   /* Pure White */
+    --sidebar-background: 204 14% 6.86% / 0.8;
+    /* Match deep dark charcoal #0F1214CC with glass blur */
+    --sidebar-foreground: 0 0% 100%;
+    /* Pure White */
     --sidebar-primary: 210 100% 70%;
     --sidebar-primary-foreground: 210 20% 13%;
-    --sidebar-accent: 210 60% 19%;     /* Active Item Dark blue background #132f4c */
-    --sidebar-accent-foreground: 210 100% 70%; /* Active Item Neon Blue Text #66b3ff */
+    --sidebar-accent: 213 13% 13%;
+    /* Active Item Background #1D2126 */
+    --sidebar-accent-foreground: 210 100% 70%;
+    /* Active Item Neon Blue Text #66b3ff */
     --sidebar-border: 210 14% 28% / 0.3;
     --sidebar-ring: 210 100% 85%;
 
     /* Dark Mode Gradients */
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary-light))
-    );
-    --gradient-accent: linear-gradient(
-      90deg,
-      hsl(var(--accent)),
-      hsl(195, 100%, 65%)
-    );
-    --gradient-glass: linear-gradient(
-      135deg,
-      rgba(10, 25, 47, 0.85) 0%,
-      rgba(0, 30, 60, 0.6) 100%
-    );
-    --gradient-purple: radial-gradient(
-      125% 125% at 50% 10%,
-      hsla(216, 65%, 11%, 1) 40%,
-      hsla(210, 100%, 60%, 0.1) 100%
-    );
+    --gradient-primary: linear-gradient(135deg,
+        hsl(var(--primary)),
+        hsl(var(--primary-light)));
+    --gradient-accent: linear-gradient(90deg,
+        hsl(var(--accent)),
+        hsl(195, 100%, 65%));
+    --gradient-glass: linear-gradient(135deg,
+        rgba(10, 25, 47, 0.85) 0%,
+        rgba(0, 30, 60, 0.6) 100%);
+    --gradient-purple: radial-gradient(125% 125% at 50% 10%,
+        hsla(216, 65%, 11%, 1) 40%,
+        hsla(210, 100%, 60%, 0.1) 100%);
 
     /* Shadows */
     --shadow-soft: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
@@ -180,9 +200,14 @@
     -moz-osx-font-smoothing: grayscale;
     transition: color 0.2s ease, background-color 0.2s ease;
   }
+
+  .dark body {
+    background-color: #0f1214;
+  }
 }
 
 @layer components {
+
   /* Glassmorphism Styles using standard CSS declarations to avoid build quirks */
   .glass {
     backdrop-filter: blur(12px);
@@ -267,6 +292,7 @@
       opacity: 0;
       transform: translateY(20px) scale(0.95);
     }
+
     100% {
       opacity: 1;
       transform: translateY(0) scale(1);
@@ -308,6 +334,7 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

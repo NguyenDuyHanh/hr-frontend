@@ -15,8 +15,8 @@ export const getDesignTokens = (mode) => ({
       contrastText: '#fff',
     },
     background: {
-      default: mode === 'light' ? '#f8fafc' : '#0F1214', // MUI light and deep dark charcoal #0F1214
-      paper: mode === 'light' ? '#ffffff' : '#181C20',   // Lighter charcoal card background
+      default: mode === 'light' ? '#f8fafc' : '#0F1214CC', // MUI light and deep dark charcoal #0F1214CC
+      paper: mode === 'light' ? '#ffffff' : '#0F1214CC',   // Lighter charcoal card background
     },
     text: {
       primary: mode === 'light' ? '#1A2027' : '#f8fafc',
@@ -58,7 +58,7 @@ export const getDesignTokens = (mode) => ({
             borderBottom: 0,
           },
           '&:before': { display: 'none' },
-          backgroundColor: mode === 'light' ? '#ffffff' : '#001e3c',
+          backgroundColor: mode === 'light' ? '#ffffff' : '#0F1214CC',
         },
       },
     },
@@ -76,6 +76,51 @@ export const getDesignTokens = (mode) => ({
       styleOverrides: {
         root: {
           borderColor: mode === 'light' ? '#e5eaf2' : '#173a5e',
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: mode === 'light' ? '#ffffff' : '#16191c',
+          backgroundImage: 'none',
+          border: mode === 'light' ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+        },
+      },
+    },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: mode === 'light' ? '#ffffff' : '#1f2327',
+          backgroundImage: 'none',
+          border: mode === 'light' ? '1px solid #e5eaf2' : '1px solid rgba(255, 255, 255, 0.08)',
+        },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: mode === 'light' ? '#ffffff' : '#1f2327',
+          backgroundImage: 'none',
+          border: mode === 'light' ? '1px solid #e5eaf2' : '1px solid rgba(255, 255, 255, 0.08)',
+        },
+      },
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: mode === 'light' ? '#ffffff' : '#1f2327',
+          backgroundImage: 'none',
+          border: mode === 'light' ? '1px solid #e5eaf2' : '1px solid rgba(255, 255, 255, 0.08)',
+        },
+      },
+    },
+    MuiPickersPopper: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: mode === 'light' ? '#ffffff' : '#1f2327',
+          backgroundImage: 'none',
+          border: mode === 'light' ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
         },
       },
     },
