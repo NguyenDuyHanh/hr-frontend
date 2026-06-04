@@ -349,3 +349,12 @@
 #nprogress .peg {
   box-shadow: none !important;
 }
+
+/* Custom styles for label colors to support dark mode inside MUI Dialog/Portals where Tailwind utility classes are ignored due to important: '#root' */
+label, .label-container, .old-label {
+  color: #374151 !important; /* text-gray-700 */
+}
+
+.dark label, .dark .label-container, .dark .old-label {
+  color: #9ca3af !important; /* text-gray-400 */
+}

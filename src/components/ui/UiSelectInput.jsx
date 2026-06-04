@@ -146,7 +146,7 @@ const MySelectInput = React.forwardRef(({
       {label && (
         <label 
           htmlFor={name} 
-          className={`block text-sm font-semibold mb-1.5 text-gray-700 ${oldStyle ? 'text-xs' : ''}`}
+          className={`block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-400 ${oldStyle ? 'text-xs' : ''}`}
         >
           {label} {(validate || required) && <span style={{ color: 'red' }} className="font-bold ml-1">*</span>}
         </label>

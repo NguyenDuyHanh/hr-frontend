@@ -56,7 +56,6 @@ const useStaffStore = create((set, get) => ({
     modifyStaff: async (id, staff) => {
         try {
             await saveStaff({ ...staff, id });
-            get().loadStaffs();
             set({ openForm: false });
         } catch (error) {
             console.error('Error modifying staff:', error);

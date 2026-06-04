@@ -41,8 +41,10 @@ const UiAvatar = React.forwardRef(({ name, imgPath, isFile, style, className }, 
         ...style
     };
 
+    const isExternalUrl = imgPath && (imgPath.startsWith('http://') || imgPath.startsWith('https://'));
+
     if (imgPath && !errorLinkImg) {
-        if (isFile) {
+        if (isFile || isExternalUrl) {
             return (
                 <img 
                     ref={ref}
