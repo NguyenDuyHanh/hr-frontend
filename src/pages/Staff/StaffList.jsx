@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Grid, IconButton, TextField, Paper } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,6 +19,7 @@ import { WorkingStatusOptions } from '../../LocalConstants';
 import { getLabelFromOptions } from '../../LocalFunction';
 
 const StaffList = () => {
+    const navigate = useNavigate();
     const [openConfirm, setOpenConfirm] = useState(false);
 
     const { 
@@ -46,9 +48,12 @@ const StaffList = () => {
         setOpenForm(true);
     };
 
+    const handleView = (staff) => {
+        navigate(`/staff/${staff.id}`, { state: { isView: true } });
+    };
+
     const handleEdit = (staff) => {
-        setSelectedStaff(staff);
-        setOpenForm(true);
+        navigate(`/staff/${staff.id}`, { state: { isEdit: true } });
     };
 
     const handleDelete = (staff) => {
@@ -71,7 +76,7 @@ const StaffList = () => {
             width: 140,
             render: (rowData) => (
                 <div className="flex items-center space-x-0">
-                    <IconButton size="small" sx={{ color: '#1976d2' }}><VisibilityIcon fontSize="small" /></IconButton>
+                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleView(rowData)}><VisibilityIcon fontSize="small" /></IconButton>
                     <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)}><EditIcon fontSize="small" /></IconButton>
                     <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)}><DeleteIcon fontSize="small" /></IconButton>
                     <IconButton size="small"><MoreHorizIcon fontSize="small" /></IconButton>

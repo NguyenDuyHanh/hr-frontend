@@ -9,12 +9,14 @@ import AuthGuard from "./components/auth/AuthGuard";
 import { navigations } from "./navigationConfig";
 import StaffList from "./pages/Staff/StaffList";
 import UserList from "./pages/User/UserList";
+import StaffDetailPage from "./pages/Staff/StaffDetailPage";
 import useUiStore from "./store/uiStore";
 import UiLoading from "./components/ui/UiLoading";
 import GlobalLoadingHandler from "./components/common/GlobalLoadingHandler";
 import AiChatbotWidget from "./components/ui/AiChatbotWidget";
 import LoginPage from "./pages/auth/LoginPage";
 import { setNavigate } from "./navigation";
+import { ROLES } from "./constants/roles";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -96,6 +98,16 @@ function App() {
               } 
             />
           ))}
+
+          {/* Route chi tiết nhân viên (Staff Detail/Edit) */}
+          <Route 
+            path="/staff/:id" 
+            element={
+              <AuthGuard roles={[ROLES.ADMIN, ROLES.HR_MANAGER, ROLES.HR_STAFF_VIEW]}>
+                <StaffDetailPage />
+              </AuthGuard>
+            } 
+          />
 
           {/* Route Test không cần auth */}
           <Route path="/test" element={<TestComponents />} />

@@ -58,7 +58,7 @@ function UiSearchInput({ search }) {
           placeholder={t("general.enterSearch")}
           className="
             flex-1 bg-transparent outline-none border-none
-            text-gray-700 text-sm ml-3
+            text-gray-700 dark:text-gray-200 text-sm ml-3
             placeholder-gray-400
           "
         />
