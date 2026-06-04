@@ -45,7 +45,6 @@ function UiSearchInput({ search }) {
         <SearchIcon
           className="
             text-gray-400 group-hover:text-blue-500
-            transition-colors duration-200
           "
           fontSize="small"
         />
@@ -66,7 +65,7 @@ function UiSearchInput({ search }) {
         {/* Button */}
         <IconButton
           onClick={handleSearch}
-          className="!text-gray-500 hover:!text-blue-600 transition-colors ml-1"
+          className="!text-gray-500 hover:!text-blue-600 ml-1"
           size="small"
         >
           <SearchIcon fontSize="small" />

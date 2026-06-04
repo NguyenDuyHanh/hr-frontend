@@ -6,22 +6,13 @@ const useThemeStore = create((set) => ({
     const newMode = state.mode === 'light' ? 'dark' : 'light';
     localStorage.setItem('theme-mode', newMode);
     
-    // Đồng bộ class "dark" cho Tailwind CSS
-    if (newMode === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', newMode === 'dark');
     
     return { mode: newMode };
   }),
   setMode: (mode) => set(() => {
     localStorage.setItem('theme-mode', mode);
-    if (mode === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', mode === 'dark');
     return { mode };
   })
 }));

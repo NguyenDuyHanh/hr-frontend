@@ -63,10 +63,10 @@ const LayoutHeader = () => {
   };
 
   return (
-    <div className='bg-card h-[48px] flex items-center justify-between px-4 text-foreground border-b border-border shadow-sm transition-[background-color,color] duration-200'>
+    <div className='bg-card h-[48px] flex items-center justify-between px-4 text-foreground border-b border-border shadow-sm'>
       {/* Left side: Logo and Toggle */}
       <div className='flex items-center md:ml-10 space-x-6'>
-        <NavLink to="/dashboard" className='bg-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline hidden md:block shadow-sm transition-all duration-200 hover:opacity-95'>
+        <NavLink to="/dashboard" className='bg-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline hidden md:block shadow-sm hover:opacity-95'>
           H R M
         </NavLink>
  
@@ -81,23 +81,23 @@ const LayoutHeader = () => {
  
       {/* Right side: Actions */}
       <div className='flex items-center space-x-4'>
-        <div className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer transition-[background-color,color] border border-border'>
+        <div className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'>
           <MailOutlineIcon sx={{ fontSize: '18px' }} />
         </div>
  
-        <div className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer relative transition-[background-color,color] border border-border'>
+        <div className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer relative border border-border'>
           <NotificationsNoneIcon sx={{ fontSize: '18px' }} />
           <span className='absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-card'></span>
         </div>
  
-        <div className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer transition-[background-color,color] border border-border'>
+        <div className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'>
           <AppsIcon sx={{ fontSize: '18px' }} />
         </div>
  
         {/* Nút bật/tắt chế độ Sáng/Tối phong cách MUI */}
         <div 
           onClick={toggleTheme}
-          className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer transition-[background-color,color] border border-border'
+          className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'
           title={mode === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
         >
           {mode === 'light' ? <DarkModeIcon sx={{ fontSize: '18px' }} /> : <LightModeIcon sx={{ fontSize: '18px' }} />}
@@ -106,7 +106,7 @@ const LayoutHeader = () => {
         {/* Avatar Trigger with dynamic initials */}
         <div 
           onClick={handleAvatarClick}
-          className='w-8 h-8 rounded-full bg-primary text-primary-foreground hover:opacity-90 active:scale-95 flex items-center justify-center text-[12px] border border-border cursor-pointer font-bold ml-2 transition-all duration-200 shadow-sm'
+          className='w-8 h-8 rounded-full bg-primary text-primary-foreground hover:opacity-90 active:scale-95 flex items-center justify-center text-[12px] border border-border cursor-pointer font-bold ml-2 shadow-sm'
         >
           {getInitials(user?.fullName || user?.username)}
         </div>

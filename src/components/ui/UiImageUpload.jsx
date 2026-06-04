@@ -142,7 +142,7 @@ const MyImageUpload = React.forwardRef(({
                     borderRadius: '8px',
                     padding: '16px',
                     backgroundColor: (theme) => theme.palette.mode === 'light' ? '#fafafa' : 'rgba(255,255,255,0.02)',
-                    transition: 'all 0.2s ease-in-out',
+                    // transition: 'all 0.2s ease-in-out',
                     '&:hover': {
                         borderColor: 'primary.main',
                         backgroundColor: (theme) => theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255,255,255,0.04)',
