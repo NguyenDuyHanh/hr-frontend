@@ -21,7 +21,7 @@ function TabAccordion({ children, title, component, className = "", open = true,
                 borderRadius: '6px !important',
                 overflow: 'hidden',
                 mb: 2,
-                transition: 'all 0.2s ease-in-out',
+                // transition: 'all 0.2s ease-in-out',
                 '&:before': {
                     display: 'none',
                 },
