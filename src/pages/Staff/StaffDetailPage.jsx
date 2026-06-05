@@ -10,7 +10,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import { toast } from 'sonner';
 
 import TabComponent from '../../components/ui/Tab/TabComponent';
-import StaffGeneralInfoForm from './StaffGeneralInfoForm';
+import StaffGeneralInfoForm from './components/StaffTabs/StaffGeneralInfoForm';
 import { getStaffById } from '../../services/StaffService';
 
 const StaffDetailPage = () => {
