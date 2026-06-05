@@ -72,7 +72,7 @@ const SubSidebarItem = memo(({ child }) => {
     <li>
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border transition-[background-color,color] duration-150 ${
+        className={`flex items-center justify-between pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border ${
           hasActiveSubChild 
             ? "bg-sidebar-accent/60 text-sidebar-accent-foreground" 
             : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
@@ -95,7 +95,7 @@ const SubSidebarItem = memo(({ child }) => {
               <NavLink
                 to={subChild.path}
                 className={({ isActive }) =>
-                  `flex items-center pl-16 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border/50 no-underline transition-[background-color,color] duration-150 
+                  `flex items-center pl-16 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border/50 no-underline 
                   ${isActive 
                     ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                     : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/30 hover:text-sidebar-accent-foreground"}`
@@ -127,7 +127,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
     const itemContent = item.children && item.children.length > 0 ? (
       <div
         onClick={onExpandSidebar}
-        className={`flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border transition-[background-color,color] duration-150 ${
+        className={`flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border ${
           hasActiveChild 
             ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
             : "text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
@@ -140,7 +140,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
         href={item.path}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border no-underline text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground transition-[background-color,color] duration-150"
+        className="flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border no-underline text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
       >
         <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
       </a>
@@ -148,7 +148,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
       <NavLink
         to={item.path}
         className={({ isActive }) =>
-          `flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border no-underline transition-[background-color,color] duration-150
+          `flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border no-underline
           ${isActive 
             ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
             : "text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
@@ -206,7 +206,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
                     <NavLink
                       to={child.path}
                       className={({ isActive }) =>
-                        `flex items-center pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border no-underline transition-[background-color,color] duration-150 
+                        `flex items-center pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border no-underline 
                         ${isActive 
                           ? "bg-sidebar-accent text-sidebar-accent-foreground" 
                           : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
@@ -227,7 +227,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
               href={item.path}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground transition-[background-color,color] duration-150"
+              className="flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
             >
               <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
               <span className="flex-1 font-normal text-[14px]">{item.name}</span>
@@ -236,7 +236,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
             <NavLink
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline transition-[background-color,color] duration-150
+                `flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline
                 ${isActive 
                   ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
                   : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
@@ -330,7 +330,7 @@ const LayoutSidebar = () => {
             ${isCollapsed ? "md:w-[50px] md:min-w-[50px]" : "md:w-[220px] md:min-w-[220px]"}
             w-[240px] min-w-[240px] md:w-full md:min-w-full`}
         >
-          <div className="h-full text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-[background-color,color] duration-200">
+          <div className="h-full text-sidebar-foreground border-r border-sidebar-border flex flex-col">
             {/* Mobile Header Logo inside Sidebar */}
             <div className="h-[48px] flex items-center justify-between px-4 bg-card border-b border-sidebar-border md:hidden">
               <NavLink to="/dashboard" className='bg-gradient-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline'>

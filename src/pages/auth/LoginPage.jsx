@@ -8,18 +8,21 @@ import {
   LockOutlined,
   Visibility,
   VisibilityOff,
-  Shield
+  Shield,
+  LightMode,
+  DarkMode
 } from '@mui/icons-material';
 import { toast } from 'sonner';
 import useAuthStore from '../../store/useAuthStore';
+import useThemeStore from '../../store/themeStore';
 import UiTextField from '../../components/ui/UiTextField';
 import UiCheckBox from '../../components/ui/UiCheckBox';
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
   const { login } = useAuthStore();
+  const { mode, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -68,25 +71,37 @@ const LoginPage = () => {
   });
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-slate-50 overflow-hidden font-sans">
+    <div className="relative min-h-screen flex items-center justify-center bg-background text-foreground overflow-hidden font-sans">
+      {/* Floating Theme Toggle */}
+      {/* <div className="absolute top-4 right-4 z-50">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-2.5 rounded-full bg-card/80 backdrop-blur-md border border-border text-primary shadow-md hover:shadow-lg focus:outline-none transition-all active:scale-95 cursor-pointer flex items-center justify-center"
+          title={mode === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
+        >
+          {mode === 'light' ? <DarkMode className="text-[18px]" /> : <LightMode className="text-[18px]" />}
+        </button>
+      </div> */}
+
       {/* Visual background ambient glow circles */}
-      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-blue-100 blur-[150px] opacity-60 pointer-events-none"></div>
-      <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-100 blur-[150px] opacity-60 pointer-events-none"></div>
+      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-primary/10 dark:bg-primary/5 blur-[150px] opacity-60 pointer-events-none"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-accent/10 dark:bg-accent/5 blur-[150px] opacity-60 pointer-events-none"></div>
 
       <div className="w-full max-w-[480px] p-4 z-10">
         {/* Main premium login card container */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-slate-100 shadow-xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl">
+        <div className="bg-card/85 backdrop-blur-md rounded-2xl border border-border shadow-xl dark:shadow-primary/10 hover:dark:shadow-primary/20 transition-all duration-300 overflow-hidden flex flex-col">
 
           {/* Header image/brand section with circular shield badge */}
           <div className="pt-10 pb-4 flex flex-col items-center justify-center text-center px-6">
             <div className="w-16 h-16 rounded-2xl bg-gradient-primary shadow-lg shadow-primary/20 flex items-center justify-center text-primary-foreground mb-6 transform transition duration-500 hover:scale-105 hover:rotate-3">
               <Shield className="text-[32px]" />
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-800 mb-2">
-              Welcome Back
+            <h1 className="text-3xl font-extrabold tracking-tight text-foreground mb-2">
+              Đăng nhập
             </h1>
-            <p className="text-sm font-medium text-slate-500 max-w-[320px]">
-              Sign in to manage your human resources securely.
+            <p className="text-sm font-medium text-muted-foreground max-w-[320px]">
+              Đăng nhập để bắt đầu sử dụng hệ thống
             </p>
           </div>
 
@@ -141,21 +156,13 @@ const LoginPage = () => {
 
               {/* Checkbox and Forgot Password Link */}
               <div className="flex items-center justify-between text-sm py-2">
-                <div className="flex items-center">
-                  <UiCheckBox
-                    name="rememberMe"
-                    label="Remember Me"
-                    disabled={isLoading}
-                    alignCenter={false}
-                  />
-                </div>
                 <a
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     alert('Vui lòng liên hệ quản trị viên (admin@hrm.com) để khôi phục mật khẩu.');
                   }}
-                  className="font-bold text-blue-600 hover:text-blue-800 hover:underline text-[13px] transition-colors"
+                  className="font-bold text-primary hover:opacity-80 text-[13px] transition-colors"
                 >
                   Forgot Password?
                 </a>
@@ -174,7 +181,7 @@ const LoginPage = () => {
                     <span>Đang đăng nhập...</span>
                   </>
                 ) : (
-                  <span>Login</span>
+                  <span>Đăng nhập</span>
                 )}
               </Button>
             </form>
