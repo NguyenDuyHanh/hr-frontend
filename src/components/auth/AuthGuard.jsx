@@ -18,12 +18,13 @@ const AuthGuard = ({ children, roles }) => {
 
   // 2. Kiểm tra phân quyền (RBAC)
   if (roles && roles.length > 0) {
-    const hasPermission = roles.includes(user.role);
+    const userRoles = user.role || [];
+    const hasPermission = roles.some(r => userRoles.includes(r));
     
     if (!hasPermission) {
       // Nếu không có quyền, chuyển hướng về trang dashboard hoặc trang 403
       // Ở đây tạm thời về dashboard
-      console.warn(`User ${user.fullName} attempted unauthorized access to ${location.pathname}`);
+      console.warn(`User ${user.staffName || user.username} attempted unauthorized access to ${location.pathname}`);
       return <Navigate to="/dashboard" replace />;
     }
   }

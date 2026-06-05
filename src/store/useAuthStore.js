@@ -30,15 +30,10 @@ const useAuthStore = create(
               if (userResponse.data && userResponse.data.status === 200) {
                 const userData = userResponse.data.data;
                 const rolesList = userData.roles || [];
-                const primaryRole = rolesList.length > 0 ? rolesList[0].name : 'ROLE_EMPLOYEE';
                 
                 const userObj = {
-                  id: userData.id,
-                  username: userData.username,
-                  email: userData.email,
-                  fullName: userData.staffName || userData.username,
-                  role: primaryRole,
-                  staffId: userData.staffId
+                  ...userData,
+                  role: rolesList.map(r => r.name)
                 };
                 
                 set({ user: userObj });
@@ -69,15 +64,10 @@ const useAuthStore = create(
           if (userResponse.data && userResponse.data.status === 200) {
             const userData = userResponse.data.data;
             const rolesList = userData.roles || [];
-            const primaryRole = rolesList.length > 0 ? rolesList[0].name : 'ROLE_EMPLOYEE';
             
             const userObj = {
-              id: userData.id,
-              username: userData.username,
-              email: userData.email,
-              fullName: userData.staffName || userData.username,
-              role: primaryRole,
-              staffId: userData.staffId
+              ...userData,
+              role: rolesList.map(r => r.name)
             };
             
             set({ user: userObj });
@@ -106,9 +96,10 @@ const useAuthStore = create(
         if (!user) return false;
         if (!roles) return true; // Không yêu cầu role thì cho qua
         
+        const userRoles = user.role || [];
         return Array.isArray(roles)
-          ? roles.includes(user.role)
-          : user.role === roles;
+          ? roles.some(r => userRoles.includes(r))
+          : userRoles.includes(roles);
       },
     }),
     {

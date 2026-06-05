@@ -14,12 +14,13 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-import PersonIcon from '@mui/icons-material/Person'
-import SettingsIcon from '@mui/icons-material/Settings'
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline'
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import LogoutIcon from '@mui/icons-material/Logout'
 import useSidebarStore from '@/store/sidebarStore'
 import useAuthStore from '@/store/useAuthStore'
 import UiConfirmationDialog from '@/components/ui/UiConfirmationDialog'
+import UiAvatar from '@/components/ui/UiAvatar'
 
 const LayoutHeader = () => {
   const { toggleCollapsed, toggleMobileOpen } = useSidebarStore();
@@ -54,61 +55,57 @@ const LayoutHeader = () => {
     logout();
   };
 
-  // Helper to extract initials from full name or username
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    const parts = name.trim().split(/\s+/);
-    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  };
-
   return (
-    <div className='bg-card h-[48px] flex items-center justify-between px-4 text-foreground border-b border-border shadow-sm'>
+    <div className='bg-background h-[48px] flex items-center justify-between px-4 text-foreground border-b border-border shadow-sm'>
       {/* Left side: Logo and Toggle */}
       <div className='flex items-center md:ml-10 space-x-6'>
         <NavLink to="/dashboard" className='bg-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline hidden md:block shadow-sm hover:opacity-95'>
           H R M
         </NavLink>
  
-        <IconButton size="small" className='text-primary !ml-0 md:!ml-6' onClick={handleToggle}>
+        <IconButton size="small" className='text-primary !ml-0 md:!ml-12' onClick={handleToggle}>
           <MenuOutlinedIcon fontSize="medium" />
         </IconButton>
  
-        <span className='font-medium text-[16px] text-primary ml-2 hidden md:block'>
-          {user?.fullName || user?.username || 'HANHND_TLU_K64'}
+        <span className='font-medium text-[18px] text-primary !ml-3 hidden md:block'>
+          {user?.fullName || user?.username || 'Unknown User'}
         </span>
       </div>
  
       {/* Right side: Actions */}
       <div className='flex items-center space-x-4'>
-        <div className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'>
+        <div className='flex items-center bg-muted hover:bg-primary/10 dark:hover:bg-primary/20 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'>
           <MailOutlineIcon sx={{ fontSize: '18px' }} />
         </div>
  
-        <div className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer relative border border-border'>
+        <div className='flex items-center bg-muted hover:bg-primary/10 dark:hover:bg-primary/20 text-primary px-2.5 py-1.5 rounded-md cursor-pointer relative border border-border'>
           <NotificationsNoneIcon sx={{ fontSize: '18px' }} />
-          <span className='absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-card'></span>
+          <span className='absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-background'></span>
         </div>
  
-        <div className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'>
+        <div className='flex items-center bg-muted hover:bg-primary/10 dark:hover:bg-primary/20 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'>
           <AppsIcon sx={{ fontSize: '18px' }} />
         </div>
  
         {/* Nút bật/tắt chế độ Sáng/Tối phong cách MUI */}
         <div 
           onClick={toggleTheme}
-          className='flex items-center bg-muted hover:bg-muted/80 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'
+          className='flex items-center bg-muted hover:bg-primary/10 dark:hover:bg-primary/20 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'
           title={mode === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
         >
           {mode === 'light' ? <DarkModeIcon sx={{ fontSize: '18px' }} /> : <LightModeIcon sx={{ fontSize: '18px' }} />}
         </div>
  
-        {/* Avatar Trigger with dynamic initials */}
+        {/* Avatar Trigger with dynamic initials or image */}
         <div 
           onClick={handleAvatarClick}
-          className='w-8 h-8 rounded-full bg-primary text-primary-foreground hover:opacity-90 active:scale-95 flex items-center justify-center text-[12px] border border-border cursor-pointer font-bold ml-2 shadow-sm'
+          className='w-8 h-8 rounded-full hover:opacity-90 active:scale-95 flex items-center justify-center border border-border cursor-pointer ml-2 shadow-sm overflow-hidden'
         >
-          {getInitials(user?.fullName || user?.username)}
+          <UiAvatar 
+            name={user?.fullName || user?.username} 
+            imgPath={user?.imagePath} 
+            className="w-full h-full text-[12px] font-bold" 
+          />
         </div>
 
         {/* User Profile Dropdown Menu */}
@@ -118,71 +115,62 @@ const LayoutHeader = () => {
           open={open}
           onClose={handleClose}
           onClick={handleClose}
+          disablePortal
           PaperProps={{
-            elevation: 0,
+            className: "shadow-lg mt-3 w-[220px] md:w-[260px] rounded-lg p-1 border border-border bg-popover text-popover-foreground",
             sx: {
-              overflow: 'visible',
-              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.15))',
-              mt: 1.5,
-              width: 220,
-              borderRadius: '8px',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
-              '&::before': {
-                content: '""',
-                display: 'block',
-                position: 'absolute',
-                top: 0,
-                right: 14,
-                width: 10,
-                height: 10,
-                bgcolor: 'background.paper',
-                transform: 'translateY(-50%) rotate(45deg)',
-                zIndex: 0,
-              },
-            },
+              marginLeft: '-16px'
+            }
           }}
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <Box sx={{ px: 2, py: 1.5, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {user?.fullName || 'Người dùng'}
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              @{user?.username || 'user'}
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 500, fontSize: '11px', mt: 0.5 }}>
-              Vị trí: {user?.role || 'Nhân viên'}
-            </Typography>
-          </Box>
-          <Divider />
-          <MenuItem onClick={handleClose} sx={{ fontSize: '14px', py: 1 }}>
-            <ListItemIcon>
-              <PersonIcon fontSize="small" />
-            </ListItemIcon>
-            Hồ sơ cá nhân
+          {/* User Info Header Section */}
+          <div className="flex items-center gap-3 px-4 py-2">
+            <UiAvatar 
+              name={user?.fullName || user?.username} 
+              imgPath={user?.imagePath} 
+              className="w-12 h-12 border-2 border-background shadow-sm flex-shrink-0 text-lg font-semibold" 
+            />
+            <div className="flex flex-col min-w-0">
+              {user?.staffName && (
+                <span className="font-semibold text-[15px] text-foreground truncate block leading-tight">
+                  {user.staffName}
+                </span>
+              )}
+              <span className="text-muted-foreground text-[12px] truncate mt-0.5 block">
+                {user?.email || (user?.username ? `${user.username}@gmail.com` : 'user@domain.com')}
+              </span>
+              {user?.staffCode && (
+                <span className="text-secondary text-[12px] font-semibold mt-0.5 block tracking-wide">
+                  {user.staffCode}
+                </span>
+              )}
+            </div>
+          </div>
+          <Divider className="my-1 border-border" />
+          
+          <MenuItem 
+            onClick={handleClose}
+            className="mx-1 my-0.5 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground flex items-center gap-3 group transition-colors cursor-pointer"
+          >
+            <PersonOutlineIcon className="text-foreground group-hover:text-sidebar-accent-foreground w-[18px] h-[18px] min-w-[18px]" />
+            Trang cá nhân
           </MenuItem>
-          <MenuItem onClick={handleClose} sx={{ fontSize: '14px', py: 1 }}>
-            <ListItemIcon>
-              <SettingsIcon fontSize="small" />
-            </ListItemIcon>
-            Thiết lập tài khoản
+          
+          <MenuItem 
+            onClick={handleClose}
+            className="mx-1 my-0.5 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground flex items-center gap-3 group transition-colors cursor-pointer"
+          >
+            <SettingsOutlinedIcon className="text-foreground group-hover:text-sidebar-accent-foreground w-[18px] h-[18px] min-w-[18px]" />
+            Cài đặt
           </MenuItem>
-          <Divider />
+          
           <MenuItem 
             onClick={handleLogoutClick} 
-            sx={{ 
-              fontSize: '14px', 
-              py: 1,
-              color: '#d32f2f',
-              '&:hover': {
-                bgcolor: '#fde8e8',
-              }
-            }}
+            className="mx-1 my-0.5 px-3 py-2.5 rounded-md text-sm text-destructive hover:bg-destructive/10 flex items-center gap-3 group transition-colors cursor-pointer"
           >
-            <ListItemIcon sx={{ color: '#d32f2f' }}>
-              <LogoutIcon fontSize="small" />
-            </ListItemIcon>
+            <LogoutIcon className="text-destructive w-[18px] h-[18px] min-w-[18px]" />
             Đăng xuất
           </MenuItem>
         </Menu>

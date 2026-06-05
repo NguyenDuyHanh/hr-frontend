@@ -9,7 +9,7 @@ const Breadcrumb = () => {
   const displayTitle = routeSegments && routeSegments.length > 1 ? routeSegments[routeSegments.length - 1].name : "";
 
   return (
-    <div className="flex items-center justify-between h-15 py-4 bg-transparent">
+    <div className="flex items-center justify-between h-15 py-4 bg-background">
       <div className="text-[18px] text-primary uppercase font-normal">
         {displayTitle}
       </div>
