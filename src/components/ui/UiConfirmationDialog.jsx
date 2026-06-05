@@ -5,29 +5,15 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
 import CloseIcon from "@mui/icons-material/Close";
 import DoneIcon from "@mui/icons-material/Done";
 import BlockIcon from "@mui/icons-material/Block";
-import Draggable from "react-draggable";
 import { useTranslation } from "react-i18next";
 
 /**
  * UiConfirmationDialog - A modernized confirmation dialog for MUI v5.
- * Features draggable header, premium styling, and full compatibility 
- * with the original logic.
+ * Features premium styling and full compatibility with the original logic.
  */
-
-function PaperComponent(props) {
-  return (
-    <Draggable
-      handle="#draggable-confirm-dialog-title"
-      cancel={'[class*="MuiDialogContent-root"]'}
-    >
-      <Paper {...props} />
-    </Draggable>
-  );
-}
 
 const UiConfirmationDialog = React.forwardRef(({
   open,
@@ -63,8 +49,7 @@ const UiConfirmationDialog = React.forwardRef(({
       onClose={onConfirmDialogClose}
       maxWidth={maxWidth}
       fullWidth
-      PaperComponent={PaperComponent}
-      aria-labelledby="draggable-confirm-dialog-title"
+      aria-labelledby="confirm-dialog-title"
       sx={{
         '& .MuiPaper-root': {
           borderRadius: '4px',
@@ -74,9 +59,8 @@ const UiConfirmationDialog = React.forwardRef(({
       }}
     >
       <DialogTitle
-        id="draggable-confirm-dialog-title"
+        id="confirm-dialog-title"
         sx={{
-          cursor: 'move',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',

@@ -6,25 +6,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import Paper from "@mui/material/Paper";
-import Draggable from "react-draggable";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-
-/**
- * Draggable Paper component for MUI Dialog.
- */
-function PaperComponent(props) {
-  const { popupId, ...other } = props;
-  return (
-    <Draggable
-      handle={popupId ? `#${popupId}` : "#ui-draggable-dialog-title"}
-      cancel={'[class*="MuiDialogContent-root"]'}
-    >
-      <Paper {...other} />
-    </Draggable>
-  );
-}
 
 /**
  * Standardized High-performance Popup component.
@@ -45,21 +28,15 @@ function UiPopup({
   ...otherProps
 }) {
   const { t } = useTranslation();
-  
-  // Rule: Stabilize PaperComponent to prevent Dialog remount and focus loss
-  const MemoizedPaperComponent = React.useMemo(() => {
-    return (props) => <PaperComponent {...props} popupId={popupId} />;
-  }, [popupId]);
 
   return (
     <Dialog
       fullWidth
       open={open}
       onClose={onClosePopup}
-      PaperComponent={MemoizedPaperComponent}
       scroll={scroll}
       maxWidth={size}
-      aria-labelledby={popupId || "ui-draggable-dialog-title"}
+      aria-labelledby={popupId || "ui-dialog-title"}
       className="dialog-container"
       {...otherProps}
     >
@@ -68,7 +45,6 @@ function UiPopup({
           <DialogTitle
             className="dialog-header"
             sx={{ 
-              cursor: "move", 
               bgcolor: "primary.main", 
               color: "primary.contrastText",
               borderBottom: (theme) => theme.palette.mode === 'light' ? 'none' : '1px solid',
@@ -79,7 +55,7 @@ function UiPopup({
               p: 2,
               ...styleTitle 
             }}
-            id={popupId || "ui-draggable-dialog-title"}
+            id={popupId || "ui-dialog-title"}
           >
             <span>{title}</span>
             <IconButton

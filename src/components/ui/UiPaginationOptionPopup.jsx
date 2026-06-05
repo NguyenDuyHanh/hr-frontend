@@ -4,7 +4,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import { useTranslation } from "react-i18next";
-import UiPopupV2 from "./UiPopupV2";
+import UiPopup from "./UiPopup";
 import PropTypes from "prop-types";
 
 /**
@@ -56,7 +56,7 @@ function UiPaginationOptionPopup({
   }, [handleGo]);
 
   return (
-    <UiPopupV2
+    <UiPopup
       scroll="body"
       size="xs"
       open={open}
@@ -107,7 +107,7 @@ function UiPaginationOptionPopup({
           </Grid>
         </Grid>
       </DialogContent>
-    </UiPopupV2>
+    </UiPopup>
   );
 }
 
