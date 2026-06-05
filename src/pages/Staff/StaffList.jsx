@@ -12,7 +12,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
 import UiTable from '../../components/ui/UiTable';
-import StaffForm from './StaffForm';
+import StaffForm from './components/StaffForm';
 import UiConfirmationDialog from '../../components/ui/UiConfirmationDialog';
 import useStaffStore from '../../store/staffStore';
 import { WorkingStatusOptions } from '../../LocalConstants';

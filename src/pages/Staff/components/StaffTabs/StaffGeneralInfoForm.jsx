@@ -2,15 +2,15 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { Grid, Button, Box, Typography } from '@mui/material';
-import useStaffStore from '../../store/staffStore';
-import UiTextField from '../../components/ui/UiTextField';
-import UiSelectInput from '../../components/ui/UiSelectInput';
-import UiDateTimePicker from '../../components/ui/UiDateTimePicker';
-import UiAutocomplete from '../../components/ui/UiAutocomplete';
-import TabAccordion from '../../components/ui/Tab/TabAccordion';
-import UiImageUpload from '../../components/ui/UiImageUpload';
-import { WorkingStatusOptions } from '../../LocalConstants';
-import { getDepartments, getPositions } from '../../services/StaffService';
+import useStaffStore from '../../../../store/staffStore';
+import UiTextField from '../../../../components/ui/UiTextField';
+import UiSelectInput from '../../../../components/ui/UiSelectInput';
+import UiDateTimePicker from '../../../../components/ui/UiDateTimePicker';
+import UiAutocomplete from '../../../../components/ui/UiAutocomplete';
+import TabAccordion from '../../../../components/ui/Tab/TabAccordion';
+import UiImageUpload from '../../../../components/ui/UiImageUpload';
+import { WorkingStatusOptions } from '../../../../LocalConstants';
+import { getDepartments, getPositions } from '../../../../services/StaffService';
 import { format } from 'date-fns';
 
 // Static options for references
