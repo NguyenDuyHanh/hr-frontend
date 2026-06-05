@@ -15,7 +15,7 @@ export const getDesignTokens = (mode) => ({
       contrastText: '#fff',
     },
     background: {
-      default: mode === 'light' ? '#f8fafc' : '#0F1214CC', // MUI light and deep dark charcoal #0F1214CC
+      default: mode === 'light' ? '#ffffff' : '#0F1214CC', // MUI light and deep dark charcoal #0F1214CC
       paper: mode === 'light' ? '#ffffff' : '#0F1214CC',   // Lighter charcoal card background
     },
     text: {

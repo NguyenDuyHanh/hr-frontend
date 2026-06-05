@@ -20,7 +20,7 @@ const UiAvatar = React.forwardRef(({ name, imgPath, isFile, style, className }, 
 
     const getLastName = (name) => {
         if (name) {
-            return name.split(" ").pop().charAt(0);
+            return name.split(" ").pop().charAt(0).toUpperCase();
         }
         return "";
     };
@@ -31,13 +31,10 @@ const UiAvatar = React.forwardRef(({ name, imgPath, isFile, style, className }, 
 
     // Premium styling for the fallback div to match the new UI
     const defaultStyle = {
-        backgroundColor: '#5899ca7d',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#fff',
         fontWeight: 'bold',
-        fontSize: '16px',
         ...style
     };
 
@@ -71,7 +68,7 @@ const UiAvatar = React.forwardRef(({ name, imgPath, isFile, style, className }, 
         return (
             <div 
                 ref={ref}
-                className={`${className || ''} avatar-new rounded-full flex items-center justify-center`} 
+                className={`${className || ''} avatar-new rounded-full flex items-center justify-center bg-primary text-primary-foreground`} 
                 style={defaultStyle}
             >
                 {name ? getLastName(name) : 'NS'}

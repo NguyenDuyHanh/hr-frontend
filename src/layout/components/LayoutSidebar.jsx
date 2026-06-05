@@ -179,11 +179,11 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
               minHeight: "unset",
               px: "12px",
               py: "10px",
-              borderBottom: "1px solid var(--sidebar-border)",
-              backgroundColor: hasActiveChild ? "var(--sidebar-accent)" : "transparent",
+              borderBottom: "1px solid hsl(var(--sidebar-border))",
+              backgroundColor: hasActiveChild ? "hsl(var(--sidebar-accent))" : "transparent",
               color: hasActiveChild ? "hsl(var(--sidebar-accent-foreground))" : "hsl(var(--sidebar-foreground))",
               "&:hover": {
-                backgroundColor: hasActiveChild ? "var(--sidebar-accent)" : "hsl(var(--sidebar-accent) / 0.4)",
+                backgroundColor: hasActiveChild ? "hsl(var(--sidebar-accent))" : "hsl(var(--sidebar-accent) / 0.4)",
                 color: "hsl(var(--sidebar-accent-foreground))",
               },
             },
@@ -227,7 +227,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
               href={item.path}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
+              className="flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline bg-sidebar text-sidebar-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
             >
               <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
               <span className="flex-1 font-normal text-[14px]">{item.name}</span>
@@ -239,7 +239,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
                 `flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline
                 ${isActive 
                   ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
-                  : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
+                  : "bg-sidebar text-sidebar-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
               }
             >
               <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
@@ -260,14 +260,15 @@ const LayoutSidebar = () => {
 
   // Lọc menu theo quyền (Sử dụng useMemo và tránh mutate mảng gốc)
   const filteredNavigations = React.useMemo(() => {
+    const userRoles = user?.role || [];
     return navigations
-      .filter((item) => !item.auth || item.auth.includes(user?.role))
+      .filter((item) => !item.auth || item.auth.some((r) => userRoles.includes(r)))
       .map((item) => {
         // Nếu có con, tạo bản sao và lọc các con của bản sao đó
         if (item.children) {
           return {
             ...item,
-            children: item.children.filter((child) => !child.auth || child.auth.includes(user?.role)),
+            children: item.children.filter((child) => !child.auth || child.auth.some((r) => userRoles.includes(r))),
           };
         }
         return item;
@@ -332,7 +333,7 @@ const LayoutSidebar = () => {
         >
           <div className="h-full text-sidebar-foreground border-r border-sidebar-border flex flex-col">
             {/* Mobile Header Logo inside Sidebar */}
-            <div className="h-[48px] flex items-center justify-between px-4 bg-card border-b border-sidebar-border md:hidden">
+            <div className="h-[48px] flex items-center justify-between px-4 bg-background border-b border-sidebar-border md:hidden">
               <NavLink to="/dashboard" className='bg-gradient-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline'>
                 H R M
               </NavLink>
