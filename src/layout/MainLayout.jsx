@@ -18,7 +18,7 @@ const MainLayout = () => {
         <LayoutSidebar />
 
         {/* Content - Khu vực nội dung chính */}
-        <main className="flex-1 px-5 overflow-x-hidden flex flex-col bg-background">
+        <main className="flex-1 px-2 sm:px-5 overflow-x-hidden flex flex-col bg-background">
           <Breadcrumb />
           {/* div này sẽ chứa nội dung và co giãn theo nội dung, 
               nhưng nhờ flex-1 ở cha nên footer vẫn bị đẩy xuống đáy */}

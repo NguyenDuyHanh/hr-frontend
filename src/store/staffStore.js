@@ -8,6 +8,7 @@ const useStaffStore = create((set, get) => ({
     page: 1,
     pageSize: 10,
     keyword: '',
+    filters: {},
     selectedStaff: null,
     openForm: false,
 
@@ -15,14 +16,20 @@ const useStaffStore = create((set, get) => ({
     setPage: (page) => set({ page }),
     setPageSize: (pageSize) => set({ pageSize, page: 1 }),
     setKeyword: (keyword) => set({ keyword, page: 1 }),
+    setFilters: (filters) => set({ filters, page: 1 }),
     setOpenForm: (open) => set({ openForm: open }),
     setSelectedStaff: (staff) => set({ selectedStaff: staff }),
 
     loadStaffs: async () => {
         set({ loading: true });
         try {
-            const { page, pageSize, keyword } = get();
-            const response = await pagingStaffs({ pageIndex: page, pageSize, keyword });
+            const { page, pageSize, keyword, filters } = get();
+            const response = await pagingStaffs({ 
+                pageIndex: page, 
+                pageSize, 
+                keyword,
+                ...filters
+            });
             set({ 
                 staffs: response?.data?.content || [], 
                 totalElements: response?.data?.totalElements || 0,

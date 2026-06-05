@@ -221,7 +221,7 @@ function UiTable(props) {
       : mColumns.find(col => col.field !== "tableData.id");
 
     return (
-      <Box sx={{ p: 1 }}>
+      <Box>
         {data.map((row, index) => {
           const rowIndex = (page - 1) * pageSize + index;
           const titleValue = titleColumn ? renderCellValue(titleColumn, row) : '';

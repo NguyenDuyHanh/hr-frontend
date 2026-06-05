@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid, IconButton, TextField, Paper } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -16,11 +16,33 @@ import StaffForm from './components/StaffForm';
 import UiConfirmationDialog from '../../components/ui/UiConfirmationDialog';
 import useStaffStore from '../../store/staffStore';
 import { WorkingStatusOptions } from '../../LocalConstants';
-import { getLabelFromOptions } from '../../LocalFunction';
+import { getLabelFromOptions, getActiveFilterCount } from '../../LocalFunction';
+import { getDepartments, getPositions } from '../../services/StaffService';
+import UiListToolbar from '../../components/ui/UiListToolbar';
+import UiFilterPanel from '../../components/ui/UiFilterPanel';
+import { Formik } from 'formik';
+import UiAutocomplete from '../../components/ui/UiAutocomplete';
+
+const FAKE_DEPARTMENTS = [
+  { id: '1', name: "Phòng Hành chính" },
+  { id: '2', name: "Phòng Kỹ thuật" },
+  { id: '3', name: "Phòng Kinh doanh" },
+  { id: '4', name: "Phòng Nhân sự" },
+];
+
+const FAKE_POSITIONS = [
+  { id: '1', name: "Giám đốc" },
+  { id: '2', name: "Trưởng phòng" },
+  { id: '3', name: "Trưởng nhóm" },
+  { id: '4', name: "Nhân viên" },
+];
 
 const StaffList = () => {
     const navigate = useNavigate();
     const [openConfirm, setOpenConfirm] = useState(false);
+    const [departments, setDepartments] = useState([]);
+    const [positions, setPositions] = useState([]);
+    const [filterOpen, setFilterOpen] = useState(false);
 
     const { 
         staffs, 
@@ -37,11 +59,36 @@ const StaffList = () => {
         selectedStaff,
         keyword,
         setKeyword,
+        filters,
+        setFilters,
     } = useStaffStore();
+
+    const formikRef = useRef();
+    const [searchDraft, setSearchDraft] = useState(keyword || '');
+
+    useEffect(() => {
+        const fetchRefs = async () => {
+            try {
+                const depRes = await getDepartments();
+                setDepartments(depRes?.data?.length ? depRes.data : FAKE_DEPARTMENTS);
+                const posRes = await getPositions();
+                setPositions(posRes?.data?.length ? posRes.data : FAKE_POSITIONS);
+            } catch (err) {
+                console.error("Failed to load filter metadata:", err);
+                setDepartments(FAKE_DEPARTMENTS);
+                setPositions(FAKE_POSITIONS);
+            }
+        };
+        fetchRefs();
+    }, []);
+
+    useEffect(() => {
+        setSearchDraft(keyword || '');
+    }, [keyword]);
 
     useEffect(() => {
         loadStaffs();
-    }, [page, pageSize, keyword]);
+    }, [page, pageSize, keyword, filters]);
 
     const handleAdd = () => {
         setSelectedStaff(null);
@@ -67,6 +114,67 @@ const StaffList = () => {
             setSelectedStaff(null);
             setOpenConfirm(false);
         }
+    };
+
+    const handleSearch = () => {
+        setKeyword(searchDraft);
+        if (filterOpen) {
+            formikRef.current?.handleSubmit();
+        }
+    };
+
+    const handleApplyFilters = () => {
+        setKeyword(searchDraft);
+        formikRef.current?.handleSubmit();
+    };
+
+    const handleReset = () => {
+        setSearchDraft('');
+        formikRef.current?.resetForm();
+        setKeyword('');
+        setFilters({});
+    };
+
+    const initialDepartment = useMemo(() => {
+        return departments.find(d => d.id === filters.departmentId) || null;
+    }, [departments, filters.departmentId]);
+
+    const initialPosition = useMemo(() => {
+        return positions.find(p => p.id === filters.positionId) || null;
+    }, [positions, filters.positionId]);
+
+    const activeFilterCount = useMemo(() => {
+        return getActiveFilterCount(filters);
+    }, [filters]);
+
+    const importOpts = useMemo(() => [
+        {
+            label: 'Nhập Excel nhân viên cũ',
+            onImport: async (file) => {
+                console.log('Nhập Excel nhân viên cũ:', file);
+            }
+        },
+        {
+            label: 'Nhập Excel nhân viên mới',
+            onImport: async (file) => {
+                console.log('Nhập Excel nhân viên mới:', file);
+            }
+        }
+    ], []);
+
+    const templateOpts = useMemo(() => [
+        {
+            label: 'Tải mẫu nhập',
+            fileName: 'mau_nhap_nhan_vien.xlsx',
+            onDownload: async () => {
+                return new Blob([""], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            }
+        }
+    ], []);
+
+    const handleExport = async () => {
+        console.log('Xuất Excel danh sách nhân viên...');
+        return new Blob([""], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     };
 
     const columns = [
@@ -181,65 +289,70 @@ const StaffList = () => {
 
     return (
         <>
-            <Paper elevation={0} className="p-4 border border-border">
-                {/* Toolbar buttons */}
-                <div className="flex flex-wrap gap-2 mb-5">
-                    <Button 
-                        variant="contained" 
-                        size="small" 
-                        startIcon={<AddIcon />} 
-                        onClick={handleAdd}
-                        sx={{ textTransform: 'none' }}
-                    >
-                        Thêm mới
-                    </Button>
-                    <Button variant="contained" size="small" startIcon={<FileDownloadIcon />} sx={{ textTransform: 'none' }}>
-                        Xuất Excel
-                    </Button>
-                    <Button variant="contained" size="small" startIcon={<FileUploadIcon />} sx={{ textTransform: 'none' }}>
-                        Nhập Excel nhân viên cũ
-                    </Button>
-                    <Button variant="contained" size="small" startIcon={<FileUploadIcon />} sx={{ textTransform: 'none' }}>
-                        Nhập Excel nhân viên mới
-                    </Button>
-                    <Button variant="contained" size="small" startIcon={<FileDownloadIcon />} sx={{ textTransform: 'none' }}>
-                        Tải mẫu nhập
-                    </Button>
-                </div>
+            <Paper elevation={0} className="p-3 sm:p-4 border border-border">
+                <Formik
+                    innerRef={formikRef}
+                    initialValues={{
+                        department: initialDepartment,
+                        position: initialPosition
+                    }}
+                    enableReinitialize={true}
+                    onSubmit={(values) => {
+                        setFilters({
+                            departmentId: values.department?.id || '',
+                            positionId: values.position?.id || ''
+                        });
+                    }}
+                >
+                    {() => (
+                        <>
+                            {/* Toolbar & Advanced Filter */}
+                            <UiListToolbar
+                                searchDraft={searchDraft}
+                                onSearchDraftChange={setSearchDraft}
+                                onSearch={handleSearch}
+                                onReset={handleReset}
+                                onAdd={handleAdd}
+                                addLabel="Thêm mới"
+                                filter={{
+                                    open: filterOpen,
+                                    onToggle: setFilterOpen,
+                                    activeCount: activeFilterCount
+                                }}
+                                downloadTemplateOptions={templateOpts}
+                                importOptions={importOpts}
+                                onExport={handleExport}
+                                exportFileName="Danh_sach_nhan_vien.xlsx"
+                            />
 
-                {/* Search area */}
-                <Grid container spacing={1} alignItems="center" className="mb-6">
-                    <Grid item xs={12} sm={8} md={8}>
-                        <TextField 
-                            fullWidth
-                            size="small"
-                            placeholder="Tìm kiếm theo tên, mã nhân viên, email, số điện thoại..."
-                            variant="outlined"
-                            value={keyword}
-                            onChange={(e) => setKeyword(e.target.value)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4} md={4}>
-                        <div className="flex gap-2">
-                            <Button 
-                                variant="contained" 
-                                size="small" 
-                                startIcon={<SearchIcon />} 
-                                sx={{ textTransform: 'none', height: '32px', whiteSpace: 'nowrap' }}
-                                onClick={() => loadStaffs()}
+                            <UiFilterPanel
+                                open={filterOpen}
+                                onOpenChange={setFilterOpen}
+                                onApply={handleApplyFilters}
+                                onReset={handleReset}
                             >
-                                Tìm kiếm
-                            </Button>
-                            <Button 
-                                variant="outlined" 
-                                size="small" 
-                                startIcon={<FilterListIcon />} 
-                            >
-                                Bộ lọc
-                            </Button>
-                        </div>
-                    </Grid>
-                </Grid>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <UiAutocomplete
+                                            name="department"
+                                            label="Phòng ban"
+                                            options={departments}
+                                            getOptionLabel={(option) => option?.name || ''}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <UiAutocomplete
+                                            name="position"
+                                            label="Chức danh"
+                                            options={positions}
+                                            getOptionLabel={(option) => option?.name || ''}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </UiFilterPanel>
+                        </>
+                    )}
+                </Formik>
 
                 {/* Table */}
                 <UiTable 

@@ -57,3 +57,20 @@ export const getLabelFromOptions = (options, value) => {
     const option = options.find(opt => String(opt.value) === String(value));
     return option ? (option.label || option.name) : value;
 };
+
+/**
+ * Count active filters in a filter object generically
+ */
+export const getActiveFilterCount = (filters) => {
+    if (!filters || typeof filters !== 'object') return 0;
+    return Object.values(filters).filter(value => {
+        if (value === null || value === undefined || value === '') return false;
+        if (Array.isArray(value)) return value.length > 0;
+        if (typeof value === 'object') {
+            if (value.id !== undefined) return value.id !== null && value.id !== '';
+            if (value.value !== undefined) return value.value !== null && value.value !== '';
+            return Object.keys(value).length > 0;
+        }
+        return true;
+    }).length;
+};
