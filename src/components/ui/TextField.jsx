@@ -1,15 +1,15 @@
-import React, { memo, useEffect, useState, useRef, useMemo } from "react";
-import TextField from "@mui/material/TextField";
+﻿import React, { memo, useEffect, useState, useRef, useMemo } from "react";
+import MuiTextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
 import { FastField, getIn } from "formik";
 
 /**
- * UiTextField - Modernized MUI v5 TextField with Formik integration.
+ * TextField - Modernized MUI v5 TextField with Formik integration.
  * Standards: FastField + shouldComponentUpdate + useRef (timer) + useMemo (props).
  */
 
-const UiTextField = React.forwardRef((props, ref) => {
+const TextField = React.forwardRef((props, ref) => {
   return (
     <FastField
       {...props}
@@ -214,7 +214,7 @@ const MyTextField = React.forwardRef(({
       )}
 
       <FormControl fullWidth>
-        <TextField
+        <MuiTextField
           {...otherProps}
           {...field}
           id={name}
@@ -239,4 +239,4 @@ const MyTextField = React.forwardRef(({
   );
 });
 
-export default memo(UiTextField);
+export default memo(TextField);

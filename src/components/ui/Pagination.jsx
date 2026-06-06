@@ -3,12 +3,11 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
-import Pagination from "@mui/material/Pagination";
+import MuiPagination from "@mui/material/Pagination";
 import AddIcon from "@mui/icons-material/Add";
-import { useTranslation } from "react-i18next";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import UiPaginationOptionPopup from "./UiPaginationOptionPopup";
+import PaginationOptionPopup from "./PaginationOptionPopup";
 import PropTypes from "prop-types";
 import { Box, Typography } from "@mui/material";
 
@@ -16,8 +15,7 @@ import { Box, Typography } from "@mui/material";
  * High-performance Pagination component.
  * Standardized for MUI v5.
  */
-function UiPagination(props) {
-  const { t } = useTranslation();
+function Pagination(props) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -60,7 +58,7 @@ function UiPagination(props) {
         {totalElements}
       </Box>
     </Typography>
-  ), [t, totalElements, isMobile]);
+  ), [totalElements, isMobile]);
 
   return (
     <Box sx={{ 
@@ -106,7 +104,7 @@ function UiPagination(props) {
             </Box>
           </Box>
 
-          <Pagination
+          <MuiPagination
             count={totalPages}
             shape="rounded"
             page={page}
@@ -146,7 +144,7 @@ function UiPagination(props) {
             </Button>
           </Box>
 
-          <Pagination
+          <MuiPagination
             count={totalPages}
             shape="rounded"
             page={page}
@@ -167,7 +165,7 @@ function UiPagination(props) {
             }}
           />
 
-          <UiPaginationOptionPopup
+          <PaginationOptionPopup
             open={openPopup}
             handleClose={handleClosePopup}
             totalElements={totalElements}
@@ -184,7 +182,7 @@ function UiPagination(props) {
   );
 }
 
-UiPagination.propTypes = {
+Pagination.propTypes = {
   totalElements: PropTypes.number.isRequired,
   totalPages: PropTypes.number.isRequired,
   pageSizeOption: PropTypes.arrayOf(PropTypes.number),
@@ -194,4 +192,4 @@ UiPagination.propTypes = {
   pageSize: PropTypes.number.isRequired,
 };
 
-export default memo(UiPagination);
+export default memo(Pagination);

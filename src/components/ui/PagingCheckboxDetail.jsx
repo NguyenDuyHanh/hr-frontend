@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, memo, useMemo } from "react";
+﻿import React, { useEffect, useState, useRef, useCallback, memo, useMemo } from "react";
 import { FastField, getIn } from "formik";
 import { isEqual } from "lodash";
 import clsx from "clsx";
@@ -8,7 +8,7 @@ import Checkbox from "@mui/material/Checkbox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { useTranslation } from "react-i18next";
-import UiRequiredLabel from "./UiRequiredLabel";
+import RequiredLabel from "./RequiredLabel";
 import { styled } from "@mui/material/styles";
 
 const PAGE_SIZE = 22;
@@ -26,7 +26,7 @@ const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
  * High-performance Paging Checkbox Detail component.
  * Features: Silent Render (FastField), Infinite Scroll, Select All, Debounced Search.
  */
-const UiPagingCheckboxDetail = (props) => {
+const PagingCheckboxDetail = (props) => {
   const { name, ...other } = props;
 
   const shouldUpdate = useCallback((nextProps, currentProps) => {
@@ -82,7 +82,7 @@ function MyPagingCheckboxDetail(props) {
     ...otherProps
   } = props;
 
-  // DEBUG: console.log(`Render [UiPagingCheckboxDetail]: ${name}`);
+  // DEBUG: console.log(`Render [PagingCheckboxDetail]: ${name}`);
 
   const { t } = useTranslation();
   const listSelected = field?.value || [];
@@ -209,7 +209,7 @@ function MyPagingCheckboxDetail(props) {
     <div style={{ width: "100%" }}>
       {label && (
         <label htmlFor={name} className={clsx(oldStyle ? "old-label" : "label-container", readOnly && "read-only")}>
-          <UiRequiredLabel label={label} requiredLabel={required} />
+          <RequiredLabel label={label} requiredLabel={required} />
         </label>
       )}
       <StyledAutocomplete
@@ -273,4 +273,4 @@ function MyPagingCheckboxDetail(props) {
   );
 }
 
-export default memo(UiPagingCheckboxDetail);
+export default memo(PagingCheckboxDetail);

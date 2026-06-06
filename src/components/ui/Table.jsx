@@ -1,14 +1,14 @@
 import React, { useMemo, useState, useEffect, useCallback, memo } from "react";
 import MaterialTable from "@material-table/core";
-import { useTranslation } from "react-i18next";
 import { useTheme, styled } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
 import ChevronRight from "@mui/icons-material/ChevronRight";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import ExpandLess from "@mui/icons-material/ExpandLess";
-import UiPagination from "./UiPagination";
+import Pagination from "./Pagination";
 import { calculateTotalPages } from "../../LocalFunction";
 import PropTypes from "prop-types";
 
@@ -51,12 +51,12 @@ const MobileCard = memo(({
 }) => {
   return (
     <Box sx={{ 
-      border: "1px solid #e0e0e0", 
+      border: (theme) => theme.palette.mode === "dark" ? "1px solid hsl(var(--border))" : "1px solid #e0e0e0", 
       borderRadius: "8px", 
       p: 2, 
       mb: 2, 
-      bgcolor: "white", 
-      boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+      bgcolor: (theme) => theme.palette.mode === "dark" ? "hsl(var(--card))" : "white", 
+      boxShadow: (theme) => theme.palette.mode === "dark" ? "none" : "0 2px 4px rgba(0,0,0,0.05)",
       cursor: onRowClick ? "pointer" : "default"
     }}>
       <Box sx={{ 
@@ -65,7 +65,7 @@ const MobileCard = memo(({
         alignItems: "center", 
         mb: 1.5, 
         pb: 1, 
-        borderBottom: "1px solid #f0f0f0" 
+        borderBottom: (theme) => theme.palette.mode === "dark" ? "1px solid hsl(var(--border))" : "1px solid #f0f0f0" 
       }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           {showIndex && (
@@ -73,7 +73,7 @@ const MobileCard = memo(({
               #{rowIndex + 1}
             </Typography>
           )}
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#333" }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: (theme) => theme.palette.mode === "dark" ? "hsl(var(--foreground))" : "#333" }}>
             {titleValue}
           </Typography>
         </Box>
@@ -103,7 +103,7 @@ const MobileCard = memo(({
               <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                 {column.title}:
               </Typography>
-              <Typography variant="body2" sx={{ textAlign: "right", ml: 2 }}>
+              <Typography variant="body2" sx={{ textAlign: "right", ml: 2, color: (theme) => theme.palette.mode === "dark" ? "hsl(var(--foreground))" : "inherit" }}>
                 {renderCellValue(column, row)}
               </Typography>
             </Box>
@@ -112,7 +112,13 @@ const MobileCard = memo(({
       </Box>
 
       {hasDetailPanel && isExpanded && (
-        <Box sx={{ mt: 2, p: 1.5, bgcolor: "#f9f9f9", borderRadius: "6px", border: "1px solid #e0e0e0" }}>
+        <Box sx={{ 
+          mt: 2, 
+          p: 1.5, 
+          bgcolor: (theme) => theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "#f9f9f9", 
+          borderRadius: "6px", 
+          border: (theme) => theme.palette.mode === "dark" ? "1px solid hsl(var(--border))" : "1px solid #e0e0e0" 
+        }}>
           {typeof detailPanel === 'function' ? detailPanel(row) : detailPanel[0]?.render?.(row)}
         </Box>
       )}
@@ -124,8 +130,7 @@ const MobileCard = memo(({
  * Standardized High-performance Table component.
  * Uses @material-table/core for MUI v5 compatibility.
  */
-function UiTable(props) {
-  const { t } = useTranslation();
+function Table(props) {
   const theme = useTheme();
   const isMobileSize = useMediaQuery(theme.breakpoints.down("md"));
   const [expandedRows, setExpandedRows] = useState(new Set());
@@ -207,7 +212,7 @@ function UiTable(props) {
     if (!data || data.length === 0) {
       return (
         <Box sx={{ p: 5, textAlign: "center", color: "text.secondary" }}>
-          {t("general.emptyDataMessageTable")}
+          Không có dữ liệu
         </Box>
       );
     }
@@ -288,7 +293,7 @@ function UiTable(props) {
         onRowClick={onRowClick ? (event, rowData) => onRowClick(rowData) : undefined}
         localization={{
           body: {
-            emptyDataSourceMessage: t("general.emptyDataMessageTable"),
+            emptyDataSourceMessage: "Không có dữ liệu",
           },
         }}
       />
@@ -300,7 +305,7 @@ function UiTable(props) {
       {isMobileSize ? renderMobileView() : renderDesktopView()}
 
       {!nonePagination && (
-        <UiPagination
+        <Pagination
           totalPages={totalPages}
           handleChangePage={handleChangePage}
           setRowsPerPage={setRowsPerPage}
@@ -314,7 +319,7 @@ function UiTable(props) {
   );
 }
 
-UiTable.propTypes = {
+Table.propTypes = {
     data: PropTypes.array.isRequired,
     columns: PropTypes.array.isRequired,
     selection: PropTypes.bool,
@@ -336,4 +341,4 @@ UiTable.propTypes = {
     setRowsPerPage: PropTypes.func.isRequired,
 };
 
-export default memo(UiTable);
+export default memo(Table);

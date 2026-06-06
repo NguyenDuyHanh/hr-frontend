@@ -1,15 +1,15 @@
-import React, { memo, useEffect, useState, useMemo, Fragment } from "react";
+﻿import React, { memo, useEffect, useState, useMemo, Fragment } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 import { FastField, getIn } from "formik";
 
 /**
- * UiAsyncAutocomplete - Modernized MUI v5 Async Autocomplete with Formik integration.
+ * AsyncAutocomplete - Modernized MUI v5 Async Autocomplete with Formik integration.
  * Standards: FastField + shouldComponentUpdate + useMemo (props).
  */
 
-const UiAsyncAutocomplete = React.forwardRef((props, ref) => {
+const AsyncAutocomplete = React.forwardRef((props, ref) => {
   return (
     <FastField
       {...props}
@@ -230,4 +230,4 @@ const MyAsyncAutocomplete = React.forwardRef(({
   );
 });
 
-export default memo(UiAsyncAutocomplete);
+export default memo(AsyncAutocomplete);

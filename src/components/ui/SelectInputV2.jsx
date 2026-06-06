@@ -1,17 +1,17 @@
-import React, { memo, useEffect, useState, useCallback, useMemo } from "react";
+﻿import React, { memo, useEffect, useState, useCallback, useMemo } from "react";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import { FastField, getIn, useFormikContext } from "formik";
 import { styled } from "@mui/material/styles";
 import clsx from "clsx";
-import UiRequiredLabel from "./UiRequiredLabel";
+import RequiredLabel from "./RequiredLabel";
 
 /**
  * High-performance Select Input V2 component.
  * Features: Silent Render (FastField), Property Stability, MUI v5 Standards.
  */
-const UiSelectInputV2 = (props) => {
+const SelectInputV2 = (props) => {
   const { name, ...other } = props;
 
   const shouldUpdate = useCallback((nextProps, currentProps) => {
@@ -63,7 +63,7 @@ const MySelectInput = ({
   meta,
   ...otherProps
 }) => {
-  // DEBUG: console.log(`Render [UiSelectInputV2]: ${name}`);
+  // DEBUG: console.log(`Render [SelectInputV2]: ${name}`);
 
   const { setFieldValue } = useFormikContext();
   const [internalValue, setInternalValue] = useState(field?.value ?? "");
@@ -108,7 +108,7 @@ const MySelectInput = ({
           className={clsx(oldStyle ? "old-label" : "label-container", readOnly && "read-only")} 
           htmlFor={name}
         >
-          <UiRequiredLabel label={label} requiredLabel={required} />
+          <RequiredLabel label={label} requiredLabel={required} />
         </label>
       )}
 
@@ -155,4 +155,4 @@ const MySelectInput = ({
   );
 };
 
-export default memo(UiSelectInputV2);
+export default memo(SelectInputV2);

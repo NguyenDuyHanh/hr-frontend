@@ -1,12 +1,12 @@
-import React, { useMemo, useEffect } from 'react';
+﻿import React, { useMemo, useEffect } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { Grid, Button } from '@mui/material';
 import useStaffStore from '../../../store/staffStore';
-import UiTextField from '../../../components/ui/UiTextField';
-import UiSelectInput from '../../../components/ui/UiSelectInput';
-import UiDateTimePicker from '../../../components/ui/UiDateTimePicker';
-import UiPopup from '../../../components/ui/UiPopup';
+import TextField from '../../../components/ui/TextField';
+import SelectInput from '../../../components/ui/SelectInput';
+import DateTimePicker from '../../../components/ui/DateTimePicker';
+import Popup from '../../../components/ui/Popup';
 import { WorkingStatusOptions } from '../../../LocalConstants';
 import { generateStaffCode } from '../../../services/StaffService';
 import { format } from 'date-fns';
@@ -71,7 +71,7 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
     );
 
     return (
-        <UiPopup 
+        <Popup 
             open={open} 
             onClosePopup={onClose} 
             title={staffData ? 'Chỉnh sửa nhân viên' : 'Thêm mới nhân viên'}
@@ -81,14 +81,14 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
             <FormikProvider value={formik}>
                 <Grid container spacing={1}>
                     <Grid item xs={12}>
-                        <UiDateTimePicker 
+                        <DateTimePicker 
                             label="Ngày vào làm việc" 
                             name="startDate" 
                             notValueMillisecond={true}
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <UiTextField 
+                        <TextField 
                             label="Mã nhân viên" 
                             name="staffCode" 
                             readOnly
@@ -96,14 +96,14 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <UiTextField 
+                        <TextField 
                             label="Họ và tên" 
                             name="displayName" 
                             required
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <UiSelectInput 
+                        <SelectInput 
                             label="Trạng Thái Nhân Viên" 
                             name="workingStatus" 
                             options={WorkingStatusOptions}
@@ -112,7 +112,7 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
                     </Grid>
                 </Grid>
             </FormikProvider>
-        </UiPopup>
+        </Popup>
     );
 };
 

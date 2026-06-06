@@ -1,17 +1,17 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FastField, getIn } from "formik";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import FormHelperText from "@mui/material/FormHelperText";
 import Box from "@mui/material/Box";
 import clsx from "clsx";
-import UiRequiredLabel from "./UiRequiredLabel";
+import RequiredLabel from "./RequiredLabel";
 
 /**
  * High-performance Editor component based on ReactQuill.
  * Features: Silent Render (FastField), Image Handling, MUI v5 Standards.
  */
-function UiEditor(props) {
+function Editor(props) {
   const { name, label, oldStyle, meta, ...other } = props;
 
   const shouldUpdate = useCallback((nextProps, currentProps) => {
@@ -41,7 +41,7 @@ function UiEditor(props) {
                 htmlFor={name}
                 className={clsx(oldStyle ? "old-label" : "label-container", props.readOnly && "read-only")}
               >
-                <UiRequiredLabel label={label} requiredLabel={props.required || props.validate} />
+                <RequiredLabel label={label} requiredLabel={props.required || props.validate} />
               </label>
             )}
 
@@ -74,7 +74,7 @@ function MyEditor({
   oldStyle = false,
   imageHandler: customImageHandler,
 }) {
-  // DEBUG: console.log(`Render [UiEditor]: ${name}`);
+  // DEBUG: console.log(`Render [Editor]: ${name}`);
 
   const quillRef = useRef(null);
   const [internalData, setInternalData] = useState(field.value || "");
@@ -227,4 +227,4 @@ function MyEditor({
   );
 }
 
-export default memo(UiEditor);
+export default memo(Editor);

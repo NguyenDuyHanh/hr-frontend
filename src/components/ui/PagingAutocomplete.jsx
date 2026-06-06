@@ -1,31 +1,25 @@
-import React, { useEffect, useMemo, useState, useRef, useCallback, memo } from "react";
+﻿import React, { useEffect, useMemo, useState, useRef, useCallback, memo } from "react";
 import { FastField, getIn } from "formik";
 import { isEqual } from "lodash";
 import clsx from "clsx";
+import Popper from "@mui/material/Popper";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useTranslation } from "react-i18next";
-import UiRequiredLabel from "./UiRequiredLabel";
-import { styled } from "@mui/material/styles";
+import RequiredLabel from "./RequiredLabel";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
-const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
-  "& .MuiAutocomplete-inputRoot": {
-    paddingTop: "0px !important",
-    paddingBottom: "0px !important",
-  },
-  "& .MuiAutocomplete-input": {
-    height: "auto !important",
-  },
-}));
+const CustomPopper = (props) => {
+  return <Popper {...props} placement="bottom-start" />;
+};
 
 /**
- * High-performance Paging Autocomplete V2 component.
- * Standardized for MUI v5.
+ * High-performance Paging Autocomplete component.
+ * Features: Silent Render (FastField), Infinite Scroll, Debounced Search (useRef), MUI v5 Standards.
  */
-const UiPagingAutocompleteV2 = (props) => {
+const PagingAutocomplete = (props) => {
   const { name, ...other } = props;
 
   const shouldUpdate = useCallback((nextProps, currentProps) => {
@@ -36,7 +30,6 @@ const UiPagingAutocompleteV2 = (props) => {
       nextProps.disabled !== currentProps.disabled ||
       nextProps.readOnly !== currentProps.readOnly ||
       nextProps.api !== currentProps.api ||
-      nextProps.getOptionDisabled !== currentProps.getOptionDisabled ||
       !isEqual(nextProps.searchObject, currentProps.searchObject) ||
       nextProps.formik.isSubmitting !== currentProps.formik.isSubmitting ||
       getIn(nextProps.formik.values, currentProps.name) !== getIn(currentProps.formik.values, currentProps.name) ||
@@ -62,24 +55,33 @@ const UiPagingAutocompleteV2 = (props) => {
 
 function MyPagingAutocomplete(props) {
   const {
-    api,
     name,
+    api,
+    displayData = "name",
+    size = "small",
     searchObject,
-    allowLoadOptions = true,
-    clearOptionOnClose,
-    handleChange: externalHandleChange,
+    label,
+    sortOptions,
     field,
     meta,
     setFieldValue,
-    label,
-    oldStyle = false,
-    required,
+    onChange,
+    getOptionLabel,
+    isOptionEqualToValue,
     getOptionDisabled,
+    allowLoadOptions = true,
+    disableClearable,
+    fullWidth = true,
+    required = false,
+    placeholder = "",
+    InputProps,
+    oldStyle = false,
     readOnly = false,
+    customData,
     ...otherProps
   } = props;
 
-  // DEBUG: console.log(`Render [UiPagingAutocompleteV2]: ${name}`);
+  // DEBUG: console.log(`Render [PagingAutocomplete]: ${name}`);
 
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
@@ -100,17 +102,20 @@ function MyPagingAutocomplete(props) {
       pageSize: PAGE_SIZE,
       keyword: searchKeyword || "",
     })
-      .then(({ data }) => {
-        if (data && data.content) {
-          setOptions((prev) => isLoadMore ? [...prev, ...data.content] : [...data.content]);
-          setTotalPage(data.totalPages || 1);
-        } else {
-          if (!isLoadMore) setOptions([]);
-        }
+      .then((response) => {
+        const result = customData ? response[customData] : response;
+        const data = result?.data || result; // Handle both {data: {content}} and {content}
+        const content = data?.content || [];
+
+        setOptions((prev) => {
+          const newContent = sortOptions ? sortOptions(content) : content;
+          return isLoadMore ? [...prev, ...newContent] : newContent;
+        });
+        setTotalPage(data?.totalPages || 1);
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
-  }, [api, allowLoadOptions, searchObject]);
+  }, [api, allowLoadOptions, searchObject, customData, sortOptions]);
 
   useEffect(() => {
     if (open && allowLoadOptions) {
@@ -122,7 +127,7 @@ function MyPagingAutocomplete(props) {
   const handleScroll = (event) => {
     const listboxNode = event.currentTarget;
     const position = listboxNode.scrollTop + listboxNode.clientHeight;
-    if (listboxNode.scrollHeight - position <= 8 && page < totalPage && !loading) {
+    if (listboxNode.scrollHeight - position <= 10 && page < totalPage && !loading) {
       const nextPage = page + 1;
       setPage(nextPage);
       loadData(nextPage, keyword, true);
@@ -142,68 +147,72 @@ function MyPagingAutocomplete(props) {
 
   const handleChange = (event, value) => {
     if (readOnly) return;
-    if (externalHandleChange) {
-      externalHandleChange(event, value);
+    if (onChange) {
+      onChange(event, value);
     } else {
       setFieldValue(name, value || null);
     }
   };
 
-  const defaultGetOptionLabel = useCallback((option) => {
+  const internalGetOptionLabel = useCallback((option) => {
+    if (getOptionLabel) return getOptionLabel(option);
     if (!option) return "";
-    return option[otherProps?.displayName ? otherProps?.displayName : "name"] || "";
-  }, [otherProps?.displayName]);
+    return displayData.split(".").reduce((obj, key) => obj?.[key], option) || "";
+  }, [getOptionLabel, displayData]);
+
+  const internalIsOptionEqualToValue = useCallback((option, value) => {
+    if (isOptionEqualToValue) return isOptionEqualToValue(option, value);
+    return option?.id === value?.id;
+  }, [isOptionEqualToValue]);
 
   const isError = Boolean(meta && meta.touched && meta.error);
 
   const memoSx = useMemo(() => ({
     "& .MuiOutlinedInput-root": {
-      backgroundColor: (readOnly || otherProps.disabled) ? "rgba(0, 0, 0, 0.05)" : "inherit",
+      backgroundColor: readOnly ? "rgba(0, 0, 0, 0.05)" : "inherit",
     },
     ...otherProps.sx
-  }), [readOnly, otherProps.disabled, otherProps.sx]);
+  }), [readOnly, otherProps.sx]);
 
   const memoInputProps = useMemo(() => ({
-    ...otherProps.InputProps,
+    ...InputProps,
     endAdornment: (
       <React.Fragment>
         {loading ? <CircularProgress color="inherit" size={20} /> : null}
-        {otherProps.InputProps?.endAdornment}
+        {InputProps?.endAdornment}
       </React.Fragment>
     ),
     readOnly: readOnly,
-    autoComplete: "off",
-  }), [loading, otherProps.InputProps, readOnly]);
+  }), [loading, InputProps, readOnly]);
 
   return (
-    <div style={{ width: "100%" }}>
+    <div style={{ width: fullWidth ? "100%" : "auto" }}>
       {label && (
-        <label htmlFor={name} className={clsx(oldStyle ? "old-label" : "label-container", readOnly && "read-only")}>
-          <UiRequiredLabel label={label} requiredLabel={required} />
+        <label
+          htmlFor={name}
+          className={clsx(oldStyle ? "old-label" : "label-container", readOnly && "read-only")}
+        >
+          <RequiredLabel label={label} requiredLabel={required} />
         </label>
       )}
-
-      <StyledAutocomplete
+      <Autocomplete
         {...otherProps}
         id={name}
-        options={options}
-        loading={loading && !readOnly}
-        open={readOnly ? false : open}
+        open={open && !readOnly}
         onOpen={() => setOpen(true)}
-        onClose={() => {
-          setOpen(false);
-          setKeyword("");
-          if (clearOptionOnClose) {
-            setOptions([]);
-            setTotalPage(1);
-          }
-        }}
-        value={field.value || (otherProps.multiple ? [] : null)}
+        onClose={() => setOpen(false)}
+        options={options}
+        loading={loading}
+        value={field.value || null}
         onChange={handleChange}
         onInputChange={handleInputChange}
-        getOptionLabel={otherProps.getOptionLabel || defaultGetOptionLabel}
-        isOptionEqualToValue={(option, value) => option?.id === value?.id}
-        getOptionDisabled={readOnly ? () => true : getOptionDisabled}
+        getOptionLabel={internalGetOptionLabel}
+        isOptionEqualToValue={internalIsOptionEqualToValue}
+        getOptionDisabled={getOptionDisabled}
+        disableClearable={disableClearable}
+        fullWidth={fullWidth}
+        size={size}
+        PopperComponent={CustomPopper}
         noOptionsText={t ? t("general.noData") : "Không có dữ liệu"}
         ListboxProps={{
           onScroll: handleScroll,
@@ -212,16 +221,16 @@ function MyPagingAutocomplete(props) {
         renderInput={(params) => (
           <TextField
             {...params}
-            variant={otherProps.variant || "outlined"}
-            size="small"
+            placeholder={placeholder}
             error={isError}
             helperText={isError ? meta.error : ""}
+            variant={otherProps.variant || "outlined"}
+            className="input-container"
             InputProps={{
               ...params.InputProps,
               ...memoInputProps,
             }}
             sx={memoSx}
-            className="input-container"
           />
         )}
       />
@@ -229,4 +238,4 @@ function MyPagingAutocomplete(props) {
   );
 }
 
-export default memo(UiPagingAutocompleteV2);
+export default memo(PagingAutocomplete);

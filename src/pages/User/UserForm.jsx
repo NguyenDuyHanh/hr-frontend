@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Button, Grid, TextField } from '@mui/material';
+﻿import React, { useState, useEffect, useMemo } from 'react';
+import { Button, Grid } from '@mui/material';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
-import UiTextField from '../../components/ui/UiTextField';
-import UiCheckBox from '../../components/ui/UiCheckBox';
-import UiPagingAutocomplete from '../../components/ui/UiPagingAutocomplete';
-import UiAutocomplete from '../../components/ui/UiAutocomplete';
-import UiPopup from '../../components/ui/UiPopup';
+import TextField from '../../components/ui/TextField';
+import CheckBox from '../../components/ui/CheckBox';
+import PagingAutocomplete from '../../components/ui/PagingAutocomplete';
+import Autocomplete from '../../components/ui/Autocomplete';
+import Popup from '../../components/ui/Popup';
 import { pagingStaffs } from '../../services/StaffService';
 import useUserStore from '../../store/userStore';
 
@@ -105,7 +105,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
     );
 
     return (
-        <UiPopup
+        <Popup
             open={open}
             onClosePopup={onClose}
             title={isView ? 'Chi tiết tài khoản' : (userData ? 'Cập nhật tài khoản' : 'Thêm tài khoản')}
@@ -115,7 +115,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
             <FormikProvider value={formik}>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
-                        <UiTextField 
+                        <TextField 
                             label="Tên đăng nhập" 
                             name="username" 
                             required
@@ -125,7 +125,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                     </Grid>
                     {!userData && (
                         <Grid item xs={12}>
-                            <UiTextField 
+                            <TextField 
                                 label="Mật khẩu" 
                                 name="password" 
                                 type="password"
@@ -136,7 +136,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                         </Grid>
                     )}
                     <Grid item xs={12}>
-                        <UiTextField 
+                        <TextField 
                             label="Email" 
                             name="email" 
                             fullWidth 
@@ -144,7 +144,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <UiPagingAutocomplete 
+                        <PagingAutocomplete 
                             label="Nhân viên liên kết" 
                             name="staff"
                             api={pagingStaffs}
@@ -170,7 +170,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <UiAutocomplete
+                        <Autocomplete
                             multiple
                             name="roles"
                             label="Vai trò (Quyền)"
@@ -183,7 +183,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                     </Grid>
                 </Grid>
             </FormikProvider>
-        </UiPopup>
+        </Popup>
     );
 };
 

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+﻿import React, { memo } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -11,11 +11,11 @@ import BlockIcon from "@mui/icons-material/Block";
 import { useTranslation } from "react-i18next";
 
 /**
- * UiConfirmationDialog - A modernized confirmation dialog for MUI v5.
+ * ConfirmationDialog - A modernized confirmation dialog for MUI v5.
  * Features premium styling and full compatibility with the original logic.
  */
 
-const UiConfirmationDialog = React.forwardRef(({
+const ConfirmationDialog = React.forwardRef(({
   open,
   onConfirmDialogClose,
   text,
@@ -124,4 +124,4 @@ const UiConfirmationDialog = React.forwardRef(({
   );
 });
 
-export default memo(UiConfirmationDialog);
+export default memo(ConfirmationDialog);

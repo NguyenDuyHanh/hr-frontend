@@ -1,23 +1,23 @@
-import React, { useState, useCallback, useMemo } from "react";
+﻿import React, { useState, useCallback, useMemo } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import UiTextField from "../components/ui/UiTextField";
-import UiAutocomplete from "../components/ui/UiAutocomplete";
-import UiAsyncAutocomplete from "../components/ui/UiAsyncAutocomplete";
-import UiAvatar from "../components/ui/UiAvatar";
-import UiCheckBox from "../components/ui/UiCheckBox";
-import UiConfirmationDialog from "../components/ui/UiConfirmationDialog";
-import UiDateTimePicker from "../components/ui/UiDateTimePicker";
-import UiSelectInput from "../components/ui/UiSelectInput";
-import UiSelectInputV2 from "../components/ui/UiSelectInputV2";
-import UiNumberInput from "../components/ui/UiNumberInput";
-import UiVNDCurrencyInput from "../components/ui/UiVNDCurrencyInput";
-import UiPagingAutocomplete from "../components/ui/UiPagingAutocomplete";
-import UiPagingAutocompleteV2 from "../components/ui/UiPagingAutocompleteV2";
-import UiEditor from "../components/ui/UiEditor";
-import UiTable from "../components/ui/UiTable";
-import UiPopup from "../components/ui/UiPopup";
-import UiSearchInput from "../components/ui/UiSearchInput";
+import TextField from "../components/ui/TextField";
+import Autocomplete from "../components/ui/Autocomplete";
+import AsyncAutocomplete from "../components/ui/AsyncAutocomplete";
+import Avatar from "../components/ui/Avatar";
+import CheckBox from "../components/ui/CheckBox";
+import ConfirmationDialog from "../components/ui/ConfirmationDialog";
+import DateTimePicker from "../components/ui/DateTimePicker";
+import SelectInput from "../components/ui/SelectInput";
+import SelectInputV2 from "../components/ui/SelectInputV2";
+import NumberInput from "../components/ui/NumberInput";
+import VNDCurrencyInput from "../components/ui/VNDCurrencyInput";
+import PagingAutocomplete from "../components/ui/PagingAutocomplete";
+import PagingAutocompleteV2 from "../components/ui/PagingAutocompleteV2";
+import Editor from "../components/ui/Editor";
+import Table from "../components/ui/Table";
+import Popup from "../components/ui/Popup";
+import SearchInput from "../components/ui/SearchInput";
 import Button from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
 import { Box, Typography, Divider } from "@mui/material";
@@ -137,7 +137,7 @@ const TestComponents = () => {
         <div className="bg-white shadow-xl rounded-2xl border border-gray-100">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center">
             <Typography variant="h5" fontWeight={900}>Form Modernization</Typography>
-            <UiSearchInput search={(val) => console.log("Search trigger:", val)} />
+            <SearchInput search={(val) => console.log("Search trigger:", val)} />
           </div>
 
           <Formik
@@ -151,13 +151,13 @@ const TestComponents = () => {
             {({ values, isSubmitting }) => (
               <Form className="p-8 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <UiTextField name="firstName" label="Tên" required validate />
-                  <UiTextField name="lastName" label="Họ" required validate />
+                  <TextField name="firstName" label="Tên" required validate />
+                  <TextField name="lastName" label="Họ" required validate />
                   
-                  <UiNumberInput name="yearsOfExperience" label="Số năm kinh nghiệm" maxValue={50} />
-                  <UiVNDCurrencyInput name="salary" label="Mức lương mong muốn" suffix="VNĐ" textAlignRight />
+                  <NumberInput name="yearsOfExperience" label="Số năm kinh nghiệm" maxValue={50} />
+                  <VNDCurrencyInput name="salary" label="Mức lương mong muốn" suffix="VNĐ" textAlignRight />
                   
-                  <UiSelectInputV2 
+                  <SelectInputV2 
                     name="contractType" 
                     label="Loại hợp đồng (V2)" 
                     options={CONTRACT_OPTIONS} 
@@ -165,16 +165,16 @@ const TestComponents = () => {
                     required
                   />
                   
-                  <UiDateTimePicker name="birthDate" label="Ngày sinh" required validate />
+                  <DateTimePicker name="birthDate" label="Ngày sinh" required validate />
                   
-                  <UiPagingAutocomplete 
+                  <PagingAutocomplete 
                     name="province" 
                     label="Tỉnh/Thành phố (Paging)" 
                     api={mockApi} 
                     placeholder="Gõ để tìm kiếm..."
                   />
 
-                  <UiPagingAutocompleteV2 
+                  <PagingAutocompleteV2 
                     name="district" 
                     label="Quận/Huyện (Paging V2)" 
                     api={mockApi} 
@@ -184,7 +184,7 @@ const TestComponents = () => {
 
                 <Divider sx={{ my: 4 }} />
                 
-                <UiEditor name="content" label="Nội dung mô tả (Quill Editor)" />
+                <Editor name="content" label="Nội dung mô tả (Quill Editor)" />
 
                 <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
                    <Button variant="outlined" onClick={() => setShowPopup(true)}>Mở Popup Test</Button>
@@ -197,8 +197,8 @@ const TestComponents = () => {
 
         {/* DATA GRID SECTION */}
         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
-          <Typography variant="h6" fontWeight={800} gutterBottom>Data Grid (UiTable)</Typography>
-          <UiTable 
+          <Typography variant="h6" fontWeight={800} gutterBottom>Data Grid (Table)</Typography>
+          <Table 
             data={tableData}
             columns={tableColumns}
             totalElements={50}
@@ -221,7 +221,7 @@ const TestComponents = () => {
       </div>
 
       {/* OVERLAY COMPONENTS */}
-      <UiConfirmationDialog
+      <ConfirmationDialog
         open={showConfirm}
         onConfirmDialogClose={() => setShowConfirm(false)}
         title="Xác nhận"
@@ -229,7 +229,7 @@ const TestComponents = () => {
         onYesClick={() => setShowConfirm(false)}
       />
 
-      <UiPopup 
+      <Popup 
         open={showPopup} 
         onClosePopup={() => setShowPopup(false)} 
         title="Hệ thống Quản lý HRM v2"
@@ -237,10 +237,10 @@ const TestComponents = () => {
         action={<Button onClick={() => setShowPopup(false)}>Đóng</Button>}
       >
         <Typography variant="body1">
-          Đây là nội dung của <strong>UiPopup</strong> mới được di chuyển sang MUI v5.
+          Đây là nội dung của <strong>Popup</strong> mới được di chuyển sang MUI v5.
           Hỗ trợ Draggable trên thanh tiêu đề này.
         </Typography>
-      </UiPopup>
+      </Popup>
     </div>
   );
 };

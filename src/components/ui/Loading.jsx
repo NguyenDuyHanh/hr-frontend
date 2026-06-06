@@ -1,7 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { CircularProgress, Box } from '@mui/material';
 
-const UiLoading = ({ 
+const Loading = ({ 
   overlay = true, 
   fixed = false,
   size = 70,
@@ -35,4 +35,4 @@ const UiLoading = ({
   );
 };
 
-export default UiLoading;
+export default Loading;

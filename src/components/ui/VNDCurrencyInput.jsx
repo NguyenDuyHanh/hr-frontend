@@ -1,9 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+﻿/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, memo, useCallback, useMemo } from "react";
 import TextField from "@mui/material/TextField";
 import { FastField, getIn } from "formik";
 import { NumericFormat } from 'react-number-format';
-import UiRequiredLabel from "./UiRequiredLabel";
+import RequiredLabel from "./RequiredLabel";
 import clsx from "clsx";
 
 /**
@@ -34,7 +34,7 @@ const NumericFormatCustom = React.forwardRef((props, ref) => {
  * High-performance VND Currency Input component.
  * Features: Silent Render (FastField), Property Stability, MUI v5 Standards.
  */
-const UiVNDCurrencyInput = (props) => {
+const VNDCurrencyInput = (props) => {
   const { name, ...other } = props;
 
   const shouldUpdate = useCallback((nextProps, currentProps) => {
@@ -89,7 +89,7 @@ const MyVNDCurrencyInput = ({
   textAlignRight,
   ...otherProps
 }) => {
-  // DEBUG: console.log(`Render [UiVNDCurrencyInput]: ${name}`);
+  // DEBUG: console.log(`Render [VNDCurrencyInput]: ${name}`);
 
   const [internalValue, setInternalValue] = useState(field.value ?? "");
   const timerRef = React.useRef(null);
@@ -152,7 +152,7 @@ const MyVNDCurrencyInput = ({
           htmlFor={name} 
           className={clsx(oldStyle ? 'old-label' : 'label-container', readOnly && 'read-only')}
         >
-          <UiRequiredLabel label={label} requiredLabel={required} />
+          <RequiredLabel label={label} requiredLabel={required} />
         </label>
       )}
 
@@ -182,4 +182,4 @@ const MyVNDCurrencyInput = ({
   );
 };
 
-export default memo(UiVNDCurrencyInput);
+export default memo(VNDCurrencyInput);

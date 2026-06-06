@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import IconButton from '@mui/material/IconButton'
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined'
@@ -19,8 +19,8 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import LogoutIcon from '@mui/icons-material/Logout'
 import useSidebarStore from '@/store/sidebarStore'
 import useAuthStore from '@/store/useAuthStore'
-import UiConfirmationDialog from '@/components/ui/UiConfirmationDialog'
-import UiAvatar from '@/components/ui/UiAvatar'
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog'
+import Avatar from '@/components/ui/Avatar'
 
 const LayoutHeader = () => {
   const { toggleCollapsed, toggleMobileOpen } = useSidebarStore();
@@ -101,7 +101,7 @@ const LayoutHeader = () => {
           onClick={handleAvatarClick}
           className='w-8 h-8 rounded-full hover:opacity-90 active:scale-95 flex items-center justify-center border border-border cursor-pointer ml-2 shadow-sm overflow-hidden'
         >
-          <UiAvatar 
+          <Avatar 
             name={user?.fullName || user?.username} 
             imgPath={user?.imagePath} 
             className="w-full h-full text-[12px] font-bold" 
@@ -127,7 +127,7 @@ const LayoutHeader = () => {
         >
           {/* User Info Header Section */}
           <div className="flex items-center gap-3 px-4 py-2">
-            <UiAvatar 
+            <Avatar 
               name={user?.fullName || user?.username} 
               imgPath={user?.imagePath} 
               className="w-12 h-12 border-2 border-background shadow-sm flex-shrink-0 text-lg font-semibold" 
@@ -176,7 +176,7 @@ const LayoutHeader = () => {
         </Menu>
 
         {/* Confirmation Dialog for Logging out */}
-        <UiConfirmationDialog
+        <ConfirmationDialog
           open={showConfirmLogout}
           onConfirmDialogClose={() => setShowConfirmLogout(false)}
           title="Xác nhận đăng xuất"

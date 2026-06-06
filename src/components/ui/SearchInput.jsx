@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo, useEffect } from "react";
+﻿import React, { useState, useCallback, memo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
@@ -10,7 +10,7 @@ import CloseIcon from "@mui/icons-material/Close";
  * Standardized for MUI v5 / Standard UI.
  * Supports both controlled (value/onChange) and uncontrolled (search callback) modes.
  */
-function UiSearchInput({
+function SearchInput({
   value: controlledValue,
   onChange,
   onKeyDown,
@@ -119,4 +119,4 @@ function UiSearchInput({
   );
 }
 
-export default memo(UiSearchInput);
+export default memo(SearchInput);

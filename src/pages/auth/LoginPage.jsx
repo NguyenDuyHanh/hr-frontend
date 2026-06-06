@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
@@ -15,8 +15,8 @@ import {
 import { toast } from 'sonner';
 import useAuthStore from '../../store/useAuthStore';
 import useThemeStore from '../../store/themeStore';
-import UiTextField from '../../components/ui/UiTextField';
-import UiCheckBox from '../../components/ui/UiCheckBox';
+import TextField from '../../components/ui/TextField';
+import CheckBox from '../../components/ui/CheckBox';
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -109,8 +109,8 @@ const LoginPage = () => {
           <FormikProvider value={formik}>
             <form onSubmit={formik.handleSubmit} className="px-8 pb-10 flex flex-col gap-1">
 
-              {/* Username Input using shared UiTextField */}
-              <UiTextField
+              {/* Username Input using shared TextField */}
+              <TextField
                 name="username"
                 label="Tên đăng nhập"
                 placeholder="Tên đăng nhập"
@@ -126,8 +126,8 @@ const LoginPage = () => {
                 }}
               />
 
-              {/* Password Input using shared UiTextField */}
-              <UiTextField
+              {/* Password Input using shared TextField */}
+              <TextField
                 name="password"
                 label="Mật khẩu"
                 placeholder="Mật khẩu"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+﻿import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid, IconButton, TextField, Paper } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -11,17 +11,17 @@ import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
-import UiTable from '../../components/ui/UiTable';
+import Table from '../../components/ui/Table';
 import StaffForm from './components/StaffForm';
-import UiConfirmationDialog from '../../components/ui/UiConfirmationDialog';
+import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import useStaffStore from '../../store/staffStore';
 import { WorkingStatusOptions } from '../../LocalConstants';
 import { getLabelFromOptions, getActiveFilterCount } from '../../LocalFunction';
 import { getDepartments, getPositions } from '../../services/StaffService';
-import UiListToolbar from '../../components/ui/UiListToolbar';
-import UiFilterPanel from '../../components/ui/UiFilterPanel';
+import ListToolbar from '../../components/ui/ListToolbar';
+import FilterPanel from '../../components/ui/FilterPanel';
 import { Formik } from 'formik';
-import UiAutocomplete from '../../components/ui/UiAutocomplete';
+import Autocomplete from '../../components/ui/Autocomplete';
 
 const FAKE_DEPARTMENTS = [
   { id: '1', name: "Phòng Hành chính" },
@@ -307,7 +307,7 @@ const StaffList = () => {
                     {() => (
                         <>
                             {/* Toolbar & Advanced Filter */}
-                            <UiListToolbar
+                            <ListToolbar
                                 searchDraft={searchDraft}
                                 onSearchDraftChange={setSearchDraft}
                                 onSearch={handleSearch}
@@ -325,7 +325,7 @@ const StaffList = () => {
                                 exportFileName="Danh_sach_nhan_vien.xlsx"
                             />
 
-                            <UiFilterPanel
+                            <FilterPanel
                                 open={filterOpen}
                                 onOpenChange={setFilterOpen}
                                 onApply={handleApplyFilters}
@@ -333,7 +333,7 @@ const StaffList = () => {
                             >
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={6}>
-                                        <UiAutocomplete
+                                        <Autocomplete
                                             name="department"
                                             label="Phòng ban"
                                             options={departments}
@@ -341,7 +341,7 @@ const StaffList = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
-                                        <UiAutocomplete
+                                        <Autocomplete
                                             name="position"
                                             label="Chức danh"
                                             options={positions}
@@ -349,13 +349,13 @@ const StaffList = () => {
                                         />
                                     </Grid>
                                 </Grid>
-                            </UiFilterPanel>
+                            </FilterPanel>
                         </>
                     )}
                 </Formik>
 
                 {/* Table */}
-                <UiTable 
+                <Table 
                     columns={columns} 
                     data={staffs} 
                     totalElements={totalElements}
@@ -377,7 +377,7 @@ const StaffList = () => {
                 />
             )}
 
-            <UiConfirmationDialog
+            <ConfirmationDialog
                 open={openConfirm}
                 onConfirmDialogClose={() => setOpenConfirm(false)}
                 onYesClick={confirmDelete}
