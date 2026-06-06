@@ -3,15 +3,14 @@ import DialogContent from "@mui/material/DialogContent";
 import MenuItem from "@mui/material/MenuItem";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
-import { useTranslation } from "react-i18next";
-import UiPopup from "./UiPopup";
+import Popup from "./Popup";
 import PropTypes from "prop-types";
 
 /**
  * High-performance Pagination Option Popup.
  * Features: Silent Render (memo), Optimized event handlers.
  */
-function UiPaginationOptionPopup({
+function PaginationOptionPopup({
   open,
   handleClose,
   setRowsPerPage,
@@ -21,7 +20,6 @@ function UiPaginationOptionPopup({
   page,
   pageSize: propPageSize,
 }) {
-  const { t } = useTranslation();
   const [pageIndex, setPageIndex] = useState(page);
   const [pageSize, setPageSize] = useState(propPageSize);
 
@@ -36,12 +34,12 @@ function UiPaginationOptionPopup({
   const handleGo = useCallback((event) => {
     const num = Number(pageIndex);
     if (isNaN(num) || num < 1 || num > totalPages) {
-      alert(`${t("general.enterNumberBetween")} 1 ${t("general.and")} ${totalPages}`);
+      alert(`Vui lòng nhập số trang từ 1 đến ${totalPages}`);
       return;
     }
     handleChangePage(event, num);
     handleClose();
-  }, [pageIndex, totalPages, handleChangePage, handleClose, t]);
+  }, [pageIndex, totalPages, handleChangePage, handleClose]);
 
   const handlePageSizeChange = useCallback((event) => {
     setPageSize(event.target.value);
@@ -56,20 +54,20 @@ function UiPaginationOptionPopup({
   }, [handleGo]);
 
   return (
-    <UiPopup
+    <Popup
       scroll="body"
       size="xs"
       open={open}
       noDialogContent
-      title={t("pagination.tool")}
+      title="Thiết lập hiển thị"
       onClosePopup={handleClose}
     >
       <DialogContent sx={{ overflow: "hidden", p: 2 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <div>
-              <p style={{ margin: "0 0 8px 0", fontSize: "14px", fontWeight: 500 }}>
-                {t("general.rowsPerPage")}
+              <p style={{ margin: "8px 0 8px 0", fontSize: "14px", fontWeight: 500 }}>
+                Số dòng mỗi trang
               </p>
               <TextField 
                 select 
@@ -89,7 +87,7 @@ function UiPaginationOptionPopup({
           <Grid item xs={12}>
             <div>
               <p style={{ margin: "0 0 8px 0", fontSize: "14px", fontWeight: 500 }}>
-                {t("general.gotoPage")}
+                Đi đến trang
               </p>
               <TextField
                 type="number"
@@ -107,11 +105,11 @@ function UiPaginationOptionPopup({
           </Grid>
         </Grid>
       </DialogContent>
-    </UiPopup>
+    </Popup>
   );
 }
 
-UiPaginationOptionPopup.propTypes = {
+PaginationOptionPopup.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   setRowsPerPage: PropTypes.func.isRequired,
@@ -122,4 +120,4 @@ UiPaginationOptionPopup.propTypes = {
   pageSize: PropTypes.number.isRequired,
 };
 
-export default memo(UiPaginationOptionPopup);
+export default memo(PaginationOptionPopup);

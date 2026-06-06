@@ -1,4 +1,4 @@
-import React, { memo, useState, useRef, useMemo } from 'react';
+﻿import React, { memo, useState, useRef, useMemo } from 'react';
 import { FastField, getIn } from 'formik';
 import { Box, Button, CircularProgress, Typography, Avatar } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -8,11 +8,11 @@ import { toast } from 'sonner';
 import { uploadImage } from '../../services/CloudinaryService';
 
 /**
- * UiImageUpload - A premium, Formik-integrated image uploader component.
+ * ImageUpload - A premium, Formik-integrated image uploader component.
  * Allows choosing a local file, shows an immediate preview, uploads directly to Cloudinary,
  * and updates the Formik state with the absolute Cloudinary secure URL.
  */
-const UiImageUpload = React.forwardRef((props, ref) => {
+const ImageUpload = React.forwardRef((props, ref) => {
     return (
         <FastField
             name={props.name}
@@ -283,4 +283,4 @@ const MyImageUpload = React.forwardRef(({
     );
 });
 
-export default memo(UiImageUpload);
+export default memo(ImageUpload);

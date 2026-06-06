@@ -1,15 +1,15 @@
-import React, { memo, useMemo } from "react";
+﻿import React, { memo, useMemo } from "react";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import { FastField, getIn } from "formik";
 
 /**
- * UiSelectInput - Modernized MUI v5 Select Input with Formik integration.
+ * SelectInput - Modernized MUI v5 Select Input with Formik integration.
  * Standards: FastField + shouldComponentUpdate + useMemo.
  */
 
-const UiSelectInput = React.forwardRef((props, ref) => {
+const SelectInput = React.forwardRef((props, ref) => {
   return (
     <FastField
       {...props}
@@ -196,4 +196,4 @@ const MySelectInput = React.forwardRef(({
   );
 });
 
-export default memo(UiSelectInput);
+export default memo(SelectInput);

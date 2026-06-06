@@ -1,10 +1,10 @@
-import React, { memo } from 'react';
+﻿import React, { memo } from 'react';
 
 /**
  * High-performance Required Label component.
  * Standardized for MUI v5 / HRM HRM-standard.
  */
-function UiRequiredLabel({ label, requiredLabel }) {
+function RequiredLabel({ label, requiredLabel }) {
   if (!label) {
     return null;
   }
@@ -17,4 +17,4 @@ function UiRequiredLabel({ label, requiredLabel }) {
   );
 }
 
-export default memo(UiRequiredLabel);
+export default memo(RequiredLabel);

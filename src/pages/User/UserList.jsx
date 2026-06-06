@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+﻿import React, { useEffect, useState, useMemo } from 'react';
 import { 
     Button, 
     Grid, 
@@ -22,11 +22,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-import UiTable from '../../components/ui/UiTable';
+import Table from '../../components/ui/Table';
 import useUserStore from '../../store/userStore';
-import UiConfirmationDialog from '../../components/ui/UiConfirmationDialog';
+import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import UserForm from './UserForm';
-import UiSelectInput from '../../components/ui/UiSelectInput';
+import SelectInput from '../../components/ui/SelectInput';
 import { Formik } from 'formik';
 import { saveUser } from '../../services/UserService';
 import { getDepartments, getPositions } from '../../services/StaffService';
@@ -334,7 +334,7 @@ const UserList = () => {
                             {() => (
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={6} md={3}>
-                                        <UiSelectInput
+                                        <SelectInput
                                             label="Trạng thái"
                                             name="active"
                                             options={activeOptions}
@@ -347,7 +347,7 @@ const UserList = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
-                                        <UiSelectInput
+                                        <SelectInput
                                             label="Vai trò (Quyền)"
                                             name="roleId"
                                             options={roleOptions}
@@ -360,7 +360,7 @@ const UserList = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
-                                        <UiSelectInput
+                                        <SelectInput
                                             label="Phòng ban"
                                             name="departmentId"
                                             options={departmentOptions}
@@ -373,7 +373,7 @@ const UserList = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
-                                        <UiSelectInput
+                                        <SelectInput
                                             label="Chức danh"
                                             name="positionId"
                                             options={positionOptions}
@@ -411,7 +411,7 @@ const UserList = () => {
                     </Box>
                 </Collapse>
                 
-                <UiTable 
+                <Table 
                     columns={columns} 
                     data={users} 
                     totalElements={totalElements}
@@ -434,7 +434,7 @@ const UserList = () => {
                 />
             )}
 
-            <UiConfirmationDialog
+            <ConfirmationDialog
                 open={openConfirm}
                 onConfirmDialogClose={() => setOpenConfirm(false)}
                 onYesClick={confirmDelete}
@@ -444,7 +444,7 @@ const UserList = () => {
                 cancel="Hủy bỏ"
             />
 
-            <UiConfirmationDialog
+            <ConfirmationDialog
                 open={openLockConfirm}
                 onConfirmDialogClose={() => setOpenLockConfirm(false)}
                 onYesClick={confirmToggleActive}

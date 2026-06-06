@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import 'nprogress/nprogress.css';
 import { Toaster } from 'sonner';
@@ -11,7 +11,7 @@ import StaffList from "./pages/Staff/StaffList";
 import UserList from "./pages/User/UserList";
 import StaffDetailPage from "./pages/Staff/StaffDetailPage";
 import useUiStore from "./store/uiStore";
-import UiLoading from "./components/ui/UiLoading";
+import Loading from "./components/ui/Loading";
 import GlobalLoadingHandler from "./components/common/GlobalLoadingHandler";
 import AiChatbotWidget from "./components/ui/AiChatbotWidget";
 import LoginPage from "./pages/auth/LoginPage";
@@ -73,7 +73,7 @@ function App() {
       <GlobalLoadingHandler />
       
       {/* Vòng xoay trung tâm điều khiển bởi showLoading */}
-      {showLoading && <UiLoading fixed />}
+      {showLoading && <Loading fixed />}
       
       {/* Widget Trợ lý AI */}
       <AiChatbotWidget />

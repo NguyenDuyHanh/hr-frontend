@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+﻿import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -12,7 +12,7 @@ import clsx from "clsx";
 /**
  * Standardized High-performance Popup component.
  */
-function UiPopup({
+function Popup({
   open,
   onClosePopup,
   title,
@@ -97,7 +97,7 @@ function UiPopup({
   );
 }
 
-UiPopup.propTypes = {
+Popup.propTypes = {
   size: PropTypes.oneOf(["xs", "sm", "md", "lg", "xl", false]),
   open: PropTypes.bool.isRequired,
   onClosePopup: PropTypes.func.isRequired,
@@ -109,4 +109,4 @@ UiPopup.propTypes = {
   styleTitle: PropTypes.object,
 };
 
-export default memo(UiPopup);
+export default memo(Popup);

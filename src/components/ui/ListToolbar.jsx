@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   Children,
   Fragment,
   isValidElement,
@@ -74,7 +74,7 @@ function downloadBlob(blob, filename) {
 }
 
 /**
- * UiListToolbar — MUI port of hr-v5 ListToolbar.
+ * ListToolbar — MUI port of hr-v5 ListToolbar.
  *
  * Features:
  *  - Keyword search with clear button
@@ -84,7 +84,7 @@ function downloadBlob(blob, filename) {
  *  - Responsive overflow → actions collapse into MoreHoriz dropdown
  *  - Extra buttons slot
  */
-function UiListToolbar({
+function ListToolbar({
   // ─── search ───
   keyword = '',
   onKeywordChange,
@@ -755,4 +755,4 @@ function UiListToolbar({
   );
 }
 
-export default memo(UiListToolbar);
+export default memo(ListToolbar);

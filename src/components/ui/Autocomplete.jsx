@@ -1,14 +1,14 @@
-import React, { memo, useEffect, useState, useMemo } from "react";
-import Autocomplete from "@mui/material/Autocomplete";
+﻿import React, { memo, useEffect, useState, useMemo } from "react";
+import MuiAutocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { FastField, getIn } from "formik";
 
 /**
- * UiAutocomplete - Modernized MUI v5 Autocomplete with Formik integration.
+ * Autocomplete - Modernized MUI v5 Autocomplete with Formik integration.
  * Standards: FastField + shouldComponentUpdate + useMemo (props).
  */
 
-const UiAutocomplete = React.forwardRef((props, ref) => {
+const Autocomplete = React.forwardRef((props, ref) => {
   return (
     <FastField
       {...props}
@@ -173,7 +173,7 @@ const MyAutocomplete = React.forwardRef(({
           {label} {(validate || required) && <span className="text-red-500 font-bold ml-1">*</span>}
         </label>
       )}
-      <Autocomplete
+      <MuiAutocomplete
         {...field}
         {...otherProps}
         id={name}
@@ -196,4 +196,4 @@ const MyAutocomplete = React.forwardRef(({
   );
 });
 
-export default memo(UiAutocomplete);
+export default memo(Autocomplete);

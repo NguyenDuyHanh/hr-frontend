@@ -1,13 +1,13 @@
-import React, { useState, useEffect, memo } from 'react';
+﻿import React, { useState, useEffect, memo } from 'react';
 import ConstantList from '../../appConfig';
 
 /**
- * UiAvatar - A modernized version of GlobitsAvatar.
+ * Avatar - A modernized version of GlobitsAvatar.
  * Preserves 100% of the original logic for image path construction, 
  * error handling, and fallback initials.
  */
 
-const UiAvatar = React.forwardRef(({ name, imgPath, isFile, style, className }, ref) => {
+const Avatar = React.forwardRef(({ name, imgPath, isFile, style, className }, ref) => {
     const [errorLinkImg, setErrorLinkImg] = useState(false);
 
     const getImageNameAndType = (name) => {
@@ -77,4 +77,4 @@ const UiAvatar = React.forwardRef(({ name, imgPath, isFile, style, className }, 
     }
 });
 
-export default memo(UiAvatar);
+export default memo(Avatar);

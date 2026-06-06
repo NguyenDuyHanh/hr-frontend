@@ -1,15 +1,15 @@
-import React, { memo, useMemo } from "react";
-import Checkbox from "@mui/material/Checkbox";
+﻿import React, { memo, useMemo } from "react";
+import MuiCheckbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import { FastField, getIn } from "formik";
 
 /**
- * UiCheckBox - Modernized MUI v5 CheckBox with Formik integration.
+ * CheckBox - Modernized MUI v5 CheckBox with Formik integration.
  * Standards: FastField + shouldComponentUpdate + useMemo.
  */
 
-const UiCheckBox = React.forwardRef((props, ref) => {
+const CheckBox = React.forwardRef((props, ref) => {
   return (
     <FastField
       {...props}
@@ -119,7 +119,7 @@ const MyCheckBox = React.forwardRef(({
         style={style}
         sx={sxMemo}
         control={
-          <Checkbox
+          <MuiCheckbox
             {...field}
             {...otherProps}
             checked={Boolean(field.value)}
@@ -133,4 +133,4 @@ const MyCheckBox = React.forwardRef(({
   );
 });
 
-export default memo(UiCheckBox);
+export default memo(CheckBox);

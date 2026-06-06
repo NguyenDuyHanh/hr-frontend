@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useRef, useCallback, memo, useMemo } from "react";
+﻿import React, { useEffect, useState, useRef, useCallback, memo, useMemo } from "react";
 import TextField from "@mui/material/TextField";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { FastField, getIn } from "formik";
 import clsx from "clsx";
 import { containsOnlyNumbers } from "../../LocalFunction";
-import UiRequiredLabel from "./UiRequiredLabel";
+import RequiredLabel from "./RequiredLabel";
 
 /**
  * High-performance Number Input component.
  * Features: Silent Render (FastField), Debounced Input, Property Stability.
  */
-const UiNumberInput = (props) => {
+const NumberInput = (props) => {
   const { name, ...other } = props;
   
   const shouldUpdate = useCallback((nextProps, currentProps) => {
@@ -68,7 +68,7 @@ const MyNumberInput = ({
   formik,
   ...otherProps
 }) => {
-  // DEBUG: console.log(`Render [UiNumberInput]: ${name}`);
+  // DEBUG: console.log(`Render [NumberInput]: ${name}`);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -173,7 +173,7 @@ const MyNumberInput = ({
           htmlFor={name}
           className={clsx(oldStyle ? "old-label" : "label-container", readOnly && "read-only")}
         >
-          <UiRequiredLabel label={label} requiredLabel={required || requiredLabel} />
+          <RequiredLabel label={label} requiredLabel={required || requiredLabel} />
         </label>
       )}
       <TextField
@@ -196,4 +196,4 @@ const MyNumberInput = ({
   );
 };
 
-export default memo(UiNumberInput);
+export default memo(NumberInput);

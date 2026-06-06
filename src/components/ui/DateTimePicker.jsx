@@ -3,17 +3,17 @@ import { FastField, getIn } from "formik";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { DateTimePicker as MuiDateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import viLocale from "date-fns/locale/vi";
 import { isValid, getTime, format as formatDatefns } from "date-fns";
 
 /**
- * UiDateTimePicker - Modernized MUI v5 Picker with Formik integration.
+ * DateTimePicker - Modernized MUI v5 Picker with Formik integration.
  * Standards: FastField + shouldComponentUpdate + useRef (timer) + useMemo (props).
  */
 
-const UiDateTimePicker = React.forwardRef((props, ref) => {
+const DateTimePicker = React.forwardRef((props, ref) => {
   return (
     <FastField
       {...props}
@@ -191,7 +191,7 @@ const MyDateTimePicker = React.forwardRef(({
   }), [name, isError, meta.error, readOnly, isTimePicker, otherProps.size, otherProps.variant, otherProps.placeholder, otherProps.helperText, otherProps.sx]);
 
   const PickerComponent = isDateTimePicker || isDateTimeSecondsPicker 
-    ? DateTimePicker 
+    ? MuiDateTimePicker 
     : isTimePicker ? TimePicker : DatePicker;
 
   return (
@@ -220,4 +220,4 @@ const MyDateTimePicker = React.forwardRef(({
   );
 });
 
-export default memo(UiDateTimePicker);
+export default memo(DateTimePicker);

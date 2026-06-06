@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+﻿import React, { useState, memo } from 'react';
 import { Collapse, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import RotateLeftIcon from '@mui/icons-material/RotateLeft';
@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import TuneIcon from '@mui/icons-material/Tune';
 
 /**
- * UiFilterPanel — Bộ lọc nâng cao.
+ * FilterPanel — Bộ lọc nâng cao.
  *
  * Phiên bản tối ưu hóa bằng Tailwind CSS của FilterPanel.
  * Dùng MUI Collapse để animate open/close.
@@ -15,14 +15,14 @@ import TuneIcon from '@mui/icons-material/Tune';
  *  - children      : các field filter (controlled bởi parent)
  *  - onApply       : callback khi click "Tìm kiếm"
  *  - onReset       : callback khi click "Đặt lại"
- *  - open          : controlled open state (dùng cùng UiListToolbar filter.open)
+ *  - open          : controlled open state (dùng cùng ListToolbar filter.open)
  *  - onOpenChange  : callback khi open thay đổi
  *  - defaultOpen   : initial open state (uncontrolled mode)
  *  - disabled      : disable tất cả buttons
  *  - title         : tiêu đề panel (false để ẩn)
  *  - className     : class cho wrapper ngoài cùng
  */
-function UiFilterPanel({
+function FilterPanel({
   children,
   onApply,
   onReset,
@@ -114,4 +114,4 @@ function UiFilterPanel({
   );
 }
 
-export default memo(UiFilterPanel);
+export default memo(FilterPanel);

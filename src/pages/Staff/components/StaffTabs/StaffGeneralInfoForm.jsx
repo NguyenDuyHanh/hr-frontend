@@ -1,14 +1,14 @@
-import React, { useMemo, useEffect, useState } from 'react';
+﻿import React, { useMemo, useEffect, useState } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { Grid, Button, Box, Typography } from '@mui/material';
 import useStaffStore from '../../../../store/staffStore';
-import UiTextField from '../../../../components/ui/UiTextField';
-import UiSelectInput from '../../../../components/ui/UiSelectInput';
-import UiDateTimePicker from '../../../../components/ui/UiDateTimePicker';
-import UiAutocomplete from '../../../../components/ui/UiAutocomplete';
+import TextField from '../../../../components/ui/TextField';
+import SelectInput from '../../../../components/ui/SelectInput';
+import DateTimePicker from '../../../../components/ui/DateTimePicker';
+import Autocomplete from '../../../../components/ui/Autocomplete';
 import TabAccordion from '../../../../components/ui/Tab/TabAccordion';
-import UiImageUpload from '../../../../components/ui/UiImageUpload';
+import ImageUpload from '../../../../components/ui/ImageUpload';
 import { WorkingStatusOptions } from '../../../../LocalConstants';
 import { getDepartments, getPositions } from '../../../../services/StaffService';
 import { format } from 'date-fns';
@@ -353,39 +353,39 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 <TabAccordion title="Thông tin cá nhân" open={true}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={3}>
-                            <UiImageUpload label="Ảnh đại diện" name="imagePath" disabled={isView} />
+                            <ImageUpload label="Ảnh đại diện" name="imagePath" disabled={isView} />
                         </Grid>
                         <Grid item xs={12} md={9}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <UiTextField label="Họ và tên" name="displayName" required fullWidth disabled={isView} />
+                                    <TextField label="Họ và tên" name="displayName" required fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <UiSelectInput label="Giới tính" name="gender" options={[
+                                    <SelectInput label="Giới tính" name="gender" options={[
                                         { value: 'M', name: 'Nam' },
                                         { value: 'F', name: 'Nữ' },
                                     ]} fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <UiDateTimePicker label="Ngày sinh" name="birthDate" notValueMillisecond={true} required fullWidth disabled={isView} />
+                                    <DateTimePicker label="Ngày sinh" name="birthDate" notValueMillisecond={true} required fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <UiSelectInput label="Tình trạng hôn nhân" name="maritalStatus" options={maritalStatusOptions} fullWidth disabled={isView} />
+                                    <SelectInput label="Tình trạng hôn nhân" name="maritalStatus" options={maritalStatusOptions} fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <UiTextField label="Nơi sinh" name="birthPlace" fullWidth disabled={isView} />
+                                    <TextField label="Nơi sinh" name="birthPlace" fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <UiSelectInput label="Quốc tịch" name="nationalityId" options={nationalityOptions} required fullWidth disabled={isView} />
+                                    <SelectInput label="Quốc tịch" name="nationalityId" options={nationalityOptions} required fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <UiSelectInput label="Dân tộc" name="ethnicsId" options={ethnicsOptions} fullWidth disabled={isView} />
+                                    <SelectInput label="Dân tộc" name="ethnicsId" options={ethnicsOptions} fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <UiSelectInput label="Tôn giáo" name="religionId" options={religionOptions} fullWidth disabled={isView} />
+                                    <SelectInput label="Tôn giáo" name="religionId" options={religionOptions} fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <UiSelectInput label="Trình độ học vấn" name="educationDegreeId" options={educationDegreeOptions} fullWidth disabled={isView} />
+                                    <SelectInput label="Trình độ học vấn" name="educationDegreeId" options={educationDegreeOptions} fullWidth disabled={isView} />
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -396,7 +396,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 <TabAccordion title="Địa chỉ thường trú / tạm trú" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput 
+                            <SelectInput 
                                 label="Tỉnh thường trú" 
                                 name="provinceId" 
                                 options={provinceOptions} 
@@ -407,7 +407,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput 
+                            <SelectInput 
                                 label="Xã thường trú" 
                                 name="administrativeunitId" 
                                 options={activeWards} 
@@ -416,13 +416,13 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={6}>
-                            <UiTextField label="Quê quán" name="homeTown" fullWidth disabled={isView} />
+                            <TextField label="Quê quán" name="homeTown" fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <UiTextField label="Chi tiết thường trú" name="permanentResidence" multiline rows={2} fullWidth disabled={isView} />
+                            <TextField label="Chi tiết thường trú" name="permanentResidence" multiline rows={2} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <UiTextField label="Tạm trú" name="currentResidence" multiline rows={2} fullWidth disabled={isView} />
+                            <TextField label="Tạm trú" name="currentResidence" multiline rows={2} fullWidth disabled={isView} />
                         </Grid>
                     </Grid>
                 </TabAccordion>
@@ -431,30 +431,30 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 <TabAccordion title="Giấy tờ pháp lý" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Số CMND" name="idNumber" fullWidth inputProps={{ maxLength: 12 }} disabled={isView} />
+                            <TextField label="Số CMND" name="idNumber" fullWidth inputProps={{ maxLength: 12 }} disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiDateTimePicker label="Ngày cấp CMND" name="idNumberIssueDate" notValueMillisecond={true} fullWidth disabled={isView} />
+                            <DateTimePicker label="Ngày cấp CMND" name="idNumberIssueDate" notValueMillisecond={true} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Nơi cấp CMND" name="idNumberIssueBy" fullWidth disabled={isView} />
+                            <TextField label="Nơi cấp CMND" name="idNumberIssueBy" fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Số CCCD" name="personalIdentificationNumber" fullWidth inputProps={{ maxLength: 12 }} disabled={isView} />
+                            <TextField label="Số CCCD" name="personalIdentificationNumber" fullWidth inputProps={{ maxLength: 12 }} disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiDateTimePicker label="Ngày cấp CCCD" name="personalIdentificationIssueDate" notValueMillisecond={true} fullWidth disabled={isView} />
+                            <DateTimePicker label="Ngày cấp CCCD" name="personalIdentificationIssueDate" notValueMillisecond={true} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Nơi cấp CCCD" name="personalIdentificationIssuePlace" fullWidth disabled={isView} />
+                            <TextField label="Nơi cấp CCCD" name="personalIdentificationIssuePlace" fullWidth disabled={isView} />
                         </Grid>
                         {isForeigner && (
                             <>
                                 <Grid item xs={12} sm={6} lg={3}>
-                                    <UiTextField label="Số hộ chiếu (Passport)" name="passportNumber" fullWidth disabled={isView} />
+                                    <TextField label="Số hộ chiếu (Passport)" name="passportNumber" fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={3}>
-                                    <UiTextField label="Số giấy phép lao động" name="workPermitNumber" fullWidth disabled={isView} />
+                                    <TextField label="Số giấy phép lao động" name="workPermitNumber" fullWidth disabled={isView} />
                                 </Grid>
                             </>
                         )}
@@ -465,62 +465,62 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 <TabAccordion title="Thông tin hồ sơ nhân viên" open={true}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Mã nhân viên" name="staffCode" readOnly required fullWidth disabled={isView} />
+                            <TextField label="Mã nhân viên" name="staffCode" readOnly required fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Trạng thái làm việc" name="workingStatus" options={WorkingStatusOptions} required fullWidth disabled={isView} />
+                            <SelectInput label="Trạng thái làm việc" name="workingStatus" options={WorkingStatusOptions} required fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Trạng thái hồ sơ" name="statusId" options={statusOptions} required fullWidth disabled={isView} />
+                            <SelectInput label="Trạng thái hồ sơ" name="statusId" options={statusOptions} required fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Hình thức làm việc" name="staffWorkingFormat" options={workingFormatOptions} fullWidth disabled={isView} />
+                            <SelectInput label="Hình thức làm việc" name="staffWorkingFormat" options={workingFormatOptions} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Người giới thiệu" name="introducerId" options={[]} fullWidth placeholder="Chọn người giới thiệu..." disabled={isView} />
+                            <SelectInput label="Người giới thiệu" name="introducerId" options={[]} fullWidth placeholder="Chọn người giới thiệu..." disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Người quyết định tuyển dụng" name="recruiterId" options={[]} fullWidth placeholder="Chọn người quyết định..." disabled={isView} />
+                            <SelectInput label="Người quyết định tuyển dụng" name="recruiterId" options={[]} fullWidth placeholder="Chọn người quyết định..." disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiDateTimePicker label="Ngày vào" name="recruitmentDate" notValueMillisecond={true} required fullWidth disabled={isView} />
+                            <DateTimePicker label="Ngày vào" name="recruitmentDate" notValueMillisecond={true} required fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Số ngày HV/TV" name="apprenticeDays" type="number" required fullWidth disabled={isView} />
+                            <TextField label="Số ngày HV/TV" name="apprenticeDays" type="number" required fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiDateTimePicker label="Ngày chính thức" name="startDate" notValueMillisecond={true} required fullWidth disabled={isView} />
+                            <DateTimePicker label="Ngày chính thức" name="startDate" notValueMillisecond={true} required fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Email công ty" name="companyEmail" required fullWidth disabled={isView} />
+                            <TextField label="Email công ty" name="companyEmail" required fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Tình trạng nhân sự" name="staffPhase" options={staffPhaseOptions} fullWidth disabled={isView} />
+                            <SelectInput label="Tình trạng nhân sự" name="staffPhase" options={staffPhaseOptions} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Loại vị trí việc làm" name="staffPositionType" options={positionTypeOptions} fullWidth disabled={isView} />
+                            <SelectInput label="Loại vị trí việc làm" name="staffPositionType" options={positionTypeOptions} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Nơi mong muốn ĐKKCB" name="healthCareRegistrationPlaceId" options={healthCarePlaceOptions} fullWidth disabled={isView} />
+                            <SelectInput label="Nơi mong muốn ĐKKCB" name="healthCareRegistrationPlaceId" options={healthCarePlaceOptions} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Loại phân ca" name="staffWorkShiftType" options={shiftTypeOptions} fullWidth disabled={isView} />
+                            <SelectInput label="Loại phân ca" name="staffWorkShiftType" options={shiftTypeOptions} fullWidth disabled={isView} />
                         </Grid>
                         {values.staffWorkShiftType === 'fixed' && (
                             <Grid item xs={12} sm={6} lg={3}>
-                                <UiSelectInput label="Ca làm việc cố định" name="fixShiftWorkId" options={fixShiftWorkOptions} fullWidth disabled={isView} />
+                                <SelectInput label="Ca làm việc cố định" name="fixShiftWorkId" options={fixShiftWorkOptions} fullWidth disabled={isView} />
                             </Grid>
                         )}
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Loại nghỉ trong tháng" name="staffLeaveShiftType" options={leaveShiftTypeOptions} fullWidth disabled={isView} />
+                            <SelectInput label="Loại nghỉ trong tháng" name="staffLeaveShiftType" options={leaveShiftTypeOptions} fullWidth disabled={isView} />
                         </Grid>
                         {values.staffLeaveShiftType === 'fixed' && (
                             <>
                                 <Grid item xs={12} sm={6} lg={3}>
-                                    <UiSelectInput label="Ngày nghỉ cố định 1" name="fixLeaveWeekDay" options={weekDayOptions} fullWidth disabled={isView} />
+                                    <SelectInput label="Ngày nghỉ cố định 1" name="fixLeaveWeekDay" options={weekDayOptions} fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={3}>
-                                    <UiSelectInput label="Ngày nghỉ cố định 2" name="fixLeaveWeekDay2" options={weekDayOptions} fullWidth disabled={isView} />
+                                    <SelectInput label="Ngày nghỉ cố định 2" name="fixLeaveWeekDay2" options={weekDayOptions} fullWidth disabled={isView} />
                                 </Grid>
                             </>
                         )}
@@ -531,10 +531,10 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 <TabAccordion title="Tổ chức" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Đơn vị" name="organizationId" options={organizationOptions} fullWidth disabled={isView} />
+                            <SelectInput label="Đơn vị" name="organizationId" options={organizationOptions} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiAutocomplete 
+                            <Autocomplete 
                                 label="Phòng ban" 
                                 name="department" 
                                 options={departments}
@@ -544,7 +544,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiAutocomplete 
+                            <Autocomplete 
                                 label="Chức danh" 
                                 name="position" 
                                 options={positions}
@@ -554,10 +554,10 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Cấp bậc" name="level" fullWidth disabled={isView} />
+                            <TextField label="Cấp bậc" name="level" fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiSelectInput label="Chức danh khác (Title)" name="positionTitleId" options={positionTitleOptions} fullWidth disabled={isView} />
+                            <SelectInput label="Chức danh khác (Title)" name="positionTitleId" options={positionTitleOptions} fullWidth disabled={isView} />
                         </Grid>
                     </Grid>
                 </TabAccordion>
@@ -566,13 +566,13 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 <TabAccordion title="Thông tin liên hệ" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Số điện thoại" name="phoneNumber" required fullWidth disabled={isView} />
+                            <TextField label="Số điện thoại" name="phoneNumber" required fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Email cá nhân" name="email" required fullWidth disabled={isView} />
+                            <TextField label="Email cá nhân" name="email" required fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={12}>
-                            <UiTextField label="Người liên hệ khẩn cấp (tên / SĐT / quan hệ)" name="contactPersonInfo" multiline rows={2} fullWidth disabled={isView} />
+                            <TextField label="Người liên hệ khẩn cấp (tên / SĐT / quan hệ)" name="contactPersonInfo" multiline rows={2} fullWidth disabled={isView} />
                         </Grid>
                     </Grid>
                 </TabAccordion>
@@ -581,16 +581,16 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 <TabAccordion title="Thuế & bảo hiểm" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Mã số thuế" name="taxCode" fullWidth disabled={isView} />
+                            <TextField label="Mã số thuế" name="taxCode" fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Mã số BHXH" name="socialInsuranceNumber" fullWidth disabled={isView} />
+                            <TextField label="Mã số BHXH" name="socialInsuranceNumber" fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Mã số BH sức khỏe" name="healthInsuranceNumber" fullWidth disabled={isView} />
+                            <TextField label="Mã số BH sức khỏe" name="healthInsuranceNumber" fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <UiTextField label="Tình trạng sổ BHXH" name="socialInsuranceNote" fullWidth disabled={isView} />
+                            <TextField label="Tình trạng sổ BHXH" name="socialInsuranceNote" fullWidth disabled={isView} />
                         </Grid>
                     </Grid>
                 </TabAccordion>
