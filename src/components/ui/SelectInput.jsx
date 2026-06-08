@@ -1,192 +1,151 @@
-﻿import React, { memo, useMemo } from "react";
+import React, { memo, useEffect, useState, useCallback, useMemo } from "react";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import { FastField, getIn } from "formik";
+import { FastField, getIn, useFormikContext } from "formik";
+import { styled } from "@mui/material/styles";
+import clsx from "clsx";
+import RequiredLabel from "./RequiredLabel";
 
 /**
- * SelectInput - Modernized MUI v5 Select Input with Formik integration.
- * Standards: FastField + shouldComponentUpdate + useMemo.
+ * High-performance Select Input V2 component.
+ * Features: Silent Render (FastField), Property Stability, MUI v5 Standards.
  */
+const SelectInputV2 = (props) => {
+  const { name, ...other } = props;
 
-const SelectInput = React.forwardRef((props, ref) => {
+  const shouldUpdate = useCallback((nextProps, currentProps) => {
+    return (
+      nextProps.name !== currentProps.name ||
+      nextProps.label !== currentProps.label ||
+      nextProps.required !== currentProps.required ||
+      nextProps.disabled !== currentProps.disabled ||
+      nextProps.readOnly !== currentProps.readOnly ||
+      nextProps.options !== currentProps.options ||
+      nextProps.keyValue !== currentProps.keyValue ||
+      nextProps.displayvalue !== currentProps.displayvalue ||
+      nextProps.formik.isSubmitting !== currentProps.formik.isSubmitting ||
+      getIn(nextProps.formik.values, currentProps.name) !== getIn(currentProps.formik.values, currentProps.name) ||
+      getIn(nextProps.formik.errors, currentProps.name) !== getIn(currentProps.formik.errors, currentProps.name) ||
+      getIn(nextProps.formik.touched, currentProps.name) !== getIn(currentProps.formik.touched, currentProps.name)
+    );
+  }, []);
+
   return (
-    <FastField
-      {...props}
-      name={props.name}
-      shouldUpdate={shouldComponentUpdate}
-    >
+    <FastField name={name} shouldUpdate={shouldUpdate}>
       {({ field, meta }) => (
         <MySelectInput 
-          {...props} 
+          {...other} 
+          name={name}
           field={field} 
           meta={meta} 
-          ref={ref} 
         />
       )}
     </FastField>
   );
-});
-
-const shouldComponentUpdate = (nextProps, currentProps) => {
-  return (
-    nextProps.name !== currentProps.name ||
-    nextProps.value !== currentProps.value ||
-    nextProps.onChange !== currentProps.onChange ||
-    nextProps.onValueChange !== currentProps.onValueChange ||
-    nextProps.label !== currentProps.label ||
-    nextProps.required !== currentProps.required ||
-    nextProps.disabled !== currentProps.disabled ||
-    nextProps.readOnly !== currentProps.readOnly ||
-    nextProps.multiple !== currentProps.multiple ||
-    nextProps.displayvalue !== currentProps.displayvalue ||
-    nextProps.options !== currentProps.options ||
-    nextProps.keyValue !== currentProps.keyValue ||
-    nextProps.hideNullOption !== currentProps.hideNullOption ||
-    nextProps.formik.isSubmitting !== currentProps.formik.isSubmitting ||
-    Object.keys(nextProps).length !== Object.keys(currentProps).length ||
-    getIn(nextProps.formik.values, currentProps.name) !==
-    getIn(currentProps.formik.values, currentProps.name) ||
-    getIn(nextProps.formik.errors, currentProps.name) !==
-    getIn(currentProps.formik.errors, currentProps.name) ||
-    getIn(nextProps.formik.touched, currentProps.name) !==
-    getIn(currentProps.formik.touched, currentProps.name)
-  );
 };
 
-const MySelectInput = React.forwardRef(({
+const MySelectInput = ({
   name,
-  keyValue = 'value',
-  displayvalue = 'name',
+  keyValue = "value",
+  displayvalue = "name",
   options = [],
   size = "small",
   variant = "outlined",
   label,
   hideNullOption = false,
   required = false,
-  validate = false,
   oldStyle = false,
   readOnly = false,
   getOptionDisabled,
-  getOptionLabel,
   handleChange: externalHandleChange,
-  onValueChange,
-  multiple = false,
   field,
   meta,
   ...otherProps
-}, ref) => {
+}) => {
+  // DEBUG: console.log(`Render [SelectInputV2]: ${name}`);
 
-  const handleChange = (evt) => {
+  const { setFieldValue } = useFormikContext();
+  const [internalValue, setInternalValue] = useState(field?.value ?? "");
+
+  useEffect(() => {
+    setInternalValue(field?.value ?? "");
+  }, [field?.value]);
+
+  const handleChange = useCallback((event) => {
     if (readOnly) return;
-    
-    // Internal Formik update handled by field.onChange or custom logic
+
+    const newValue = event.target.value;
+    setInternalValue(newValue);
+
+    if (name && setFieldValue) {
+      setFieldValue(name, newValue);
+    }
+
     if (externalHandleChange) {
-      externalHandleChange(evt);
-    } else {
-      field.onChange(evt);
+      externalHandleChange(event, newValue);
     }
+  }, [readOnly, name, setFieldValue, externalHandleChange]);
 
-    if (typeof onValueChange === "function") {
-      onValueChange(evt?.target?.value ?? null, evt);
-    }
-  };
+  const isError = Boolean(meta && meta.touched && meta.error);
 
-  const isError = !!(meta && meta.touched && meta.error);
-  const helperText = isError ? meta.error : (otherProps.helperText || "");
-
-  const sxMemo = useMemo(() => ({
-    '& .MuiInputBase-root': {
-      backgroundColor: (theme) => readOnly ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') : 'inherit',
-      transition: 'all 0.2s ease-in-out',
-      '&.Mui-error .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#d1d5db !important',
-      },
-      '&.Mui-error:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#9ca3af !important',
-      },
-      '&.Mui-error.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: (theme) => theme.palette.primary.main + ' !important',
-      },
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: (theme) => theme.palette.mode === 'light' ? '#d1d5db' : 'rgba(255, 255, 255, 0.15)',
-      },
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: (theme) => theme.palette.mode === 'light' ? '#9ca3af' : 'rgba(255, 255, 255, 0.3)',
-      },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: (theme) => theme.palette.primary.main,
-      },
-      '&:hover': {
-        backgroundColor: (theme) => readOnly 
-          ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') 
-          : (theme.palette.mode === 'light' ? '#ffffff' : 'inherit'),
-      },
-      '&.Mui-focused': {
-        backgroundColor: (theme) => theme.palette.mode === 'light' ? '#ffffff' : 'rgba(255, 255, 255, 0.02)',
-        boxShadow: (theme) => theme.palette.mode === 'light'
-          ? '0 0 0 2px rgba(25, 118, 210, 0.1)'
-          : `0 0 0 2px ${theme.palette.primary.main}26`,
-      }
-    },
-    '& .MuiFormHelperText-root': {
-      marginLeft: "0 !important",
-      marginRight: "0 !important",
+  const memoSx = useMemo(() => ({
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: (readOnly || otherProps.disabled) ? "rgba(0, 0, 0, 0.05)" : "inherit",
     },
     ...otherProps.sx
-  }), [readOnly, otherProps.sx]);
+  }), [readOnly, otherProps.disabled, otherProps.sx]);
 
-  const selectPropsMemo = useMemo(() => ({
-    multiple,
-    ...otherProps.SelectProps
-  }), [multiple, otherProps.SelectProps]);
+  const memoInputProps = useMemo(() => ({
+    ...otherProps.InputProps,
+    readOnly: readOnly,
+  }), [readOnly, otherProps.InputProps]);
 
   return (
     <div className="w-full mb-4">
       {label && (
         <label 
-          htmlFor={name} 
-          className={`block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-400 ${oldStyle ? 'text-xs' : ''}`}
+          htmlFor={name}
+          className={`block text-sm font-semibold mb-1.5 text-muted-foreground ${oldStyle ? 'text-xs' : ''} ${readOnly ? 'read-only' : ''}`}
         >
-          {label} {(validate || required) && <span style={{ color: 'red' }} className="font-bold ml-1">*</span>}
+          <RequiredLabel label={label} requiredLabel={required} />
         </label>
       )}
 
       <FormControl fullWidth>
         <TextField
-          {...field}
           {...otherProps}
           select
           id={name}
-          ref={ref}
+          name={name}
+          value={internalValue}
+          onChange={handleChange}
           variant={variant}
           size={size}
           fullWidth
-          onChange={handleChange}
-          disabled={readOnly || otherProps.disabled}
           error={isError}
-          helperText={helperText}
-          InputLabelProps={{ shrink: true }}
-          SelectProps={selectPropsMemo}
-          sx={sxMemo}
-          className={`${oldStyle ? '' : 'input-container'} ${readOnly ? 'read-only' : ''}`}
+          helperText={isError ? meta.error : ""}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          disabled={readOnly || otherProps.disabled}
+          InputProps={memoInputProps}
+          sx={memoSx}
+          className={clsx("input-container", readOnly && "read-only")}
         >
-          {!hideNullOption && !multiple && (
-            <MenuItem value={null}>
+          {!hideNullOption && (
+            <MenuItem value={""}>
               <em>---</em>
             </MenuItem>
           )}
           {options?.map((item, pos) => {
             const isDisabled = getOptionDisabled ? getOptionDisabled(item) : false;
-            const displayLabel = getOptionLabel ? getOptionLabel(item) : item[displayvalue];
+            const itemValue = item[keyValue];
+            const itemLabel = item[displayvalue];
 
             return (
-              <MenuItem
-                key={pos}
-                value={item[keyValue]}
-                disabled={isDisabled}
-              >
-                {displayLabel}
+              <MenuItem key={pos} value={itemValue} disabled={isDisabled}>
+                {itemLabel}
               </MenuItem>
             );
           })}
@@ -194,6 +153,6 @@ const MySelectInput = React.forwardRef(({
       </FormControl>
     </div>
   );
-});
+};
 
-export default memo(SelectInput);
+export default memo(SelectInputV2);

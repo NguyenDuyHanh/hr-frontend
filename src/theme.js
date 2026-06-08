@@ -36,6 +36,13 @@ export const getDesignTokens = (mode) => ({
     button: { textTransform: 'none', fontWeight: 500 },
   },
   components: {
+    MuiGrid: {
+      styleOverrides: {
+        item: {
+          paddingTop: '0px !important',
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {

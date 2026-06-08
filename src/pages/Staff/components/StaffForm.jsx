@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { Grid, Button } from '@mui/material';
@@ -7,7 +7,7 @@ import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
 import DateTimePicker from '../../../components/ui/DateTimePicker';
 import Popup from '../../../components/ui/Popup';
-import { WorkingStatusOptions } from '../../../LocalConstants';
+import { WorkingStatusOptions } from '../../../constants';
 import { generateStaffCode } from '../../../services/StaffService';
 import { format } from 'date-fns';
 
@@ -79,7 +79,7 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
             action={action}
         >
             <FormikProvider value={formik}>
-                <Grid container spacing={1}>
+                <Grid container spacing={2}>
                     <Grid item xs={12}>
                         <DateTimePicker 
                             label="Ngày vào làm việc" 

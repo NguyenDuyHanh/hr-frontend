@@ -2,6 +2,7 @@ import React, { memo, useState } from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
+import Box from "@mui/material/Box";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Typography } from "@mui/material";
 
@@ -43,7 +44,7 @@ function TabAccordion({ children, title, component, className = "", open = true,
                         ? `1px solid ${theme.palette.mode === 'light' ? '#e0e0e0' : 'rgba(255, 255, 255, 0.1)'} !important`
                         : 'none !important',
                     minHeight: '44px !important',
-                    px: 3,
+                    px: 2,
                     '& .MuiAccordionSummary-content': {
                         margin: '10px 0 !important',
                     },
@@ -59,8 +60,10 @@ function TabAccordion({ children, title, component, className = "", open = true,
                 </Typography>
             </AccordionSummary>
 
-            <AccordionDetails sx={{ p: 3, backgroundColor: 'background.paper' }}>
-                {children ? children : component ? component : ''}
+            <AccordionDetails sx={{ backgroundColor: 'background.paper' }}>
+                <Box sx={{ paddingTop: 3}}>
+                    {children ? children : component ? component : ''}
+                </Box>
             </AccordionDetails>
         </Accordion>
     );
