@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { Grid, Button, Box, Typography } from '@mui/material';
@@ -9,153 +9,48 @@ import DateTimePicker from '../../../../components/ui/DateTimePicker';
 import Autocomplete from '../../../../components/ui/Autocomplete';
 import TabAccordion from '../../../../components/ui/Tab/TabAccordion';
 import ImageUpload from '../../../../components/ui/ImageUpload';
-import { WorkingStatusOptions } from '../../../../LocalConstants';
+import { 
+    WorkingStatusOptions,
+    MaritalStatusOptions,
+    NationalityOptions,
+    EthnicsOptions,
+    ReligionOptions,
+    EducationDegreeOptions,
+    ProvinceOptions,
+    WardOptionsMap,
+    WorkingFormatOptions,
+    StaffPhaseOptions,
+    PositionTypeOptions,
+    ShiftTypeOptions,
+    FixShiftWorkOptions,
+    LeaveShiftTypeOptions,
+    WeekDayOptions,
+    OrganizationOptions,
+    HealthCarePlaceOptions,
+    StatusOptions,
+    PositionTitleOptions
+} from '../../../../constants';
 import { getDepartments, getPositions } from '../../../../services/StaffService';
 import { format } from 'date-fns';
 
-// Static options for references
-const maritalStatusOptions = [
-    { value: 'single', name: 'Độc thân' },
-    { value: 'married', name: 'Đã kết hôn' },
-    { value: 'divorced', name: 'Ly hôn' },
-    { value: 'widowed', name: 'Góa' }
-];
-
-const nationalityOptions = [
-    { value: 'VN', name: 'Việt Nam' },
-    { value: 'US', name: 'Mỹ' },
-    { value: 'JP', name: 'Nhật Bản' },
-    { value: 'KR', name: 'Hàn Quốc' },
-    { value: 'CN', name: 'Trung Quốc' }
-];
-
-const ethnicsOptions = [
-    { value: 'kinh', name: 'Kinh' },
-    { value: 'tay', name: 'Tày' },
-    { value: 'thai', name: 'Thái' },
-    { value: 'muong', name: 'Mường' },
-    { value: 'khmer', name: 'Khmer' },
-    { value: 'other', name: 'Khác' }
-];
-
-const religionOptions = [
-    { value: 'none', name: 'Không' },
-    { value: 'buddhism', name: 'Phật giáo' },
-    { value: 'catholicism', name: 'Công giáo' },
-    { value: 'protestantism', name: 'Tin lành' },
-    { value: 'caodai', name: 'Cao đài' },
-    { value: 'hoahao', name: 'Hòa hảo' }
-];
-
-const educationDegreeOptions = [
-    { value: 'highschool', name: 'Trung học' },
-    { value: 'college', name: 'Cao đẳng' },
-    { value: 'university', name: 'Đại học' },
-    { value: 'master', name: 'Thạc sĩ' },
-    { value: 'doctor', name: 'Tiến sĩ' }
-];
-
-const provinceOptions = [
-    { value: 'HN', name: 'Hà Nội' },
-    { value: 'HCM', name: 'TP. Hồ Chí Minh' },
-    { value: 'DN', name: 'Đà Nẵng' },
-    { value: 'HP', name: 'Hải Phòng' },
-    { value: 'CT', name: 'Cần Thơ' }
-];
-
-const wardOptionsMap = {
-    'HN': [
-        { value: 'HN-BD', name: 'Quận Ba Đình' },
-        { value: 'HN-HK', name: 'Quận Hoàn Kiếm' },
-        { value: 'HN-CG', name: 'Quận Cầu Giấy' }
-    ],
-    'HCM': [
-        { value: 'HCM-Q1', name: 'Quận 1' },
-        { value: 'HCM-Q3', name: 'Quận 3' },
-        { value: 'HCM-TD', name: 'TP. Thủ Đức' }
-    ],
-    'DN': [
-        { value: 'DN-HC', name: 'Quận Hải Châu' },
-        { value: 'DN-TK', name: 'Quận Thanh Khê' }
-    ],
-    'HP': [
-        { value: 'HP-HB', name: 'Quận Hồng Bàng' }
-    ],
-    'CT': [
-        { value: 'CT-NK', name: 'Quận Ninh Kiều' }
-    ]
-};
-
-const workingFormatOptions = [
-    { value: 'fulltime', name: 'Toàn thời gian' },
-    { value: 'parttime', name: 'Bán thời gian' },
-    { value: 'seasonal', name: 'Thời vụ' },
-    { value: 'freelance', name: 'CTV' }
-];
-
-const staffPhaseOptions = [
-    { value: 'apprentice', name: 'Học việc' },
-    { value: 'probation', name: 'Thử việc' },
-    { value: 'official', name: 'Chính thức' }
-];
-
-const positionTypeOptions = [
-    { value: 'manager', name: 'Nhà quản lý' },
-    { value: 'specialist', name: 'Chuyên môn kỹ thuật' },
-    { value: 'staff', name: 'Nhân viên nghiệp vụ' },
-    { value: 'other', name: 'Khác' }
-];
-
-const shiftTypeOptions = [
-    { value: 'fixed', name: 'Cố định' },
-    { value: 'flexible', name: 'Linh hoạt' }
-];
-
-const fixShiftWorkOptions = [
-    { value: 'hc', name: 'Ca hành chính (8h-17h)' },
-    { value: 'morning', name: 'Ca sáng (6h-14h)' },
-    { value: 'afternoon', name: 'Ca chiều (14h-22h)' }
-];
-
-const leaveShiftTypeOptions = [
-    { value: 'fixed', name: 'Nghỉ cố định' },
-    { value: 'flexible', name: 'Nghỉ linh hoạt' }
-];
-
-const weekDayOptions = [
-    { value: 'monday', name: 'Thứ 2' },
-    { value: 'tuesday', name: 'Thứ 3' },
-    { value: 'wednesday', name: 'Thứ 4' },
-    { value: 'thursday', name: 'Thứ 5' },
-    { value: 'friday', name: 'Thứ 6' },
-    { value: 'saturday', name: 'Thứ 7' },
-    { value: 'sunday', name: 'Chủ Nhật' }
-];
-
-const organizationOptions = [
-    { value: 'corp', name: 'Công ty Cổ phần HRM' },
-    { value: 'north_branch', name: 'Chi nhánh Miền Bắc' },
-    { value: 'south_branch', name: 'Chi nhánh Miền Nam' }
-];
-
-const healthCarePlaceOptions = [
-    { value: 'bm', name: 'Bệnh viện Bạch Mai' },
-    { value: 'xp', name: 'Bệnh viện Xanh Pôn' },
-    { value: 'cr', name: 'Bệnh viện Chợ Rẫy' }
-];
-
-const statusOptions = [
-    { value: 'active', name: 'Đang làm việc' },
-    { value: 'inactive', name: 'Đã nghỉ việc' },
-    { value: 'suspended', name: 'Tạm đình chỉ' }
-];
-
-const positionTitleOptions = [
-    { value: 'director', name: 'Giám đốc' },
-    { value: 'manager', name: 'Trưởng phòng' },
-    { value: 'teamlead', name: 'Trưởng nhóm' },
-    { value: 'staff', name: 'Nhân viên' }
-];
+const maritalStatusOptions = MaritalStatusOptions;
+const nationalityOptions = NationalityOptions;
+const ethnicsOptions = EthnicsOptions;
+const religionOptions = ReligionOptions;
+const educationDegreeOptions = EducationDegreeOptions;
+const provinceOptions = ProvinceOptions;
+const wardOptionsMap = WardOptionsMap;
+const workingFormatOptions = WorkingFormatOptions;
+const staffPhaseOptions = StaffPhaseOptions;
+const positionTypeOptions = PositionTypeOptions;
+const shiftTypeOptions = ShiftTypeOptions;
+const fixShiftWorkOptions = FixShiftWorkOptions;
+const leaveShiftTypeOptions = LeaveShiftTypeOptions;
+const weekDayOptions = WeekDayOptions;
+const organizationOptions = OrganizationOptions;
+const healthCarePlaceOptions = HealthCarePlaceOptions;
+const statusOptions = StatusOptions;
+const positionTitleOptions = PositionTitleOptions;
 
 const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
     const { addStaff, modifyStaff } = useStaffStore();
@@ -199,8 +94,8 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
         maritalStatus: staffData?.maritalStatus || '',
         birthPlace: staffData?.birthPlace || '',
         nationalityId: staffData?.nationalityId || 'VN',
-        ethnicsId: staffData?.ethnicsId || 'kinh',
-        religionId: staffData?.religionId || 'none',
+        ethnicsId: staffData?.ethnicsId || 'KINH',
+        religionId: staffData?.religionId || 'NONE',
         educationDegreeId: staffData?.educationDegreeId || '',
 
         // 2. Address
@@ -220,20 +115,20 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
         workPermitNumber: staffData?.workPermitNumber || '',
 
         // 4. HR Profile
-        statusId: staffData?.statusId || 'active',
-        staffWorkingFormat: staffData?.staffWorkingFormat || 'fulltime',
+        statusId: staffData?.statusId || 'ACTIVE',
+        staffWorkingFormat: staffData?.staffWorkingFormat || 'FULLTIME',
         introducerId: staffData?.introducerId || '',
         recruiterId: staffData?.recruiterId || '',
         apprenticeDays: staffData?.apprenticeDays ?? 0,
         companyEmail: staffData?.companyEmail || '',
-        staffPhase: staffData?.staffPhase || 'official',
-        staffPositionType: staffData?.staffPositionType || 'staff',
+        staffPhase: staffData?.staffPhase || 'OFFICIAL',
+        staffPositionType: staffData?.staffPositionType || 'STAFF',
         healthCareRegistrationPlaceId: staffData?.healthCareRegistrationPlaceId || '',
-        staffWorkShiftType: staffData?.staffWorkShiftType || 'fixed',
-        fixShiftWorkId: staffData?.fixShiftWorkId || 'hc',
-        staffLeaveShiftType: staffData?.staffLeaveShiftType || 'fixed',
-        fixLeaveWeekDay: staffData?.fixLeaveWeekDay || 'saturday',
-        fixLeaveWeekDay2: staffData?.fixLeaveWeekDay2 || 'sunday',
+        staffWorkShiftType: staffData?.staffWorkShiftType || 'FIXED',
+        fixShiftWorkId: staffData?.fixShiftWorkId || 'HC',
+        staffLeaveShiftType: staffData?.staffLeaveShiftType || 'FIXED',
+        fixLeaveWeekDay: staffData?.fixLeaveWeekDay || 'SATURDAY',
+        fixLeaveWeekDay2: staffData?.fixLeaveWeekDay2 || 'SUNDAY',
 
         // Checkboxes
         skipTimekeeping: staffData?.skipTimekeeping ?? false,
@@ -245,8 +140,8 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
         allowExternalIpTimekeeping: staffData?.allowExternalIpTimekeeping ?? false,
 
         // 5. Organization
-        organizationId: staffData?.organizationId || 'corp',
-        positionTitleId: staffData?.positionTitleId || 'staff',
+        organizationId: staffData?.organizationId || 'CORP',
+        positionTitleId: staffData?.positionTitleId || 'STAFF',
 
         // 6. Contact Person
         contactPersonInfo: staffData?.contactPersonInfo || '',
@@ -355,7 +250,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                         <Grid item xs={12} md={3}>
                             <ImageUpload label="Ảnh đại diện" name="imagePath" disabled={isView} />
                         </Grid>
-                        <Grid item xs={12} md={9}>
+                        <Grid item xs={12} md={9} sx={{ marginTop: 2 }}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6} lg={4}>
                                     <TextField label="Họ và tên" name="displayName" required fullWidth disabled={isView} />
@@ -506,7 +401,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                         <Grid item xs={12} sm={6} lg={3}>
                             <SelectInput label="Loại phân ca" name="staffWorkShiftType" options={shiftTypeOptions} fullWidth disabled={isView} />
                         </Grid>
-                        {values.staffWorkShiftType === 'fixed' && (
+                        {values.staffWorkShiftType === 'FIXED' && (
                             <Grid item xs={12} sm={6} lg={3}>
                                 <SelectInput label="Ca làm việc cố định" name="fixShiftWorkId" options={fixShiftWorkOptions} fullWidth disabled={isView} />
                             </Grid>
@@ -514,7 +409,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                         <Grid item xs={12} sm={6} lg={3}>
                             <SelectInput label="Loại nghỉ trong tháng" name="staffLeaveShiftType" options={leaveShiftTypeOptions} fullWidth disabled={isView} />
                         </Grid>
-                        {values.staffLeaveShiftType === 'fixed' && (
+                        {values.staffLeaveShiftType === 'FIXED' && (
                             <>
                                 <Grid item xs={12} sm={6} lg={3}>
                                     <SelectInput label="Ngày nghỉ cố định 1" name="fixLeaveWeekDay" options={weekDayOptions} fullWidth disabled={isView} />

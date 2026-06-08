@@ -3,13 +3,11 @@ import { ROLES } from "./constants/roles";
 const {
   ADMIN,
   HR_MANAGER,
-  HR_USER,
+  HR_EMPLOYEE,
   HR_STAFF_VIEW,
   HR_RECRUITMENT,
   HR_COMPENSATION_BENEFIT,
   HR_TIMEKEEPING_MANAGER,
-  IT_SUPPORT,
-  HR_LEGISLATION,
 } = ROLES;
 
 const ALL_ROLES = Object.values(ROLES);
@@ -22,17 +20,17 @@ export const navigations = [
     auth: ALL_ROLES,
     children: [
       { name: "Bảng tin", path: "/profile-page/home", auth: ALL_ROLES },
-      { name: "Đánh giá", path: "/profile-page/available-evaluations", auth: [ADMIN, HR_MANAGER, HR_USER] },
+      { name: "Đánh giá", path: "/profile-page/available-evaluations", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Công việc của tôi", path: "/profile-page/my-work", auth: ALL_ROLES },
       { name: "Email", path: "/email", auth: [ADMIN] },
-      { name: "Diễn đàn", path: "/forum/forum-group", auth: [ADMIN, IT_SUPPORT] },
+      { name: "Diễn đàn", path: "/forum/forum-group", auth: [ADMIN] },
       { name: "Thông báo", path: "/announcement/announcement", auth: [ADMIN, HR_MANAGER] },
     ]
   },
   {
     name: "Cơ cấu tổ chức",
     icon: "account_tree",
-    auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW, IT_SUPPORT],
+    auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW],
     children: [
       { name: "Sơ đồ tổ chức", path: "/organization/diagram", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
       { name: "Cây tổ chức", path: "/organization/tree", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
@@ -57,12 +55,12 @@ export const navigations = [
   {
     name: "Nhân viên",
     icon: "people",
-    auth: [ADMIN, HR_MANAGER, IT_SUPPORT, HR_USER],
+    auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE],
     children: [
       { name: "Hồ sơ nhân viên", path: "/staff/all", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
       { name: "Phiếu đánh giá", path: "/staff-evaluation-ticket", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
       { name: "Hợp đồng lao động", path: "/staff-labour-agreement", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
-      { name: "Quản lý phép năm", path: "/staff-annual-leave-history", auth: [ADMIN, HR_MANAGER, HR_USER] },
+      { name: "Quản lý phép năm", path: "/staff-annual-leave-history", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Chứng chỉ nhân viên", path: "/staff-certificate", auth: [ADMIN, HR_MANAGER] },
       {
         name: "Danh mục nhân sự",
@@ -80,15 +78,15 @@ export const navigations = [
   {
     name: "Chấm công",
     icon: "access_time",
-    auth: [ADMIN, HR_MANAGER, HR_TIMEKEEPING_MANAGER, HR_USER],
+    auth: [ADMIN, HR_MANAGER, HR_TIMEKEEPING_MANAGER, HR_EMPLOYEE],
     children: [
-      { name: "Chi tiết chấm công", path: "/time-sheet-detail", auth: [ADMIN, HR_MANAGER, HR_USER] },
+      { name: "Chi tiết chấm công", path: "/time-sheet-detail", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Ca làm việc", path: "/category/shift-work", auth: [ADMIN, HR_MANAGER, HR_TIMEKEEPING_MANAGER] },
       { name: "Phân công lịch trực", path: "/staff-work-schedule", auth: [ADMIN, HR_MANAGER] },
-      { name: "Bảng phân ca", path: "/work-schedule-calendar", auth: [ADMIN, HR_MANAGER, HR_USER] },
+      { name: "Bảng phân ca", path: "/work-schedule-calendar", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Thiết bị chấm công", path: "/timekeeping-device", auth: [ADMIN, HR_MANAGER] },
-      { name: "Yêu cầu nghỉ phép", path: "/category/leave-request", auth: [ADMIN, HR_MANAGER, HR_USER] },
-      { name: "Yêu cầu làm thêm", path: "/category/overtime-request", auth: [ADMIN, HR_MANAGER, HR_USER] },
+      { name: "Yêu cầu nghỉ phép", path: "/category/leave-request", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
+      { name: "Yêu cầu làm thêm", path: "/category/overtime-request", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Xác nhận lịch trực", path: "/category/confirm-staff-work-schedule", auth: [ADMIN, HR_MANAGER] },
       { name: "Kết quả Check-in/out", path: "/check-inout-result", auth: [ADMIN, HR_MANAGER] },
     ],
@@ -96,26 +94,26 @@ export const navigations = [
   {
     name: "KPI",
     icon: "assessment",
-    auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT, HR_USER],
+    auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT, HR_EMPLOYEE],
     children: [
       { name: "Thành phần KPI", path: "/hr-kpi/hr-kpi-item", auth: [ADMIN, HR_MANAGER] },
       { name: "Mẫu KPI", path: "/hr-kpi/hr-kpi-template", auth: [ADMIN, HR_MANAGER] },
       { name: "Kỳ đánh giá KPI", path: "/hr-kpi/hr-kpi-evaluation-period", auth: [ADMIN, HR_MANAGER] },
-      { name: "Đăng ký chỉ tiêu KPI", path: "/hr-kpi/hr-kpi-target-register", auth: [ADMIN, HR_USER] },
-      { name: "Kết quả KPI", path: "/hr-kpi/hr-kpi-result", auth: [ADMIN, HR_USER] },
+      { name: "Đăng ký chỉ tiêu KPI", path: "/hr-kpi/hr-kpi-target-register", auth: [ADMIN, HR_EMPLOYEE] },
+      { name: "Kết quả KPI", path: "/hr-kpi/hr-kpi-result", auth: [ADMIN, HR_EMPLOYEE] },
     ]
   },
   {
     name: "Lương thưởng",
     icon: "attach_money",
-    auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT, HR_USER],
+    auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT, HR_EMPLOYEE],
     children: [
       { name: "Khoản lương", path: "/salary/salary-item", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
       { name: "Mẫu bảng lương", path: "/salary/salary-template", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
       { name: "Kỳ lương", path: "/salary/salary-period", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
-      { name: "Tạm ứng lương", path: "/salary/staff-advance-payment", auth: [HR_USER, HR_COMPENSATION_BENEFIT] },
+      { name: "Tạm ứng lương", path: "/salary/staff-advance-payment", auth: [HR_EMPLOYEE, HR_COMPENSATION_BENEFIT] },
       { name: "Bảng lương nhân viên", path: "/salary/salary-result", auth: [ADMIN, HR_COMPENSATION_BENEFIT] },
-      { name: "Phiếu lương cá nhân", path: "/salary/salary-staff-payslip", auth: [HR_USER] },
+      { name: "Phiếu lương cá nhân", path: "/salary/salary-staff-payslip", auth: [HR_EMPLOYEE] },
     ],
   },
   {
@@ -130,18 +128,18 @@ export const navigations = [
   {
     name: "Pháp chế",
     icon: "gavel",
-    auth: [ADMIN, HR_MANAGER, HR_LEGISLATION],
+    auth: [ADMIN, HR_MANAGER],
     children: [
-      { name: "Sổ quản lý lao động", path: "/staff-labour-management-book", auth: [ADMIN, HR_MANAGER, HR_LEGISLATION] },
+      { name: "Sổ quản lý lao động", path: "/staff-labour-management-book", auth: [ADMIN, HR_MANAGER] },
     ]
   },
   {
     name: "Công việc & Dự án",
     icon: "work",
-    auth: [ADMIN, HR_MANAGER, HR_USER],
+    auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE],
     children: [
-      { name: "Danh sách công việc", path: "/task", auth: [ADMIN, HR_MANAGER, HR_USER] },
-      { name: "Dự án", path: "/timesheet/project", auth: [ADMIN, HR_MANAGER] },
+      { name: "Danh sách công việc", path: "/tasks", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
+      { name: "Dự án", path: "/projects", auth: [ADMIN, HR_MANAGER] },
       { name: "Trạng thái thực hiện", path: "/category/working-status", auth: [ADMIN] },
     ],
   },
@@ -180,21 +178,21 @@ export const navigations = [
   {
     name: "Báo cáo",
     icon: "assessment",
-    auth: [ADMIN, HR_MANAGER, HR_RECRUITMENT, HR_LEGISLATION],
+    auth: [ADMIN, HR_MANAGER, HR_RECRUITMENT],
     children: [
       { name: "BC Định biên nhân sự", path: "/report/hr-resource-plan-report", auth: [ADMIN, HR_MANAGER] },
       { name: "BC Yêu cầu tuyển dụng", path: "/report/recruitment-request-report", auth: [ADMIN, HR_RECRUITMENT] },
       { name: "BC Tiếp nhận ứng viên", path: "/export-candidate-report", auth: [ADMIN, HR_RECRUITMENT] },
-      { name: "BC Sử dụng lao động", path: "/report/staff-labour-util-report", auth: [ADMIN, HR_LEGISLATION] },
+      { name: "BC Sử dụng lao động", path: "/report/staff-labour-util-report", auth: [ADMIN] },
     ],
   },
   {
     name: "Quản trị",
     icon: "settings",
-    auth: [ADMIN, IT_SUPPORT],
+    auth: [ADMIN],
     children: [
-      { name: "Tài khoản", path: "/administration/accounts", auth: [ADMIN, IT_SUPPORT] },
-      { name: "Vai trò", path: "/administration/roles", auth: [ADMIN, IT_SUPPORT] },
+      { name: "Tài khoản", path: "/administration/accounts", auth: [ADMIN] },
+      { name: "Vai trò", path: "/administration/roles", auth: [ADMIN] },
       { name: "Đơn vị hành chính", path: "/category/administrative-unit", auth: [ADMIN] },
       { name: "Cấu hình hệ thống", path: "/category/system-config", auth: [ADMIN] },
     ],

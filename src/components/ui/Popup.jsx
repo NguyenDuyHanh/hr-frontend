@@ -1,4 +1,4 @@
-﻿import React, { memo } from "react";
+import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -38,6 +38,7 @@ function Popup({
       maxWidth={size}
       aria-labelledby={popupId || "ui-dialog-title"}
       className="dialog-container"
+      container={document.getElementById('root')}
       {...otherProps}
     >
       {!noHeader && (

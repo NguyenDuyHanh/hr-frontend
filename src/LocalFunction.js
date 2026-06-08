@@ -74,3 +74,35 @@ export const getActiveFilterCount = (filters) => {
         return true;
     }).length;
 };
+
+/**
+ * Format a date value into a readable string.
+ *
+ * @param {string|Date|null|undefined} value - Giá trị ngày cần format
+ * @param {string} [format='dd/MM/yyyy'] - Định dạng đầu ra:
+ *   'dd/MM/yyyy'       → 07/06/2026
+ *   'MM/dd/yyyy'       → 06/07/2026
+ *   'yyyy-MM-dd'       → 2026-06-07
+ *   'dd-MM-yyyy'       → 07-06-2026
+ *   'dd/MM/yyyy HH:mm' → 07/06/2026 14:30
+ * @returns {string} Chuỗi ngày đã format, hoặc '' nếu giá trị không hợp lệ
+ */
+export const formatDate = (value, format = 'dd/MM/yyyy') => {
+    if (!value) return '';
+    const date = value instanceof Date ? value : new Date(value);
+    if (isNaN(date.getTime())) return '';
+
+    const pad = (n) => String(n).padStart(2, '0');
+    const dd   = pad(date.getDate());
+    const MM   = pad(date.getMonth() + 1);
+    const yyyy = String(date.getFullYear());
+    const HH   = pad(date.getHours());
+    const mm   = pad(date.getMinutes());
+
+    return format
+        .replace('dd', dd)
+        .replace('MM', MM)
+        .replace('yyyy', yyyy)
+        .replace('HH', HH)
+        .replace('mm', mm);
+};

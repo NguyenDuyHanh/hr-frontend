@@ -1,4 +1,4 @@
-﻿import React, { memo, useEffect, useState, useRef, useMemo } from "react";
+import React, { memo, useEffect, useState, useRef, useMemo } from "react";
 import MuiTextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -207,7 +207,7 @@ const MyTextField = React.forwardRef(({
       {label && (
         <label 
           htmlFor={name} 
-          className={`block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-400 ${oldStyle ? 'text-xs' : ''}`}
+          className={`block text-sm font-semibold mb-1.5 text-muted-foreground ${oldStyle ? 'text-xs' : ''}`}
         >
           {label} {(validate || required) && <span style={{ color: 'red' }} className="font-bold ml-1">*</span>}
         </label>

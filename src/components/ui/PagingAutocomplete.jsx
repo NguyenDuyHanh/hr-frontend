@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState, useRef, useCallback, memo } from "react";
+import React, { useEffect, useMemo, useState, useRef, useCallback, memo } from "react";
 import { FastField, getIn } from "formik";
 import { isEqual } from "lodash";
 import clsx from "clsx";
@@ -203,7 +203,7 @@ function MyPagingAutocomplete(props) {
         onClose={() => setOpen(false)}
         options={options}
         loading={loading}
-        value={field.value || null}
+        value={field.value || (otherProps.multiple ? [] : null)}
         onChange={handleChange}
         onInputChange={handleInputChange}
         getOptionLabel={internalGetOptionLabel}

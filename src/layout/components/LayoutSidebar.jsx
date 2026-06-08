@@ -173,8 +173,12 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
           onChange={(e, isOpened) => onToggle(item.name, isOpened)}
           disableGutters
           square
-          className="bg-transparent text-sidebar-foreground border-none shadow-none before:hidden"
+          className="bg-background text-sidebar-foreground border-none shadow-none before:hidden"
           sx={{
+            transition: "none !important",
+            "&.MuiAccordion-root": {
+              transition: "none !important",
+            },
             "& .MuiAccordionSummary-root": {
               minHeight: "unset",
               px: "12px",
@@ -182,6 +186,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
               borderBottom: "1px solid hsl(var(--sidebar-border))",
               backgroundColor: hasActiveChild ? "hsl(var(--sidebar-accent))" : "transparent",
               color: hasActiveChild ? "hsl(var(--sidebar-accent-foreground))" : "hsl(var(--sidebar-foreground))",
+              transition: "none !important",
               "&:hover": {
                 backgroundColor: hasActiveChild ? "hsl(var(--sidebar-accent))" : "hsl(var(--sidebar-accent) / 0.4)",
                 color: "hsl(var(--sidebar-accent-foreground))",

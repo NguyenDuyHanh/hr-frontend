@@ -1,15 +1,16 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import 'nprogress/nprogress.css';
 import { Toaster } from 'sonner';
 
 import MainLayout from "./layout/MainLayout";
-import TestComponents from "./pages/TestComponents";
 import AuthGuard from "./components/auth/AuthGuard";
 import { navigations } from "./navigationConfig";
 import StaffList from "./pages/Staff/StaffList";
 import UserList from "./pages/User/UserList";
 import StaffDetailPage from "./pages/Staff/StaffDetailPage";
+import ProjectList from "./pages/Project/ProjectList";
+import ProjectDetail from "./pages/Project/ProjectDetail";
 import useUiStore from "./store/uiStore";
 import Loading from "./components/ui/Loading";
 import GlobalLoadingHandler from "./components/common/GlobalLoadingHandler";
@@ -59,10 +60,10 @@ function App() {
 
   // Map các component đặc biệt
   const componentMap = {
-    "/test": <TestComponents />,
     "/dashboard": <PagePlaceholder title="Bảng điều khiển" />,
     "/staff/all": <StaffList />,
     "/administration/accounts": <UserList />,
+    "/projects": <ProjectList />,
   };
 
   return (
@@ -109,8 +110,25 @@ function App() {
             } 
           />
 
-          {/* Route Test không cần auth */}
-          <Route path="/test" element={<TestComponents />} />
+          {/* Route chi tiết dự án - chế độ xem */}
+          <Route 
+            path="/projects/:id/view" 
+            element={
+              <AuthGuard roles={[ROLES.ADMIN, ROLES.HR_MANAGER]}>
+                <ProjectDetail />
+              </AuthGuard>
+            } 
+          />
+
+          {/* Route chi tiết dự án - chế độ sửa */}
+          <Route 
+            path="/projects/:id/edit" 
+            element={
+              <AuthGuard roles={[ROLES.ADMIN, ROLES.HR_MANAGER]}>
+                <ProjectDetail />
+              </AuthGuard>
+            } 
+          />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

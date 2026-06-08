@@ -1,0 +1,320 @@
+import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, Grid, IconButton, Paper, Chip } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import UndoIcon from '@mui/icons-material/Undo';
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
+
+import Table from '../../components/ui/Table';
+import ProjectForm from './components/ProjectForm';
+import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
+import useProjectStore from '../../store/useProjectStore';
+import ListToolbar from '../../components/ui/ListToolbar';
+import FilterPanel from '../../components/ui/FilterPanel';
+import SelectInput from '../../components/ui/SelectInput';
+import { Formik } from 'formik';
+import { toast } from 'sonner';
+import { formatDate } from '../../LocalFunction';
+
+const ProjectList = () => {
+    const navigate = useNavigate();
+    const [openConfirm, setOpenConfirm] = useState(false);
+    const [openFinishConfirm, setOpenFinishConfirm] = useState(false);
+    const [openUnfinishConfirm, setOpenUnfinishConfirm] = useState(false);
+    const [projectToFinish, setProjectToFinish] = useState(null);
+    const [projectToUnfinish, setProjectToUnfinish] = useState(null);
+    const [filterOpen, setFilterOpen] = useState(false);
+
+    const { 
+        projects, 
+        loadProjects, 
+        removeProject, 
+        completeProject,
+        uncompleteProject,
+        page, 
+        setPage, 
+        pageSize, 
+        setPageSize, 
+        totalElements, 
+        setOpenForm, 
+        openForm, 
+        setSelectedProject, 
+        selectedProject,
+        keyword,
+        setKeyword,
+        filters,
+        setFilters,
+    } = useProjectStore();
+
+    const formikRef = useRef();
+    const [searchDraft, setSearchDraft] = useState(keyword || '');
+
+    useEffect(() => {
+        setSearchDraft(keyword || '');
+    }, [keyword]);
+
+    useEffect(() => {
+        loadProjects();
+    }, [page, pageSize, keyword, filters]);
+
+    const handleAdd = () => {
+        setSelectedProject(null);
+        setOpenForm(true);
+    };
+
+    const handleView = (proj) => {
+        navigate(`/projects/${proj.id}/view`);
+    };
+
+    const handleEdit = (proj) => {
+        navigate(`/projects/${proj.id}/edit`);
+    };
+
+    const handleDelete = (proj) => {
+        setSelectedProject(proj);
+        setOpenConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        if (selectedProject?.id) {
+            await removeProject(selectedProject.id);
+            toast.success("Xóa dự án thành công");
+            setSelectedProject(null);
+            setOpenConfirm(false);
+        }
+    };
+
+    const handleFinish = (proj) => {
+        setProjectToFinish(proj);
+        setOpenFinishConfirm(true);
+    };
+
+    const confirmFinish = async () => {
+        if (projectToFinish?.id) {
+            await completeProject(projectToFinish.id);
+            toast.success("Đã hoàn thành dự án!");
+            setProjectToFinish(null);
+            setOpenFinishConfirm(false);
+        }
+    };
+
+    const handleUnfinish = (proj) => {
+        setProjectToUnfinish(proj);
+        setOpenUnfinishConfirm(true);
+    };
+
+    const confirmUnfinish = async () => {
+        if (projectToUnfinish?.id) {
+            await uncompleteProject(projectToUnfinish.id);
+            toast.success("Đã bỏ đánh dấu hoàn thành dự án!");
+            setProjectToUnfinish(null);
+            setOpenUnfinishConfirm(false);
+        }
+    };
+
+    const handleSearch = () => {
+        setKeyword(searchDraft);
+    };
+
+    const handleApplyFilters = () => {
+        setKeyword(searchDraft);
+        formikRef.current?.handleSubmit();
+    };
+
+    const handleReset = () => {
+        setSearchDraft('');
+        formikRef.current?.resetForm();
+        setKeyword('');
+        setFilters({});
+    };
+
+    const columns = [
+        { 
+            title: 'Thao tác', 
+            field: 'actions',
+            width: 160,
+            align: 'center',
+            render: (rowData) => (
+                <div className="flex items-center justify-center">
+                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleView(rowData)} title="Xem chi tiết"><VisibilityIcon fontSize="small" /></IconButton>
+                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)} title="Sửa"><EditIcon fontSize="small" /></IconButton>
+                    {!rowData.isFinished && (
+                        <IconButton size="small" sx={{ color: '#2e7d32' }} onClick={() => handleFinish(rowData)} title="Đánh dấu hoàn thành"><CheckCircleIcon fontSize="small" /></IconButton>
+                    )}
+                    {rowData.isFinished && (
+                        <IconButton size="small" sx={{ color: '#ed6c02' }} onClick={() => handleUnfinish(rowData)} title="Bỏ hoàn thành"><UndoIcon fontSize="small" /></IconButton>
+                    )}
+                    <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)} title="Xóa"><DeleteIcon fontSize="small" /></IconButton>
+                </div>
+            )
+        },
+        { 
+            title: 'Mã dự án', 
+            field: 'code', 
+            width: 140,
+            minWidth: 140,
+            render: (rowData) => <span className="font-semibold">{rowData.code}</span>
+        },
+        { 
+            title: 'Tên dự án', 
+            field: 'name',
+            width: 200,
+            minWidth: 200,
+            render: (rowData) => <span className="font-semibold">{rowData.name}</span>
+        },
+        { 
+            title: 'Mô tả', 
+            field: 'description',
+            width: 300,
+            minWidth: 300,
+            render: (rowData) => <span className="line-clamp-2">{rowData.description || '---'}</span>
+        },
+        { 
+            title: 'Ngày bắt đầu', 
+            field: 'startDate', 
+            width: 130,
+            align: 'center',
+            render: (rowData) => <span>{formatDate(rowData.startDate) || '---'}</span>
+        },
+        { 
+            title: 'Ngày kết thúc', 
+            field: 'endDate', 
+            width: 130,
+            align: 'center',
+            render: (rowData) => <span>{formatDate(rowData.endDate) || '---'}</span>
+        },
+
+        { 
+            title: 'Trạng thái', 
+            field: 'isFinished',
+            width: 140,
+            align: 'center',
+            render: (rowData) => (
+                <Chip 
+                    label={rowData.isFinished ? "Hoàn thành" : "Đang thực hiện"} 
+                    color={rowData.isFinished ? "success" : "warning"} 
+                    size="small" 
+                />
+            )
+        }
+    ];
+
+    return (
+        <>
+            <Paper elevation={0} className="p-4 border border-border">
+                <Formik
+                    innerRef={formikRef}
+                    initialValues={{
+                        isFinished: ''
+                    }}
+                    onSubmit={(values) => {
+                        const statusFilter = {};
+                        if (values.isFinished !== '') {
+                            statusFilter.isFinished = values.isFinished === 'true';
+                        }
+                        setFilters(statusFilter);
+                    }}
+                >
+                    {() => (
+                        <>
+                            <ListToolbar
+                                searchDraft={searchDraft}
+                                onSearchDraftChange={setSearchDraft}
+                                onSearch={handleSearch}
+                                onReset={handleReset}
+                                onAdd={handleAdd}
+                                addLabel="Thêm dự án"
+                                filter={{
+                                    open: filterOpen,
+                                    onToggle: setFilterOpen,
+                                    activeCount: Object.keys(filters).length
+                                }}
+                            />
+
+                            <FilterPanel
+                                open={filterOpen}
+                                onOpenChange={setFilterOpen}
+                                onApply={handleApplyFilters}
+                                onReset={handleReset}
+                            >
+                                 <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <SelectInput
+                                            name="isFinished"
+                                            label="Trạng thái hoàn thành"
+                                            options={[
+                                                { value: '', name: 'Tất cả' },
+                                                { value: 'false', name: 'Đang thực hiện' },
+                                                { value: 'true', name: 'Đã hoàn thành' }
+                                            ]}
+                                            keyValue="value"
+                                            displayvalue="name"
+                                            hideNullOption={true}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </FilterPanel>
+                        </>
+                    )}
+                </Formik>
+
+                <Table 
+                    columns={columns} 
+                    data={projects} 
+                    totalElements={totalElements}
+                    page={page}
+                    pageSize={pageSize}
+                    handleChangePage={(e, p) => setPage(p)}
+                    setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
+                />
+            </Paper>
+
+            {openForm && (
+                <ProjectForm 
+                    open={openForm} 
+                    onClose={() => setOpenForm(false)} 
+                    projectData={selectedProject}
+                    onSaveSuccess={() => {
+                        setOpenForm(false);
+                    }}
+                />
+            )}
+
+            <ConfirmationDialog
+                open={openConfirm}
+                onConfirmDialogClose={() => setOpenConfirm(false)}
+                onYesClick={confirmDelete}
+                title="Xác nhận xóa dự án"
+                text="Bạn có chắc chắn muốn xóa dự án này? Thao tác này không thể hoàn tác."
+                agree="Xác nhận"
+                cancel="Hủy bỏ"
+            />
+
+            <ConfirmationDialog
+                open={openFinishConfirm}
+                onConfirmDialogClose={() => setOpenFinishConfirm(false)}
+                onYesClick={confirmFinish}
+                title="Xác nhận hoàn thành dự án"
+                text="Bạn có chắc chắn muốn đánh dấu dự án này là hoàn thành? Thao tác này không thể hoàn tác."
+                agree="Xác nhận"
+                cancel="Hủy bỏ"
+            />
+
+            <ConfirmationDialog
+                open={openUnfinishConfirm}
+                onConfirmDialogClose={() => setOpenUnfinishConfirm(false)}
+                onYesClick={confirmUnfinish}
+                title="Bỏ đánh dấu hoàn thành"
+                text="Bạn có chắc chắn muốn bỏ đánh dấu hoàn thành dự án này? Ngày kết thúc sẽ bị xóa."
+                agree="Xác nhận"
+                cancel="Hủy bỏ"
+            />
+        </>
+    );
+};
+
+export default ProjectList;
