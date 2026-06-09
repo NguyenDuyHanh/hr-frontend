@@ -77,8 +77,9 @@ function Popup({
       {!noDialogContent ? (
         <DialogContent 
           sx={{ 
-            p: 2,
-            pt: '16px !important',
+            pb: 0,
+            px: 2,
+            pt: '20px !important',
             overflowY: "auto", 
             maxHeight: "75vh", 
             ...styleContent 

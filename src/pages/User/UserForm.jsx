@@ -169,7 +169,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                             }}
                         />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} mt={2}>
                         <Autocomplete
                             multiple
                             name="roles"

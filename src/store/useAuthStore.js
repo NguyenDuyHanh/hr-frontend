@@ -81,13 +81,17 @@ const useAuthStore = create(
       },
 
       logout: async () => {
-        // Xóa trạng thái client ngay lập tức để UX mượt mà, không bị trễ
-        set({ user: null, accessToken: null, refreshToken: null });
-        
         try {
+          // 1. Gọi API logout trước khi xóa Token để backend ghi nhận đúng user
           await AuthService.logout();
         } catch (err) {
           console.error('Gọi API logout ở backend thất bại:', err);
+        } finally {
+          // 2. Dù API thành công hay thất bại, vẫn xóa sạch trạng thái client
+          set({ user: null, accessToken: null, refreshToken: null });
+          
+          // 3. Chuyển hướng và tải lại trang để giải phóng toàn bộ RAM
+          window.location.href = '/login';
         }
       },
 

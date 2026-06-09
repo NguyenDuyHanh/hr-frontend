@@ -3,13 +3,24 @@ import { Draggable } from '@hello-pangea/dnd';
 import { Card, CardContent, Typography, Box, Chip, IconButton, Avatar, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { TASK_PRIORITY_LABELS, TASK_PRIORITY_COLORS } from '../../../constants/taskConstants';
 import { formatDate } from '../../../LocalFunction';
 import useTaskStore from '../../../store/useTaskStore';
+import PermissionGuard from '../../../components/auth/PermissionGuard';
+import { ROLES } from '../../../constants/roles';
+import useAuthStore from '../../../store/useAuthStore';
+import useProjectPermission from '../../../hooks/useProjectPermission';
 
 const TaskCard = ({ task, index }) => {
-    const { editTask, initiateDelete } = useTaskStore();
+    const { editTask, viewTask, initiateDelete } = useTaskStore();
+    const hasRole = useAuthStore((state) => state.hasRole);
+
+    const isSystemManager = hasRole([ROLES.ADMIN, ROLES.HR_MANAGER]);
+    const { isProjectManager } = useProjectPermission(task.projectId);
+    const canManage = isSystemManager || isProjectManager;
+
     const getInitials = (name) => {
         if (!name) return '?';
         const parts = name.trim().split(' ');
@@ -38,17 +49,26 @@ const TaskCard = ({ task, index }) => {
                             <Typography variant="caption" className="font-semibold text-primary">
                                 {task.code}
                             </Typography>
-                            <Box className="flex items-center space-x-0.5">
-                                <Tooltip title="Sửa">
-                                    <IconButton size="small" onClick={() => editTask(task)}>
-                                        <EditIcon fontSize="inherit" style={{ fontSize: '14px' }} />
+                             <Box className="flex items-center space-x-0.5">
+                                <Tooltip title="Xem chi tiết">
+                                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => viewTask(task)}>
+                                        <VisibilityIcon fontSize="inherit" style={{ fontSize: '14px' }} />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Xóa">
-                                    <IconButton size="small" color="error" onClick={() => initiateDelete(task)}>
-                                        <DeleteIcon fontSize="inherit" style={{ fontSize: '14px' }} />
-                                    </IconButton>
-                                </Tooltip>
+                                {canManage && (
+                                    <>
+                                        <Tooltip title="Sửa">
+                                            <IconButton size="small" onClick={() => editTask(task)}>
+                                                <EditIcon fontSize="inherit" style={{ fontSize: '14px' }} />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Xóa">
+                                            <IconButton size="small" color="error" onClick={() => initiateDelete(task)}>
+                                                <DeleteIcon fontSize="inherit" style={{ fontSize: '14px' }} />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </>
+                                )}
                             </Box>
                         </Box>
 

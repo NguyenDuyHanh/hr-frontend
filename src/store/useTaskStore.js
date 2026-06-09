@@ -14,6 +14,7 @@ import {
 } from '../services/taskService';
 import { getProjectWorkingStatuses } from '../services/projectService';
 import localStorageService from '../services/localStorageService';
+import useAuthStore from './useAuthStore';
 
 const KANBAN_PAGE_SIZE = 10;
 
@@ -25,8 +26,12 @@ const useTaskStore = create((set, get) => ({
     pageSize: 10,
     keyword: '',
     filters: (() => {
-        const savedProject = localStorageService.getItem('task_filter_project');
-        const savedAssignee = localStorageService.getItem('task_filter_assignee');
+        const username = useAuthStore.getState().user?.username || '';
+        const projectKey = username ? `task_filter_project_${username}` : 'task_filter_project';
+        const assigneeKey = username ? `task_filter_assignee_${username}` : 'task_filter_assignee';
+
+        const savedProject = localStorageService.getItem(projectKey);
+        const savedAssignee = localStorageService.getItem(assigneeKey);
         const initialFilters = {};
         if (savedProject) {
             initialFilters.projectId = savedProject.id || savedProject;
@@ -38,6 +43,7 @@ const useTaskStore = create((set, get) => ({
     })(),
     selectedTask: null,
     openForm: false,
+    isViewMode: false,
     openConfirm: false,
     taskToDelete: null,
 
@@ -59,10 +65,33 @@ const useTaskStore = create((set, get) => ({
     setFilters: (filters) => set({ filters, page: 1 }),
     setOpenForm: (open) => set({ openForm: open }),
     setSelectedTask: (task) => set({ selectedTask: task }),
+    setIsViewMode: (isViewMode) => set({ isViewMode }),
     setOpenConfirm: (open) => set({ openConfirm: open }),
     setTaskToDelete: (task) => set({ taskToDelete: task }),
-    editTask: (task) => set({ selectedTask: task, openForm: true }),
+    editTask: (task) => set({ selectedTask: task, openForm: true, isViewMode: false }),
+    viewTask: (task) => set({ selectedTask: task, openForm: true, isViewMode: true }),
     initiateDelete: (task) => set({ taskToDelete: task, openConfirm: true }),
+    resetStore: () => set({
+        tasks: [],
+        loading: false,
+        totalElements: 0,
+        page: 1,
+        pageSize: 10,
+        keyword: '',
+        filters: {},
+        selectedTask: null,
+        openForm: false,
+        isViewMode: false,
+        openConfirm: false,
+        taskToDelete: null,
+        kanbanTasks: [],
+        kanbanStatuses: [],
+        kanbanTotals: {},
+        kanbanPages: {},
+        kanbanLoading: false,
+        taskHistory: [],
+        historyLoading: false,
+    }),
 
     loadTasks: async () => {
         const { page, pageSize, keyword, filters } = get();
@@ -114,7 +143,7 @@ const useTaskStore = create((set, get) => ({
         const projId = projectId?.id || projectId;
         set({ kanbanLoading: true });
         try {
-            const { filters } = get();
+            const { filters, keyword } = get();
             const assigneeId = filters.assigneeId?.id || filters.assigneeId;
             const followerId = filters.followerId?.id || filters.followerId;
             const activityId = filters.activityId?.id || filters.activityId;
@@ -126,6 +155,7 @@ const useTaskStore = create((set, get) => ({
                 pageSize: KANBAN_PAGE_SIZE,
                 ...(assigneeId && { assigneeId }),
                 ...(followerId && { followerId }),
+                ...(keyword && { keyword }),
             };
             if (priority !== undefined && priority !== '') {
                 baseParams.priorities = [priority];
@@ -138,7 +168,7 @@ const useTaskStore = create((set, get) => ({
             const [statusRes, tasksRes, countsRes] = await Promise.all([
                 getProjectWorkingStatuses(projId),
                 getTasksForKanban(baseParams),
-                countTasksByStatus(projId)
+                countTasksByStatus(projId, baseParams)
             ]);
 
             const statuses = statusRes?.data || [];
@@ -327,6 +357,33 @@ const useTaskStore = create((set, get) => ({
                 set({
                     kanbanTasks: get().kanbanTasks.map(t => t.id === taskId ? updatedTask : t)
                 });
+            }
+
+            // Gọi API count để đồng bộ lại số lượng chính xác nhất từ DB
+            const projId = get().filters.projectId?.id || get().filters.projectId;
+            if (projId) {
+                const { filters, keyword } = get();
+                const assigneeId = filters.assigneeId?.id || filters.assigneeId;
+                const followerId = filters.followerId?.id || filters.followerId;
+                const activityId = filters.activityId?.id || filters.activityId;
+                const priority = filters.priority;
+
+                const countParams = {
+                    ...(assigneeId && { assigneeId }),
+                    ...(followerId && { followerId }),
+                    ...(keyword && { keyword }),
+                };
+                if (priority !== undefined && priority !== '') {
+                    countParams.priorities = [priority];
+                }
+                if (activityId) {
+                    countParams.activityIds = [activityId];
+                }
+
+                const countsRes = await countTasksByStatus(projId, countParams);
+                if (countsRes?.data) {
+                    set({ kanbanTotals: countsRes.data });
+                }
             }
         } catch (error) {
             console.error('Error updating task status:', error);

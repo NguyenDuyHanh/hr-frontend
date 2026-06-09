@@ -4,7 +4,6 @@ const {
   ADMIN,
   HR_MANAGER,
   HR_EMPLOYEE,
-  HR_STAFF_VIEW,
   HR_RECRUITMENT,
   HR_COMPENSATION_BENEFIT,
   HR_TIMEKEEPING_MANAGER,
@@ -30,11 +29,11 @@ export const navigations = [
   {
     name: "Cơ cấu tổ chức",
     icon: "account_tree",
-    auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW],
+    auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE],
     children: [
-      { name: "Sơ đồ tổ chức", path: "/organization/diagram", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
-      { name: "Cây tổ chức", path: "/organization/tree", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
-      { name: "Quản lý vị trí", path: "/category/staff/position", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
+      { name: "Sơ đồ tổ chức", path: "/organization/diagram", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
+      { name: "Cây tổ chức", path: "/organization/tree", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
+      { name: "Quản lý vị trí", path: "/category/staff/position", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Thông tin công ty", path: "/category/organization", auth: [ADMIN, HR_MANAGER] },
       { name: "Phòng ban", path: "/hr-department", auth: [ADMIN, HR_MANAGER] },
       { name: "Nhóm ngạch", path: "/organization/group-position-title", auth: [ADMIN, HR_MANAGER] },
@@ -57,9 +56,9 @@ export const navigations = [
     icon: "people",
     auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE],
     children: [
-      { name: "Hồ sơ nhân viên", path: "/staff/all", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
-      { name: "Phiếu đánh giá", path: "/staff-evaluation-ticket", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
-      { name: "Hợp đồng lao động", path: "/staff-labour-agreement", auth: [ADMIN, HR_MANAGER, HR_STAFF_VIEW] },
+      { name: "Hồ sơ nhân viên", path: "/staff/all", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
+      { name: "Phiếu đánh giá", path: "/staff-evaluation-ticket", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
+      { name: "Hợp đồng lao động", path: "/staff-labour-agreement", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Quản lý phép năm", path: "/staff-annual-leave-history", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Chứng chỉ nhân viên", path: "/staff-certificate", auth: [ADMIN, HR_MANAGER] },
       {
@@ -138,8 +137,8 @@ export const navigations = [
     icon: "work",
     auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE],
     children: [
-      { name: "Danh sách công việc", path: "/tasks", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
-      { name: "Dự án", path: "/projects", auth: [ADMIN, HR_MANAGER] },
+      { name: "Công việc", path: "/tasks", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
+      { name: "Dự án", path: "/projects", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Trạng thái thực hiện", path: "/category/working-status", auth: [ADMIN] },
     ],
   },

@@ -8,6 +8,10 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { toast } from 'sonner';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
+import useAuthStore from '../../../../store/useAuthStore';
+import { ROLES } from '../../../../constants/roles';
+import useProjectPermission from '../../../../hooks/useProjectPermission';
+import useProjectStore from '../../../../store/useProjectStore';
 
 import { 
     getProjectWorkingStatuses, addProjectWorkingStatus, 
@@ -116,7 +120,12 @@ const WorkingStatusFormDialog = ({ open, onClose, statusData, statusesCount, onS
     );
 };
 
-const ProjectWorkingStatus = ({ projectId }) => {
+const ProjectWorkingStatus = () => {
+    const project = useProjectStore((state) => state.selectedProject);
+    const projectId = project?.id;
+    const hasRole = useAuthStore((state) => state.hasRole);
+    const { isProjectManager } = useProjectPermission(project);
+    const canManage = hasRole([ROLES.ADMIN, ROLES.HR_MANAGER]) || isProjectManager;
     const [statuses, setStatuses] = useState([]);
     const [keyword, setKeyword] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
@@ -333,7 +342,7 @@ const ProjectWorkingStatus = ({ projectId }) => {
                 onSearchDraftChange={setKeyword}
                 onSearch={handleSearch}
                 onReset={handleReset}
-                onAdd={handleOpenAdd}
+                onAdd={canManage ? handleOpenAdd : undefined}
                 addLabel="Thêm trạng thái"
             />
 
@@ -341,7 +350,7 @@ const ProjectWorkingStatus = ({ projectId }) => {
                 <div className="text-center py-6 text-gray-500">Đang tải danh sách trạng thái...</div>
             ) : (
                 <Table 
-                    columns={columns} 
+                    columns={canManage ? columns : columns.filter(c => c.field !== 'actions')} 
                     data={filteredStatuses} 
                     totalElements={filteredStatuses.length}
                     page={1}

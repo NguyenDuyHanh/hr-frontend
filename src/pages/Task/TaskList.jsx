@@ -23,9 +23,17 @@ import useTaskStore from '../../store/useTaskStore';
 import { TASK_PRIORITY_LABELS, TASK_PRIORITY_COLORS } from '../../constants/taskConstants';
 import { formatDate } from '../../LocalFunction';
 import localStorageService from '../../services/localStorageService';
+import PermissionGuard from '../../components/auth/PermissionGuard';
+import { ROLES } from '../../constants/roles';
+import useAuthStore from '../../store/useAuthStore';
+import useProjectPermission from '../../hooks/useProjectPermission';
 
 const TaskList = () => {
     const navigate = useNavigate();
+    const hasRole = useAuthStore((state) => state.hasRole);
+    const username = useAuthStore((state) => state.user?.username) || '';
+    const projectKey = username ? `task_filter_project_${username}` : 'task_filter_project';
+    const assigneeKey = username ? `task_filter_assignee_${username}` : 'task_filter_assignee';
     const [activeTab, setActiveTab] = useState(1); // 0 = Table, 1 = Kanban
     const [filterOpen, setFilterOpen] = useState(false);
 
@@ -42,6 +50,8 @@ const TaskList = () => {
         setOpenForm,
         selectedTask,
         setSelectedTask,
+        isViewMode,
+        setIsViewMode,
         keyword,
         setKeyword,
         filters,
@@ -52,8 +62,13 @@ const TaskList = () => {
         taskToDelete,
         setTaskToDelete,
         editTask,
+        viewTask,
         initiateDelete
     } = useTaskStore();
+
+    const currentProjectId = filters.projectId?.id || filters.projectId;
+    const { isProjectManager } = useProjectPermission(currentProjectId);
+    const canManageTasks = hasRole([ROLES.ADMIN, ROLES.HR_MANAGER]) || isProjectManager;
 
     const formikRef = useRef();
     const [searchDraft, setSearchDraft] = useState(keyword || '');
@@ -61,6 +76,26 @@ const TaskList = () => {
     useEffect(() => {
         setSearchDraft(keyword || '');
     }, [keyword]);
+
+    // Đồng bộ bộ lọc từ localStorage vào store khi component mount hoặc username thay đổi
+    useEffect(() => {
+        if (username) {
+            const savedProject = localStorageService.getItem(projectKey);
+            const savedAssignee = localStorageService.getItem(assigneeKey);
+            const initialFilters = {};
+            if (savedProject) {
+                initialFilters.projectId = savedProject.id || savedProject;
+            }
+            if (savedAssignee) {
+                initialFilters.assigneeId = savedAssignee.id || savedAssignee;
+            }
+            if (JSON.stringify(initialFilters) !== JSON.stringify(filters)) {
+                setFilters(initialFilters);
+            }
+        } else {
+            setFilters({});
+        }
+    }, [username, projectKey, assigneeKey]);
 
     // Load tasks for table view
     useEffect(() => {
@@ -75,7 +110,7 @@ const TaskList = () => {
             const projId = filters.projectId?.id || filters.projectId;
             loadKanbanData(projId);
         }
-    }, [filters.projectId, filters.assigneeId, filters.priority, filters.followerId, filters.activityId, activeTab]);
+    }, [filters.projectId, filters.assigneeId, filters.priority, filters.followerId, filters.activityId, keyword, activeTab]);
 
     const handleSearch = () => {
         setKeyword(searchDraft);
@@ -83,8 +118,8 @@ const TaskList = () => {
 
     const handleReset = () => {
         setSearchDraft('');
-        localStorageService.removeItem('task_filter_project');
-        localStorageService.removeItem('task_filter_assignee');
+        localStorageService.removeItem(projectKey);
+        localStorageService.removeItem(assigneeKey);
         formikRef.current?.resetForm({
             values: {
                 projectId: null,
@@ -105,8 +140,9 @@ const TaskList = () => {
     };
 
     const handleAdd = () => {
+        setIsViewMode(false);
         const selectedProj = formikRef.current?.values?.projectId;
-        const savedProject = localStorageService.getItem('task_filter_project');
+        const savedProject = localStorageService.getItem(projectKey);
         if (selectedProj) {
             setSelectedTask({ projectId: selectedProj });
         } else if (savedProject) {
@@ -120,7 +156,8 @@ const TaskList = () => {
     };
 
     const handleAddForStatus = (statusId) => {
-        const savedProject = localStorageService.getItem('task_filter_project');
+        setIsViewMode(false);
+        const savedProject = localStorageService.getItem(projectKey);
         setSelectedTask({
             projectId: savedProject || filters.projectId,
             statusId: statusId
@@ -149,12 +186,19 @@ const TaskList = () => {
             align: 'center',
             render: (rowData) => (
                 <div className="flex items-center justify-center space-x-1">
-                    <IconButton size="small" color="primary" onClick={() => editTask(rowData)} title="Sửa">
-                        <EditIcon fontSize="small" />
+                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => viewTask(rowData)} title="Xem chi tiết">
+                        <VisibilityIcon fontSize="small" />
                     </IconButton>
-                    <IconButton size="small" color="error" onClick={() => initiateDelete(rowData)} title="Xóa">
-                        <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    {canManageTasks && (
+                        <>
+                            <IconButton size="small" color="primary" onClick={() => editTask(rowData)} title="Sửa">
+                                <EditIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton size="small" color="error" onClick={() => initiateDelete(rowData)} title="Xóa">
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </>
+                    )}
                 </div>
             )
         },
@@ -227,16 +271,14 @@ const TaskList = () => {
         }
     ];
 
-    const currentProjectId = filters.projectId?.id || filters.projectId;
-
     return (
         <>
             <Paper elevation={0} className="p-4 border border-border">
                 <Formik
                     innerRef={formikRef}
                     initialValues={{
-                        projectId: localStorageService.getItem('task_filter_project') || null,
-                        assigneeId: localStorageService.getItem('task_filter_assignee') || null,
+                        projectId: localStorageService.getItem(projectKey) || null,
+                        assigneeId: localStorageService.getItem(assigneeKey) || null,
                         priority: '',
                         followerId: null,
                         statusId: null,
@@ -246,13 +288,13 @@ const TaskList = () => {
                         const newFilters = {};
                         if (values.projectId) {
                             newFilters.projectId = values.projectId.id || values.projectId;
-                            localStorageService.setItem('task_filter_project', values.projectId);
+                            localStorageService.setItem(projectKey, values.projectId);
                             
                             if (values.assigneeId) {
                                 newFilters.assigneeId = values.assigneeId.id || values.assigneeId;
-                                localStorageService.setItem('task_filter_assignee', values.assigneeId);
+                                localStorageService.setItem(assigneeKey, values.assigneeId);
                             } else {
-                                localStorageService.removeItem('task_filter_assignee');
+                                localStorageService.removeItem(assigneeKey);
                             }
 
                             if (values.followerId) {
@@ -265,8 +307,8 @@ const TaskList = () => {
                                 newFilters.activityId = values.activityId.id || values.activityId;
                             }
                         } else {
-                            localStorageService.removeItem('task_filter_project');
-                            localStorageService.removeItem('task_filter_assignee');
+                            localStorageService.removeItem(projectKey);
+                            localStorageService.removeItem(assigneeKey);
                         }
                         if (values.priority !== '') {
                             newFilters.priority = Number(values.priority);
@@ -281,7 +323,7 @@ const TaskList = () => {
                                 onSearchDraftChange={setSearchDraft}
                                 onSearch={handleSearch}
                                 onReset={handleReset}
-                                onAdd={handleAdd}
+                                onAdd={canManageTasks ? handleAdd : undefined}
                                 addLabel="Thêm công việc"
                                 filter={{
                                     open: filterOpen,
@@ -340,6 +382,7 @@ const TaskList = () => {
                                     {currentProjectId ? (
                                         <KanbanBoard 
                                             onAddTask={handleAddForStatus} 
+                                            canManage={canManageTasks}
                                         />
                                     ) : (
                                         <Box className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-md bg-gray-50/50">
@@ -373,6 +416,7 @@ const TaskList = () => {
                     open={openForm}
                     onClose={() => setOpenForm(false)}
                     taskData={selectedTask}
+                    isViewMode={isViewMode}
                     onSaveSuccess={() => {
                         if (activeTab === 0) {
                             loadTasks();

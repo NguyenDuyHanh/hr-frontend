@@ -19,9 +19,15 @@ import SelectInput from '../../components/ui/SelectInput';
 import { Formik } from 'formik';
 import { toast } from 'sonner';
 import { formatDate } from '../../LocalFunction';
+import PermissionGuard from '../../components/auth/PermissionGuard';
+import { ROLES } from '../../constants/roles';
+import useAuthStore from '../../store/useAuthStore';
 
 const ProjectList = () => {
     const navigate = useNavigate();
+    const user = useAuthStore((state) => state.user);
+    const hasRole = useAuthStore((state) => state.hasRole);
+    const canAdd = hasRole([ROLES.ADMIN, ROLES.HR_MANAGER]);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [openFinishConfirm, setOpenFinishConfirm] = useState(false);
     const [openUnfinishConfirm, setOpenUnfinishConfirm] = useState(false);
@@ -138,19 +144,31 @@ const ProjectList = () => {
             field: 'actions',
             width: 160,
             align: 'center',
-            render: (rowData) => (
-                <div className="flex items-center justify-center">
-                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleView(rowData)} title="Xem chi tiết"><VisibilityIcon fontSize="small" /></IconButton>
-                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)} title="Sửa"><EditIcon fontSize="small" /></IconButton>
-                    {!rowData.isFinished && (
-                        <IconButton size="small" sx={{ color: '#2e7d32' }} onClick={() => handleFinish(rowData)} title="Đánh dấu hoàn thành"><CheckCircleIcon fontSize="small" /></IconButton>
-                    )}
-                    {rowData.isFinished && (
-                        <IconButton size="small" sx={{ color: '#ed6c02' }} onClick={() => handleUnfinish(rowData)} title="Bỏ hoàn thành"><UndoIcon fontSize="small" /></IconButton>
-                    )}
-                    <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)} title="Xóa"><DeleteIcon fontSize="small" /></IconButton>
-                </div>
-            )
+            render: (rowData) => {
+                const isSystemManager = hasRole([ROLES.ADMIN, ROLES.HR_MANAGER]);
+                const isProjectManager = rowData.staffs?.some(
+                    (s) => s.staffId === user?.staffId && s.projectRole === 'MANAGER'
+                );
+                const canManageRow = isSystemManager || isProjectManager;
+
+                return (
+                    <div className="flex items-center justify-center">
+                        <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleView(rowData)} title="Xem chi tiết"><VisibilityIcon fontSize="small" /></IconButton>
+                        {canManageRow && (
+                            <>
+                                <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)} title="Sửa"><EditIcon fontSize="small" /></IconButton>
+                                {!rowData.isFinished && (
+                                    <IconButton size="small" sx={{ color: '#2e7d32' }} onClick={() => handleFinish(rowData)} title="Đánh dấu hoàn thành"><CheckCircleIcon fontSize="small" /></IconButton>
+                                )}
+                                {rowData.isFinished && (
+                                    <IconButton size="small" sx={{ color: '#ed6c02' }} onClick={() => handleUnfinish(rowData)} title="Bỏ hoàn thành"><UndoIcon fontSize="small" /></IconButton>
+                                )}
+                                <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)} title="Xóa"><DeleteIcon fontSize="small" /></IconButton>
+                            </>
+                        )}
+                    </div>
+                );
+            }
         },
         { 
             title: 'Mã dự án', 
@@ -226,7 +244,7 @@ const ProjectList = () => {
                                 onSearchDraftChange={setSearchDraft}
                                 onSearch={handleSearch}
                                 onReset={handleReset}
-                                onAdd={handleAdd}
+                                onAdd={canAdd ? handleAdd : undefined}
                                 addLabel="Thêm dự án"
                                 filter={{
                                     open: filterOpen,

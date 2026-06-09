@@ -64,7 +64,7 @@ const ProjectForm = ({ open, onClose, projectData, onSaveSuccess }) => {
             action={action}
         >
             <FormikProvider value={formik}>
-                <Grid container>
+                <Grid container spacing={2} className='pb-0'>
                     <Grid item xs={12}>
                         <TextField 
                             label="Tên dự án" 

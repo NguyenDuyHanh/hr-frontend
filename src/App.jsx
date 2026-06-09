@@ -106,7 +106,7 @@ function App() {
           <Route 
             path="/staff/:id" 
             element={
-              <AuthGuard roles={[ROLES.ADMIN, ROLES.HR_MANAGER, ROLES.HR_STAFF_VIEW]}>
+              <AuthGuard roles={[ROLES.ADMIN, ROLES.HR_MANAGER, ROLES.HR_EMPLOYEE]}>
                 <StaffDetailPage />
               </AuthGuard>
             } 
@@ -116,7 +116,7 @@ function App() {
           <Route 
             path="/projects/:id/view" 
             element={
-              <AuthGuard roles={[ROLES.ADMIN, ROLES.HR_MANAGER]}>
+              <AuthGuard roles={[ROLES.ADMIN, ROLES.HR_MANAGER, ROLES.HR_EMPLOYEE]}>
                 <ProjectDetail />
               </AuthGuard>
             } 
@@ -126,7 +126,7 @@ function App() {
           <Route 
             path="/projects/:id/edit" 
             element={
-              <AuthGuard roles={[ROLES.ADMIN, ROLES.HR_MANAGER]}>
+              <AuthGuard roles={[ROLES.ADMIN, ROLES.HR_MANAGER, ROLES.HR_EMPLOYEE]}>
                 <ProjectDetail />
               </AuthGuard>
             } 

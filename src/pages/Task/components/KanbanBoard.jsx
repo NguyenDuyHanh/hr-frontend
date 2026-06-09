@@ -4,8 +4,10 @@ import { Box, Paper, Typography, IconButton, Tooltip, Button } from '@mui/materi
 import AddIcon from '@mui/icons-material/Add';
 import TaskCard from './TaskCard';
 import useTaskStore from '../../../store/useTaskStore';
+import PermissionGuard from '../../../components/auth/PermissionGuard';
+import { ROLES } from '../../../constants/roles';
 
-const KanbanBoard = ({ onAddTask }) => {
+const KanbanBoard = ({ onAddTask, canManage }) => {
     const { 
         kanbanStatuses, 
         kanbanTasks, 
@@ -66,11 +68,13 @@ const KanbanBoard = ({ onAddTask }) => {
                                         {taskCount}
                                     </span>
                                 </Box>
-                                <Tooltip title="Thêm công việc vào trạng thái này">
-                                    <IconButton size="small" onClick={() => onAddTask(status.id)} color="primary">
-                                        <AddIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
+                                {canManage && (
+                                    <Tooltip title="Thêm công việc vào trạng thái này">
+                                        <IconButton size="small" onClick={() => onAddTask(status.id)} color="primary">
+                                            <AddIcon fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
+                                )}
                             </Box>
 
                             {/* Inner Container wrapping Droppable and load more button */}

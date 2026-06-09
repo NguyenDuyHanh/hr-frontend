@@ -35,6 +35,21 @@ const useUserStore = create((set, get) => ({
         roleId: null, 
         page: 1 
     }),
+    resetStore: () => set({
+        users: [],
+        roles: [],
+        loading: false,
+        totalElements: 0,
+        page: 1,
+        pageSize: 10,
+        keyword: '',
+        active: null,
+        departmentId: null,
+        positionId: null,
+        roleId: null,
+        selectedUser: null,
+        openForm: false,
+    }),
 
     loadUsers: async () => {
         set({ loading: true });

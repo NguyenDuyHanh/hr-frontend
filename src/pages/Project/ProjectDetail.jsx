@@ -9,21 +9,31 @@ import ProjectActivity from './components/ProjectTabs/ProjectActivity';
 import ProjectWorkingStatus from './components/ProjectTabs/ProjectWorkingStatus';
 import TabComponent from '../../components/ui/Tab/TabComponent';
 import ProjectGeneralInfo from './components/ProjectTabs/ProjectGeneralInfo';
+import PermissionGuard from '../../components/auth/PermissionGuard';
+import { ROLES } from '../../constants/roles';
+import useAuthStore from '../../store/useAuthStore';
+import useProjectPermission from '../../hooks/useProjectPermission';
+import useProjectStore from '../../store/useProjectStore';
 
 const ProjectDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
     const isViewMode = location.pathname.endsWith('/view');
-    const [project, setProject] = useState(null);
+    const project = useProjectStore((state) => state.selectedProject);
+    const setSelectedProject = useProjectStore((state) => state.setSelectedProject);
     const [tabValue, setTabValue] = useState(0);
     const [loading, setLoading] = useState(true);
+
+    const hasRole = useAuthStore((state) => state.hasRole);
+    const { isProjectManager } = useProjectPermission(project);
+    const canManageProject = hasRole([ROLES.ADMIN, ROLES.HR_MANAGER]) || isProjectManager;
 
     const loadProjectDetails = async () => {
         setLoading(true);
         try {
             const res = await getProjectById(id);
-            setProject(res?.data || null);
+            setSelectedProject(res?.data || null);
         } catch (err) {
             console.error(err);
             toast.error("Không thể tải thông tin dự án");
@@ -36,7 +46,15 @@ const ProjectDetail = () => {
         if (id) {
             loadProjectDetails();
         }
+        return () => setSelectedProject(null);
     }, [id]);
+
+    useEffect(() => {
+        if (project && !canManageProject && !isViewMode) {
+            toast.error("Bạn không có quyền chỉnh sửa dự án này");
+            navigate('/projects');
+        }
+    }, [project, canManageProject, isViewMode, navigate]);
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
@@ -72,7 +90,6 @@ const ProjectDetail = () => {
             label: "Thông tin chung",
             content: (
                 <ProjectGeneralInfo 
-                    project={project} 
                     isViewMode={isViewMode} 
                     onSaved={loadProjectDetails} 
                 />
@@ -82,7 +99,7 @@ const ProjectDetail = () => {
             label: "Hoạt động",
             content: (
                 <Box mt={2}>
-                    <ProjectActivity projectId={project.id} />
+                    <ProjectActivity />
                 </Box>
             )
         },
@@ -90,7 +107,7 @@ const ProjectDetail = () => {
             label: "Trạng thái thực hiện",
             content: (
                 <Box mt={2}>
-                    <ProjectWorkingStatus projectId={project.id} />
+                    <ProjectWorkingStatus />
                 </Box>
             )
         }
@@ -109,7 +126,7 @@ const ProjectDetail = () => {
                     >
                         Danh sách dự án
                     </Button>
-                    {isViewMode && (
+                    {isViewMode && canManageProject && (
                         <Button
                             variant="outlined"
                             size="small"
