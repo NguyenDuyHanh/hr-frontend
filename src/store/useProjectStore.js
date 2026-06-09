@@ -19,6 +19,17 @@ const useProjectStore = create((set, get) => ({
     setFilters: (filters) => set({ filters, page: 1 }),
     setOpenForm: (open) => set({ openForm: open }),
     setSelectedProject: (project) => set({ selectedProject: project }),
+    resetStore: () => set({
+        projects: [],
+        loading: false,
+        totalElements: 0,
+        page: 1,
+        pageSize: 10,
+        keyword: '',
+        filters: {},
+        selectedProject: null,
+        openForm: false,
+    }),
 
     loadProjects: async () => {
         set({ loading: true });

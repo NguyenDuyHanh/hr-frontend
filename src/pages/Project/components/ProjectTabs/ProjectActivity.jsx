@@ -9,6 +9,10 @@ import { toast } from 'sonner';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { format } from 'date-fns';
+import useAuthStore from '../../../../store/useAuthStore';
+import { ROLES } from '../../../../constants/roles';
+import useProjectPermission from '../../../../hooks/useProjectPermission';
+import useProjectStore from '../../../../store/useProjectStore';
 
 import { 
     getProjectActivities, addProjectActivity, 
@@ -123,7 +127,12 @@ const ActivityFormDialog = ({ open, onClose, activityData, activitiesCount, onSa
     );
 };
 
-const ProjectActivity = ({ projectId }) => {
+const ProjectActivity = () => {
+    const project = useProjectStore((state) => state.selectedProject);
+    const projectId = project?.id;
+    const hasRole = useAuthStore((state) => state.hasRole);
+    const { isProjectManager } = useProjectPermission(project);
+    const canManage = hasRole([ROLES.ADMIN, ROLES.HR_MANAGER]) || isProjectManager;
     const [activities, setActivities] = useState([]);
     const [keyword, setKeyword] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
@@ -353,7 +362,7 @@ const ProjectActivity = ({ projectId }) => {
                 onSearchDraftChange={setKeyword}
                 onSearch={handleSearch}
                 onReset={handleReset}
-                onAdd={handleOpenAdd}
+                onAdd={canManage ? handleOpenAdd : undefined}
                 addLabel="Thêm hoạt động"
             />
 
@@ -361,7 +370,7 @@ const ProjectActivity = ({ projectId }) => {
                 <div className="text-center py-6 text-gray-500">Đang tải danh sách hoạt động...</div>
             ) : (
                 <Table 
-                    columns={columns} 
+                    columns={canManage ? columns : columns.filter(c => c.field !== 'actions')} 
                     data={filteredActivities} 
                     totalElements={filteredActivities.length}
                     page={1}

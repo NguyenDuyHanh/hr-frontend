@@ -22,6 +22,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 import { saveProject } from '../../../../services/projectService';
+import useProjectStore from '../../../../store/useProjectStore';
 import { pagingStaffs } from '../../../../services/StaffService';
 import TextField from '../../../../components/ui/TextField';
 import DateTimePicker from '../../../../components/ui/DateTimePicker';
@@ -35,7 +36,8 @@ const validationSchema = Yup.object({
     code: Yup.string().required('Mã dự án là bắt buộc'),
 });
 
-const ProjectGeneralInfo = ({ project, isViewMode = false, onSaved }) => {
+const ProjectGeneralInfo = ({ isViewMode = false, onSaved }) => {
+    const project = useProjectStore((state) => state.selectedProject);
     const initialValues = useMemo(() => ({
         name: project?.name || '',
         code: project?.code || '',

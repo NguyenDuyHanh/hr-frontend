@@ -1,10 +1,15 @@
 import React from 'react';
 import { Grid } from '@mui/material';
 import { useFormikContext } from 'formik';
-import Autocomplete from '../../../components/ui/AsyncAutocomplete';
+import AsyncAutocomplete from '../../../components/ui/AsyncAutocomplete';
 import SelectInput from '../../../components/ui/SelectInput';
 import { pagingProjects, getProjectStaffs, getProjectWorkingStatuses, getProjectActivities } from '../../../services/projectService';
 import { TASK_PRIORITY_OPTIONS } from '../../../constants/taskConstants';
+
+const projectSearchObject = {
+    pageIndex: 1,
+    pageSize: 100
+};
 
 const TaskListFilter = () => {
     const { values, setFieldValue } = useFormikContext();
@@ -20,11 +25,6 @@ const TaskListFilter = () => {
             prevProjectIdRef.current = projectId;
         }
     }, [projectId, setFieldValue]);
-
-    const projectSearchObject = {
-        pageIndex: 1,
-        pageSize: 100
-    };
 
     const fetchProjectStaffsApi = React.useMemo(() => {
         return async (searchObj) => {
@@ -61,7 +61,7 @@ const TaskListFilter = () => {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
-                <Autocomplete
+                <AsyncAutocomplete
                     name="projectId"
                     label="Dự án"
                     api={pagingProjects}
@@ -71,7 +71,7 @@ const TaskListFilter = () => {
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
-                <Autocomplete
+                <AsyncAutocomplete
                     name="assigneeId"
                     label="Người phụ trách"
                     api={fetchProjectStaffsApi}
@@ -83,7 +83,7 @@ const TaskListFilter = () => {
             </Grid>
 
             <Grid item xs={12} sm={4}>
-                <Autocomplete
+                <AsyncAutocomplete
                     name="followerId"
                     label="Người theo dõi"
                     api={fetchProjectStaffsApi}
@@ -94,7 +94,7 @@ const TaskListFilter = () => {
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
-                <Autocomplete
+                <AsyncAutocomplete
                     name="statusId"
                     label="Trạng thái"
                     api={fetchProjectStatusesApi}
@@ -105,7 +105,7 @@ const TaskListFilter = () => {
                 />
             </Grid>
             <Grid item xs={12} sm={4}>
-                <Autocomplete
+                <AsyncAutocomplete
                     name="activityId"
                     label="Hoạt động"
                     api={fetchProjectActivitiesApi}

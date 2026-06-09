@@ -19,6 +19,17 @@ const useStaffStore = create((set, get) => ({
     setFilters: (filters) => set({ filters, page: 1 }),
     setOpenForm: (open) => set({ openForm: open }),
     setSelectedStaff: (staff) => set({ selectedStaff: staff }),
+    resetStore: () => set({
+        staffs: [],
+        loading: false,
+        totalElements: 0,
+        page: 1,
+        pageSize: 10,
+        keyword: '',
+        filters: {},
+        selectedStaff: null,
+        openForm: false,
+    }),
 
     loadStaffs: async () => {
         set({ loading: true });

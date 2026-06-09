@@ -50,7 +50,7 @@ export const getProjectMembers = async (projectId) => {
 };
 
 export const getProjectStaffs = async (projectId) => {
-    const response = await axios.get(`${API_PATH}/${projectId}/staffs`);
+    const response = await axios.get(`${API_PATH}/${projectId}/get-staffs`);
     return response.data;
 };
 

@@ -19,7 +19,7 @@ import { uploadFile } from '../../../services/CloudinaryService';
 import { TASK_PRIORITY_OPTIONS } from '../../../constants/taskConstants';
 import { toast } from 'sonner';
 
-const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
+const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = false }) => {
     const { addTask, modifyTask } = useTaskStore();
     const [statuses, setStatuses] = useState([]);
     const [activities, setActivities] = useState([]);
@@ -227,11 +227,13 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
     const actions = (
         <>
             <Button onClick={onClose} variant="outlined" color="inherit" sx={{ textTransform: 'none' }}>
-                Hủy bỏ
+                {isViewMode ? 'Đóng' : 'Hủy bỏ'}
             </Button>
-            <Button onClick={formik.handleSubmit} variant="contained" color="primary" sx={{ textTransform: 'none', ml: 1 }}>
-                Lưu lại
-            </Button>
+            {!isViewMode && (
+                <Button onClick={formik.handleSubmit} variant="contained" color="primary" sx={{ textTransform: 'none', ml: 1 }}>
+                    Lưu lại
+                </Button>
+            )}
         </>
     );
 
@@ -239,7 +241,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
         <Popup
             open={open}
             onClosePopup={onClose}
-            title={taskData?.id ? `Chỉnh sửa công việc: ${taskData.code}` : "Thêm công việc mới"}
+            title={isViewMode ? `Chi tiết công việc: ${taskData?.code}` : (taskData?.id ? `Chỉnh sửa công việc: ${taskData.code}` : "Thêm công việc mới")}
             size="lg"
             action={actions}
         >
@@ -252,6 +254,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
                                 name="name" 
                                 label="Tên công việc" 
                                 required 
+                                disabled={isViewMode}
                             />
 
                             <AsyncAutocomplete
@@ -262,12 +265,14 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
                                 searchObject={projectSearchObj}
                                 placeholder="Chọn dự án..."
                                 displayName="name"
+                                disabled={isViewMode}
                             />
 
                             <Editor 
                                 name="description" 
                                 label="Mô tả công việc" 
                                 fullWidth 
+                                readOnly={isViewMode}
                             />
 
                             {/* Files đính kèm */}
@@ -282,14 +287,14 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
                                         startIcon={isUploading ? <CircularProgress size={16} /> : <CloudUploadIcon />}
                                         size="small"
                                         sx={{ textTransform: 'none' }}
-                                        disabled={!formik.values.id || isUploading}
+                                        disabled={!formik.values.id || isUploading || isViewMode}
                                     >
                                         {isUploading ? 'Đang tải lên...' : 'Tải file lên'}
                                         <input
                                             type="file"
                                             hidden
                                             onChange={handleUploadAttachment}
-                                            disabled={isUploading}
+                                            disabled={isUploading || isViewMode}
                                         />
                                     </Button>
                                 </Box>
@@ -310,9 +315,11 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
                                                     secondary={`${(file.size / 1024).toFixed(1)} KB`} 
                                                 />
                                                 <ListItemSecondaryAction>
-                                                    <IconButton edge="end" color="error" size="small" onClick={() => handleDeleteAttachment(file.id)}>
-                                                        <DeleteIcon />
-                                                    </IconButton>
+                                                    {!isViewMode && (
+                                                        <IconButton edge="end" color="error" size="small" onClick={() => handleDeleteAttachment(file.id)}>
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                    )}
                                                 </ListItemSecondaryAction>
                                             </ListItem>
                                         ))}
@@ -341,7 +348,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
                                 searchObject={projectStaffSearchObj}
                                 placeholder="Chọn người phụ trách..."
                                 displayName="displayName"
-                                disabled={!projectId}
+                                disabled={isViewMode || !projectId}
                             />
 
                             <AsyncAutocomplete
@@ -352,7 +359,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
                                 placeholder="Chọn người theo dõi..."
                                 displayName="displayName"
                                 multiple
-                                disabled={!projectId}
+                                disabled={isViewMode || !projectId}
                             />
 
                             <SelectInput
@@ -362,7 +369,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
                                 options={statuses}
                                 keyValue="id"
                                 displayvalue="name"
-                                disabled={!projectId}
+                                disabled={isViewMode || !projectId}
                             />
 
                             <SelectInput
@@ -372,6 +379,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
                                 options={TASK_PRIORITY_OPTIONS}
                                 keyValue="value"
                                 displayvalue="label"
+                                disabled={isViewMode}
                             />
 
                             <SelectInput
@@ -380,25 +388,28 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess }) => {
                                 options={activities}
                                 keyValue="id"
                                 displayvalue="name"
-                                disabled={!projectId}
+                                disabled={isViewMode || !projectId}
                             />
 
                             <DateTimePicker
                                 name="startTime"
                                 label="Bắt đầu"
                                 isDateTimePicker
+                                disabled={isViewMode}
                             />
 
                             <DateTimePicker
                                 name="endTime"
                                 label="Kết thúc"
                                 isDateTimePicker
+                                disabled={isViewMode}
                             />
 
                             <TextField
                                 name="estimateHour"
                                 label="Giờ ước tính"
                                 type="number"
+                                disabled={isViewMode}
                             />
                         </Paper>
                     </Grid>

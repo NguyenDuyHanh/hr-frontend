@@ -43,8 +43,8 @@ export const updateTaskStatus = async (id, statusId) => {
     return response.data;
 };
 
-export const countTasksByStatus = async (projectId) => {
-    const response = await axios.get(`${API_PATH}/project/${projectId}/count-by-status`);
+export const countTasksByStatus = async (projectId, searchDto) => {
+    const response = await axios.post(`${API_PATH}/project/${projectId}/count-by-status`, searchDto || {});
     return response.data;
 };
 

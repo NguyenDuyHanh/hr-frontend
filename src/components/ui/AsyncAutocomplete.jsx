@@ -1,4 +1,4 @@
-﻿import React, { memo, useEffect, useState, useMemo, Fragment } from "react";
+import React, { memo, useEffect, useState, useMemo, Fragment } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -33,7 +33,7 @@ const shouldComponentUpdate = (nextProps, currentProps) => {
   return (
     nextProps.name !== currentProps.name ||
     nextProps.api !== currentProps.api ||
-    nextProps.searchObject !== currentProps.searchObject ||
+    JSON.stringify(nextProps.searchObject) !== JSON.stringify(currentProps.searchObject) ||
     nextProps.value !== currentProps.value ||
     nextProps.onChange !== currentProps.onChange ||
     nextProps.label !== currentProps.label ||
@@ -74,28 +74,38 @@ const MyAsyncAutocomplete = React.forwardRef(({
 
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
-  const loading = open && options?.length === 0;
+  const [loading, setLoading] = useState(false);
+
+  const stringifiedSearchObject = JSON.stringify(searchObject);
+  const stableSearchObject = useMemo(() => {
+    return searchObject;
+  }, [stringifiedSearchObject]);
 
   useEffect(() => {
     let active = true;
 
-    if (!loading) {
+    if (!open) {
       return undefined;
     }
 
     (async () => {
-      let response;
+      setLoading(true);
       try {
-        if (searchObject != null) {
-          response = await api(searchObject);
+        let response;
+        if (stableSearchObject != null) {
+          response = await api(stableSearchObject);
         } else {
           response = await api();
         }
 
-        if (active && response.data) {
-          const data = response.data.content || response.data;
+        if (active && response) {
+          const data = response.data?.content || response.data || response;
           if (Array.isArray(data)) {
             setOptions(data);
+          } else if (response.content && Array.isArray(response.content)) {
+            setOptions(response.content);
+          } else if (Array.isArray(response)) {
+            setOptions(response);
           } else {
             setOptions([]);
           }
@@ -103,13 +113,17 @@ const MyAsyncAutocomplete = React.forwardRef(({
       } catch (error) {
         console.error("Error fetching data: ", error);
         setOptions([]);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
     })();
 
     return () => {
       active = false;
     };
-  }, [api, loading, searchObject]);
+  }, [api, open, stableSearchObject]);
 
   useEffect(() => {
     if (!open) {
@@ -224,6 +238,7 @@ const MyAsyncAutocomplete = React.forwardRef(({
         getOptionDisabled={readOnly ? () => true : getOptionDisabled}
         options={options}
         loading={loading && !readOnly}
+        noOptionsText={otherProps.noOptionsText || "Không có dữ liệu"}
         renderInput={renderInput}
       />
     </div>
