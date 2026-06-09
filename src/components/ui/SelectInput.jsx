@@ -32,7 +32,7 @@ const SelectInputV2 = (props) => {
   }, []);
 
   return (
-    <FastField name={name} shouldUpdate={shouldUpdate}>
+    <FastField name={name} shouldUpdate={shouldUpdate} {...props}>
       {({ field, meta }) => (
         <MySelectInput 
           {...other} 
