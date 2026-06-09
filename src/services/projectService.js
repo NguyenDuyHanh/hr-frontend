@@ -49,6 +49,11 @@ export const getProjectMembers = async (projectId) => {
     return response.data;
 };
 
+export const getProjectStaffs = async (projectId) => {
+    const response = await axios.get(`${API_PATH}/${projectId}/staffs`);
+    return response.data;
+};
+
 export const addProjectMember = async (projectId, memberRequest) => {
     const response = await axios.post(`${API_PATH}/${projectId}/members`, memberRequest);
     return response.data;

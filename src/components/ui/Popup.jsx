@@ -54,6 +54,7 @@ function Popup({
               alignItems: "center",
               justifyContent: "space-between",
               p: 2,
+              marginBottom: 1,
               ...styleTitle 
             }}
             id={popupId || "ui-dialog-title"}

@@ -11,6 +11,7 @@ import UserList from "./pages/User/UserList";
 import StaffDetailPage from "./pages/Staff/StaffDetailPage";
 import ProjectList from "./pages/Project/ProjectList";
 import ProjectDetail from "./pages/Project/ProjectDetail";
+import TaskList from "./pages/Task/TaskList";
 import useUiStore from "./store/uiStore";
 import Loading from "./components/ui/Loading";
 import GlobalLoadingHandler from "./components/common/GlobalLoadingHandler";
@@ -64,6 +65,7 @@ function App() {
     "/staff/all": <StaffList />,
     "/administration/accounts": <UserList />,
     "/projects": <ProjectList />,
+    "/tasks": <TaskList />,
   };
 
   return (
@@ -130,7 +132,7 @@ function App() {
             } 
           />
 
-          {/* Fallback */}
+{/* Fallback */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>

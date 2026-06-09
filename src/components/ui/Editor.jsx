@@ -1,4 +1,4 @@
-﻿import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FastField, getIn } from "formik";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -6,6 +6,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import Box from "@mui/material/Box";
 import clsx from "clsx";
 import RequiredLabel from "./RequiredLabel";
+import { uploadImage } from "../../services/CloudinaryService";
 
 /**
  * High-performance Editor component based on ReactQuill.
@@ -105,11 +106,20 @@ function MyEditor({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.result) handleInsertImage(reader.result, editor);
-    };
-    reader.readAsDataURL(file);
+    // Upload image to Cloudinary and insert URL
+    uploadImage(file)
+      .then((secureUrl) => {
+        handleInsertImage(secureUrl, editor);
+      })
+      .catch((err) => {
+        console.error("Cloudinary upload failed, falling back to base64:", err);
+        // Fallback to Base64 encoding if upload fails
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (reader.result) handleInsertImage(reader.result, editor);
+        };
+        reader.readAsDataURL(file);
+      });
   }, [customImageHandler, setFieldValue, handleInsertImage]);
 
   const handleImageClick = useCallback(() => {
@@ -207,10 +217,49 @@ function MyEditor({
 
   return (
     <Box sx={{ 
-      "& .ql-container": { minHeight: "150px" },
+      "& .ql-toolbar": {
+        borderTopLeftRadius: "var(--radius)",
+        borderTopRightRadius: "var(--radius)",
+        borderColor: "rgba(0, 0, 0, 0.23) !important",
+        ".dark &": {
+          borderColor: "hsl(var(--border)) !important",
+          backgroundColor: "hsl(var(--muted)) !important",
+        }
+      },
+      "& .ql-container": { 
+        borderBottomLeftRadius: "var(--radius)",
+        borderBottomRightRadius: "var(--radius)",
+        minHeight: "150px",
+        borderColor: "rgba(0, 0, 0, 0.23) !important",
+        ".dark &": {
+          borderColor: "hsl(var(--border)) !important",
+        }
+      },
       "& .ql-editor": { 
         bgcolor: (readOnly || disabled) ? "rgba(0, 0, 0, 0.05)" : "inherit",
-        minHeight: "150px"
+        minHeight: "150px",
+        ".dark &": {
+          bgcolor: (readOnly || disabled) ? "rgba(255, 255, 255, 0.05)" : "inherit",
+        }
+      },
+      ".dark & .ql-stroke": {
+        stroke: "hsl(var(--foreground)) !important",
+      },
+      ".dark & .ql-fill": {
+        fill: "hsl(var(--foreground)) !important",
+      },
+      ".dark & .ql-picker": {
+        color: "hsl(var(--foreground)) !important",
+      },
+      ".dark & .ql-picker-label": {
+        color: "hsl(var(--foreground)) !important",
+      },
+      ".dark & .ql-picker-options": {
+        backgroundColor: "hsl(var(--popover)) !important",
+        borderColor: "hsl(var(--border)) !important",
+      },
+      ".dark & .ql-picker-item": {
+        color: "hsl(var(--foreground)) !important",
       }
     }}>
       <ReactQuill
@@ -221,7 +270,7 @@ function MyEditor({
         placeholder={placeholder}
         readOnly={readOnly || disabled}
         modules={modules}
-        className={clsx("bg-white", !oldStyle && "editor-container", (readOnly || disabled) && "read-only")}
+        className={clsx("bg-white dark:bg-card dark:text-foreground", !oldStyle && "editor-container", (readOnly || disabled) && "read-only")}
       />
     </Box>
   );
