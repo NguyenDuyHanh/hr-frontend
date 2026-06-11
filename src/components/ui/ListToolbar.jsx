@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   Children,
   Fragment,
   isValidElement,
@@ -101,6 +101,7 @@ function ListToolbar({
   // ─── add ───
   onAdd,
   addLabel = 'Thêm mới',
+  addDisabled = false,
 
   // ─── download template ───
   onDownloadTemplate,
@@ -588,6 +589,7 @@ function ListToolbar({
           >
             {onAdd && (
               <MenuItem
+                disabled={addDisabled}
                 onClick={() => { onAdd(); setCompactAnchor(null); }}
                 className="mx-1 my-0.5 px-3 rounded-md text-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground flex items-center gap-3 text-sm transition-colors cursor-pointer"
               >
@@ -662,6 +664,7 @@ function ListToolbar({
                 variant="contained"
                 size="small"
                 onClick={onAdd}
+                disabled={addDisabled}
                 startIcon={<AddIcon fontSize="small" />}
                 className="normal-case whitespace-nowrap !shadow-none"
               >
