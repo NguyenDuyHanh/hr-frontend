@@ -14,6 +14,9 @@ import ProjectDetail from "./pages/Project/ProjectDetail";
 import TaskList from "./pages/Task/TaskList";
 import RecruitmentList from "./pages/Recruitment/RecruitmentList";
 import RecruitmentDetail from "./pages/Recruitment/RecruitmentDetail";
+import TimekeepingCalendar from "./pages/Timekeeping/TimekeepingCalendar";
+import TimekeepingSummary from "./pages/Timekeeping/TimekeepingSummary";
+import TimesheetApprovalList from "./pages/Timesheet/TimesheetApprovalList";
 import useUiStore from "./store/uiStore";
 import Loading from "./components/ui/Loading";
 import GlobalLoadingHandler from "./components/common/GlobalLoadingHandler";
@@ -69,6 +72,9 @@ function App() {
     "/projects": <ProjectList />,
     "/tasks": <TaskList />,
     "/recruitments": <RecruitmentList />,
+    "/time-sheet-detail": <TimekeepingCalendar />,
+    "/check-inout-result": <TimesheetApprovalList />,
+    "/time-sheet-summary": <TimekeepingSummary />,
   };
 
   return (

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Grid } from '@mui/material';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
@@ -121,6 +121,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                             required
                             fullWidth 
                             disabled={isView}
+                            autoComplete="new-password"
                         />
                     </Grid>
                     {!userData && (
@@ -132,6 +133,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                                 required
                                 fullWidth 
                                 disabled={isView}
+                                autoComplete="new-password"
                             />
                         </Grid>
                     )}

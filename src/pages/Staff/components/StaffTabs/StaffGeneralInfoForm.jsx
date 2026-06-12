@@ -154,19 +154,19 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
     }), [staffData]);
 
     const validationSchema = Yup.object({
-        staffCode: Yup.string().required('Mã nhân viên là bắt buộc'),
-        displayName: Yup.string().required('Họ và tên là bắt buộc'),
-        workingStatus: Yup.mixed().required('Trạng thái là bắt buộc'),
-        birthDate: Yup.date().required('Ngày sinh là bắt buộc').nullable(),
-        nationalityId: Yup.string().required('Quốc tịch là bắt buộc'),
-        provinceId: Yup.string().required('Tỉnh thường trú là bắt buộc'),
-        phoneNumber: Yup.string().required('Số điện thoại là bắt buộc').max(11, 'Số điện thoại tối đa 11 số'),
-        email: Yup.string().email('Email cá nhân không hợp lệ').required('Email cá nhân là bắt buộc'),
-        companyEmail: Yup.string().email('Email công ty không hợp lệ').required('Email công ty là bắt buộc'),
-        recruitmentDate: Yup.date().required('Ngày vào là bắt buộc').nullable(),
-        startDate: Yup.date().required('Ngày chính thức là bắt buộc').nullable(),
-        apprenticeDays: Yup.number().min(0, 'Tối thiểu là 0').required('Số ngày học việc/thử việc là bắt buộc'),
-        statusId: Yup.string().required('Trạng thái hồ sơ là bắt buộc'),
+        // staffCode: Yup.string().required('Mã nhân viên là bắt buộc'),
+        // displayName: Yup.string().required('Họ và tên là bắt buộc'),
+        // workingStatus: Yup.mixed().required('Trạng thái là bắt buộc'),
+        // birthDate: Yup.date().required('Ngày sinh là bắt buộc').nullable(),
+        // nationalityId: Yup.string().required('Quốc tịch là bắt buộc'),
+        // provinceId: Yup.string().required('Tỉnh thường trú là bắt buộc'),
+        // phoneNumber: Yup.string().required('Số điện thoại là bắt buộc').max(11, 'Số điện thoại tối đa 11 số'),
+        // email: Yup.string().email('Email cá nhân không hợp lệ').required('Email cá nhân là bắt buộc'),
+        // companyEmail: Yup.string().email('Email công ty không hợp lệ').required('Email công ty là bắt buộc'),
+        // recruitmentDate: Yup.date().required('Ngày vào là bắt buộc').nullable(),
+        // startDate: Yup.date().required('Ngày chính thức là bắt buộc').nullable(),
+        // apprenticeDays: Yup.number().min(0, 'Tối thiểu là 0').required('Số ngày học việc/thử việc là bắt buộc'),
+        // statusId: Yup.string().required('Trạng thái hồ sơ là bắt buộc'),
     });
 
     const formik = useFormik({
@@ -224,6 +224,11 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
     }, [values.skipTimekeeping, setFieldValue]);
 
 
+    const filteredPositions = useMemo(() => {
+        if (!values.department?.id) return positions;
+        return positions.filter(pos => pos.department?.id === values.department.id);
+    }, [positions, values.department?.id]);
+
     const activeWards = useMemo(() => {
         return values.provinceId ? (wardOptionsMap[values.provinceId] || []) : [];
     }, [values.provinceId]);
@@ -253,7 +258,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                         <Grid item xs={12} md={9} sx={{ marginTop: 2 }}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <TextField label="Họ và tên" name="displayName" required fullWidth disabled={isView} />
+                                    <TextField label="Họ và tên" name="displayName"  fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
                                     <SelectInput label="Giới tính" name="gender" options={[
@@ -262,16 +267,16 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                                     ]} fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <DateTimePicker label="Ngày sinh" name="birthDate" notValueMillisecond={true} required fullWidth disabled={isView} />
+                                    <DateTimePicker label="Ngày sinh" name="birthDate" notValueMillisecond={true} fullWidth disabled={isView} />
                                 </Grid>
-                                <Grid item xs={12} sm={6} lg={4}>
+                                {/* <Grid item xs={12} sm={6} lg={4}>
                                     <SelectInput label="Tình trạng hôn nhân" name="maritalStatus" options={maritalStatusOptions} fullWidth disabled={isView} />
-                                </Grid>
+                                </Grid> */}
                                 <Grid item xs={12} sm={6} lg={4}>
                                     <TextField label="Nơi sinh" name="birthPlace" fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <SelectInput label="Quốc tịch" name="nationalityId" options={nationalityOptions} required fullWidth disabled={isView} />
+                                    <SelectInput label="Quốc tịch" name="nationalityId" options={nationalityOptions} fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
                                     <SelectInput label="Dân tộc" name="ethnicsId" options={ethnicsOptions} fullWidth disabled={isView} />
@@ -291,23 +296,20 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 <TabAccordion title="Địa chỉ thường trú / tạm trú" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <SelectInput 
+                            <TextField 
                                 label="Tỉnh thường trú" 
                                 name="provinceId" 
-                                options={provinceOptions} 
-                                required 
-                                onValueChange={handleProvinceChange}
+                                // required 
                                 fullWidth 
                                 disabled={isView}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <SelectInput 
+                            <TextField 
                                 label="Xã thường trú" 
                                 name="administrativeunitId" 
-                                options={activeWards} 
-                                disabled={isView || !values.provinceId}
                                 fullWidth 
+                                disabled={isView}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={6}>
@@ -325,23 +327,14 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 {/* 3. Giấy tờ pháp lý */}
                 <TabAccordion title="Giấy tờ pháp lý" open={false}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} lg={3}>
-                            <TextField label="Số CMND" name="idNumber" fullWidth inputProps={{ maxLength: 12 }} disabled={isView} />
+                        <Grid item xs={12} sm={6} lg={4}>
+                            <TextField label="Số CCCD/CMND" name="personalIdentificationNumber" fullWidth inputProps={{ maxLength: 12 }} disabled={isView} />
                         </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
-                            <DateTimePicker label="Ngày cấp CMND" name="idNumberIssueDate" notValueMillisecond={true} fullWidth disabled={isView} />
+                        <Grid item xs={12} sm={6} lg={4}>
+                            <DateTimePicker label="Ngày cấp CCCD/CMND" name="personalIdentificationIssueDate" notValueMillisecond={true} fullWidth disabled={isView} />
                         </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
-                            <TextField label="Nơi cấp CMND" name="idNumberIssueBy" fullWidth disabled={isView} />
-                        </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
-                            <TextField label="Số CCCD" name="personalIdentificationNumber" fullWidth inputProps={{ maxLength: 12 }} disabled={isView} />
-                        </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
-                            <DateTimePicker label="Ngày cấp CCCD" name="personalIdentificationIssueDate" notValueMillisecond={true} fullWidth disabled={isView} />
-                        </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
-                            <TextField label="Nơi cấp CCCD" name="personalIdentificationIssuePlace" fullWidth disabled={isView} />
+                        <Grid item xs={12} sm={6} lg={4}>
+                            <TextField label="Nơi cấp CCCD/CMND" name="personalIdentificationIssuePlace" fullWidth disabled={isView} />
                         </Grid>
                         {isForeigner && (
                             <>
@@ -360,18 +353,18 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 <TabAccordion title="Thông tin hồ sơ nhân viên" open={true}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <TextField label="Mã nhân viên" name="staffCode" readOnly required fullWidth disabled={isView} />
+                            <TextField label="Mã nhân viên" name="staffCode" readOnly fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <SelectInput label="Trạng thái làm việc" name="workingStatus" options={WorkingStatusOptions} required fullWidth disabled={isView} />
+                            <SelectInput label="Trạng thái làm việc" name="workingStatus" options={WorkingStatusOptions} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <SelectInput label="Trạng thái hồ sơ" name="statusId" options={statusOptions} required fullWidth disabled={isView} />
+                            <SelectInput label="Trạng thái hồ sơ" name="statusId" options={statusOptions} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
                             <SelectInput label="Hình thức làm việc" name="staffWorkingFormat" options={workingFormatOptions} fullWidth disabled={isView} />
                         </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
+                        {/* <Grid item xs={12} sm={6} lg={3}>
                             <SelectInput label="Người giới thiệu" name="introducerId" options={[]} fullWidth placeholder="Chọn người giới thiệu..." disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
@@ -382,17 +375,17 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
                             <TextField label="Số ngày HV/TV" name="apprenticeDays" type="number" required fullWidth disabled={isView} />
+                        </Grid> */}
+                        <Grid item xs={12} sm={6} lg={3}>
+                            <DateTimePicker label="Ngày chính thức" name="startDate" notValueMillisecond={true} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <DateTimePicker label="Ngày chính thức" name="startDate" notValueMillisecond={true} required fullWidth disabled={isView} />
-                        </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
-                            <TextField label="Email công ty" name="companyEmail" required fullWidth disabled={isView} />
+                            <TextField label="Email công ty" name="companyEmail" fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
                             <SelectInput label="Tình trạng nhân sự" name="staffPhase" options={staffPhaseOptions} fullWidth disabled={isView} />
                         </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
+                        {/* <Grid item xs={12} sm={6} lg={3}>
                             <SelectInput label="Loại vị trí việc làm" name="staffPositionType" options={positionTypeOptions} fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
@@ -418,31 +411,42 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                                     <SelectInput label="Ngày nghỉ cố định 2" name="fixLeaveWeekDay2" options={weekDayOptions} fullWidth disabled={isView} />
                                 </Grid>
                             </>
-                        )}
+                        )} */}
                     </Grid>
                 </TabAccordion>
 
                 {/* 5. Tổ chức */}
                 <TabAccordion title="Tổ chức" open={false}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} lg={3}>
+                        {/* <Grid item xs={12} sm={6} lg={3}>
                             <SelectInput label="Đơn vị" name="organizationId" options={organizationOptions} fullWidth disabled={isView} />
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={12} sm={6} lg={3}>
                             <Autocomplete 
                                 label="Phòng ban" 
                                 name="department" 
                                 options={departments}
                                 getOptionLabel={(option) => option?.name || ''}
+                                onChange={(event, val) => {
+                                    setFieldValue('department', val);
+                                    if (val && values.position) {
+                                        const posFull = positions.find(p => p.id === values.position.id);
+                                        if (posFull && posFull.department?.id !== val.id) {
+                                            setFieldValue('position', null);
+                                        }
+                                    } else if (!val) {
+                                        setFieldValue('position', null);
+                                    }
+                                }}
                                 fullWidth
                                 disabled={isView}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
                             <Autocomplete 
-                                label="Chức danh" 
+                                label="Vị trí" 
                                 name="position" 
-                                options={positions}
+                                options={filteredPositions}
                                 getOptionLabel={(option) => option?.name || ''}
                                 fullWidth
                                 disabled={isView}
@@ -451,9 +455,9 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                         <Grid item xs={12} sm={6} lg={3}>
                             <TextField label="Cấp bậc" name="level" fullWidth disabled={isView} />
                         </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
+                        {/* <Grid item xs={12} sm={6} lg={3}>
                             <SelectInput label="Chức danh khác (Title)" name="positionTitleId" options={positionTitleOptions} fullWidth disabled={isView} />
-                        </Grid>
+                        </Grid> */}
                     </Grid>
                 </TabAccordion>
 
@@ -461,10 +465,10 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 <TabAccordion title="Thông tin liên hệ" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <TextField label="Số điện thoại" name="phoneNumber" required fullWidth disabled={isView} />
+                            <TextField label="Số điện thoại" name="phoneNumber" fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <TextField label="Email cá nhân" name="email" required fullWidth disabled={isView} />
+                            <TextField label="Email cá nhân" name="email" fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={12}>
                             <TextField label="Người liên hệ khẩn cấp (tên / SĐT / quan hệ)" name="contactPersonInfo" multiline rows={2} fullWidth disabled={isView} />
@@ -484,9 +488,9 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                         <Grid item xs={12} sm={6} lg={3}>
                             <TextField label="Mã số BH sức khỏe" name="healthInsuranceNumber" fullWidth disabled={isView} />
                         </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
+                        {/* <Grid item xs={12} sm={6} lg={3}>
                             <TextField label="Tình trạng sổ BHXH" name="socialInsuranceNote" fullWidth disabled={isView} />
-                        </Grid>
+                        </Grid> */}
                     </Grid>
                 </TabAccordion>
 

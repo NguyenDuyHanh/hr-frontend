@@ -145,9 +145,10 @@ const RecruitmentList = () => {
         {
             title: 'Thao tác',
             field: 'actions',
+            align: 'center',
             width: 120,
             render: (row) => (
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center justify-center space-x-1">
                     <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => navigate(`/recruitments/${row.id}/view`)} title="Xem chi tiết">
                         <VisibilityIcon fontSize="small" />
                     </IconButton>
@@ -160,11 +161,12 @@ const RecruitmentList = () => {
                 </div>
             )
         },
-        { title: 'Mã tin', field: 'code', width: 130 },
-        { title: 'Tiêu đề tuyển dụng', field: 'name', width: 220 },
+        { title: 'Mã tin', field: 'code', align: 'center', width: 130 },
+        { title: 'Tiêu đề tuyển dụng', field: 'name', align: 'center', width: 220 },
         { 
             title: 'Người duyệt CV', 
             field: 'personApproveCVName', 
+            align: 'center',
             width: 180,
             render: (row) => row.personApproveCVName || 'Chưa phân công'
         },

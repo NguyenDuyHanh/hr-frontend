@@ -33,9 +33,8 @@ export const navigations = [
     children: [
       // { name: "Sơ đồ tổ chức", path: "/organization/diagram", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       // { name: "Cây tổ chức", path: "/organization/tree", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
-      { name: "Quản lý vị trí", path: "/category/staff/position", auth: [ADMIN, HR_MANAGER] },
-      { name: "Thông tin công ty", path: "/category/organization", auth: [ADMIN, HR_MANAGER] },
       { name: "Phòng ban", path: "/department", auth: [ADMIN, HR_MANAGER] },
+      { name: "Quản lý vị trí", path: "/category/staff/position", auth: [ADMIN, HR_MANAGER] },
       // { name: "Nhóm ngạch", path: "/organization/group-position-title", auth: [ADMIN, HR_MANAGER] },
       // { name: "Ngạch lương", path: "/organization/rank-title", auth: [ADMIN, HR_MANAGER] },
       // { name: "Chức danh", path: "/organization/position-title", auth: [ADMIN, HR_MANAGER] },
@@ -58,7 +57,7 @@ export const navigations = [
       // { name: "Phiếu đánh giá", path: "/staff-evaluation-ticket", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Hợp đồng lao động", path: "/staff-labour-agreement", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Quản lý phép năm", path: "/staff-annual-leave-history", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
-      { name: "Chứng chỉ nhân viên", path: "/staff-certificate", auth: [ADMIN, HR_MANAGER] },
+      // { name: "Chứng chỉ nhân viên", path: "/staff-certificate", auth: [ADMIN, HR_MANAGER] },
       // {
       //   name: "Danh mục nhân sự",
       //   auth: [ADMIN, HR_MANAGER],
@@ -85,7 +84,8 @@ export const navigations = [
       // { name: "Yêu cầu nghỉ phép", path: "/category/leave-request", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       // { name: "Yêu cầu làm thêm", path: "/category/overtime-request", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       // { name: "Xác nhận lịch trực", path: "/category/confirm-staff-work-schedule", auth: [ADMIN, HR_MANAGER] },
-      { name: "Kết quả Check-in/out", path: "/check-inout-result", auth: [ADMIN, HR_MANAGER] },
+      { name: "Phê duyệt chấm công", path: "/check-inout-result", auth: [ADMIN, HR_MANAGER] },
+      { name: "Thống kê công", path: "/time-sheet-summary", auth: [ADMIN, HR_MANAGER, HR_TIMEKEEPING_MANAGER] },
     ],
   },
   // {
