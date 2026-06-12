@@ -537,6 +537,7 @@ const TimekeepingSummary = () => {
                 {
                     title: 'Nhân viên',
                     field: 'displayName',
+                    align: 'center',    
                     minWidth: 150,
                     render: (row) => <span className="font-bold text-gray-800 dark:text-gray-200">{row.displayName}</span>
                 },
