@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { 
   IconButton, Button, Menu, MenuItem, Divider, Typography, Box, 
   CircularProgress, Chip 
@@ -40,6 +40,7 @@ import Avatar from '@/components/ui/Avatar'
 import Popup from '@/components/ui/Popup'
 
 const LayoutHeader = () => {
+  const navigate = useNavigate();
   const { toggleCollapsed, toggleMobileOpen } = useSidebarStore();
   const { user, logout } = useAuthStore();
   const { mode, toggleTheme } = useThemeStore();
@@ -415,7 +416,10 @@ const LayoutHeader = () => {
           <Divider className="my-1 border-border" />
           
           <MenuItem 
-            onClick={handleClose}
+            onClick={() => {
+              handleClose();
+              navigate('/profile');
+            }}
             className="mx-1 my-0.5 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground flex items-center gap-3 group transition-colors cursor-pointer"
           >
             <PersonOutlineIcon className="text-foreground group-hover:text-sidebar-accent-foreground w-[18px] h-[18px] min-w-[18px]" />

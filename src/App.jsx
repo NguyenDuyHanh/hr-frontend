@@ -9,6 +9,7 @@ import { navigations } from "./navigationConfig";
 import StaffList from "./pages/Staff/StaffList";
 import UserList from "./pages/User/UserList";
 import StaffDetailPage from "./pages/Staff/StaffDetailPage";
+import ProfilePage from "./pages/Staff/ProfilePage";
 import ProjectList from "./pages/Project/ProjectList";
 import ProjectDetail from "./pages/Project/ProjectDetail";
 import TaskList from "./pages/Task/TaskList";
@@ -110,6 +111,16 @@ function App() {
               } 
             />
           ))}
+
+          {/* Route trang cá nhân (Profile Page) */}
+          <Route 
+            path="/profile" 
+            element={
+              <AuthGuard roles={Object.values(ROLES)}>
+                <ProfilePage />
+              </AuthGuard>
+            } 
+          />
 
           {/* Route chi tiết nhân viên (Staff Detail/Edit) */}
           <Route 

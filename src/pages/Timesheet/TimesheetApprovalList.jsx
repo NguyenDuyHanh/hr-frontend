@@ -348,7 +348,7 @@ const TimesheetApprovalList = () => {
 
     return (
         <Box className="space-y-6">
-            <Paper elevation={0} className="p-4 border border-border rounded-xl shadow-sm">
+            <Paper elevation={0} className="p-4 border border-border shadow-sm">
                 <Formik
                     innerRef={formikRef}
                     initialValues={{

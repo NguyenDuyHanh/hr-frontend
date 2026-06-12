@@ -31,6 +31,8 @@ import {
   HelpOutline
 } from '@mui/icons-material';
 import ConstantList from '../../appConfig';
+import useAuthStore from '../../store/useAuthStore';
+import * as AuthService from '../../services/AuthService';
 
 const AiChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,9 +48,55 @@ const AiChatbotWidget = () => {
 
   const messagesEndRef = useRef(null);
 
+  // Get authentication token
+  const accessToken = useAuthStore((state) => state.accessToken);
+
+  // Custom fetch function that handles Authorization header and token refresh
+  const customFetch = async (url, options) => {
+    const token = useAuthStore.getState().accessToken;
+    const headers = {
+      ...options?.headers,
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    let response = await fetch(url, { ...options, headers });
+
+    if (response.status === 401) {
+      console.log('[AiChatbotWidget] Chat request returned 401. Attempting token refresh...');
+      const refreshTokenVal = useAuthStore.getState().refreshToken;
+      if (refreshTokenVal) {
+        try {
+          const refreshResponse = await AuthService.refreshToken(refreshTokenVal);
+          if (refreshResponse.data && refreshResponse.data.status === 200) {
+            const { accessToken: newAccessToken, refreshToken: newRefreshToken } = refreshResponse.data.data;
+            
+            // Update auth store
+            useAuthStore.getState().setAuth(
+              useAuthStore.getState().user,
+              newAccessToken,
+              newRefreshToken || refreshTokenVal
+            );
+
+            console.log('[AiChatbotWidget] Token refreshed successfully. Retrying chat request...');
+            headers['Authorization'] = `Bearer ${newAccessToken}`;
+            response = await fetch(url, { ...options, headers });
+          }
+        } catch (refreshError) {
+          console.error('[AiChatbotWidget] Token refresh failed:', refreshError);
+          useAuthStore.getState().logout();
+        }
+      }
+    }
+
+    return response;
+  };
+
   // Configure useChat hook natively
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: ConstantList.API_ENPOINT + '/chat',
+    fetch: customFetch,
     body: { apiKey, model }
   });
 

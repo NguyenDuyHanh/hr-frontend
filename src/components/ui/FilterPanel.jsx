@@ -55,7 +55,7 @@ function FilterPanel({
       <div className="mb-4 mt-4 bg-background backdrop-blur-sm shadow-sm">
         {/* Header */}
         {title && (
-          <div className="flex items-center gap-2 mb-6 pb-3 border-b border-border">
+          <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
             <TuneIcon className="text-muted-foreground" sx={{ fontSize: 16 }} />
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
               {title}

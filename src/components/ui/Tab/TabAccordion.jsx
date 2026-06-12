@@ -61,7 +61,7 @@ function TabAccordion({ children, title, component, className = "", open = true,
             </AccordionSummary>
 
             <AccordionDetails sx={{ backgroundColor: 'background.paper' }}>
-                <Box sx={{ paddingTop: 3}}>
+                <Box sx={{ paddingTop: 1}}>
                     {children ? children : component ? component : ''}
                 </Box>
             </AccordionDetails>

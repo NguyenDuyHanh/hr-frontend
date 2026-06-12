@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
     Grid, Box, Card, CardContent, Typography, Button, 
-    Chip, CircularProgress, IconButton, Avatar, Tooltip,
+    Chip, IconButton, Avatar, Tooltip,
     Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 } from '@mui/material';
 import { 
@@ -244,11 +244,7 @@ const TimekeepingCalendar = () => {
                 </Box>
 
                 <CardContent className="p-6">
-                    {tsLoading ? (
-                        <Box className="h-[400px] flex items-center justify-center">
-                            <CircularProgress />
-                        </Box>
-                    ) : viewMode === 'calendar' ? (
+                    {viewMode === 'calendar' ? (
                         <Box>
                             {/* Days of week header */}
                             <Box className="grid grid-cols-7 gap-2 mb-2 text-center">

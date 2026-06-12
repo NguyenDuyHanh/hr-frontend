@@ -84,6 +84,7 @@ const StaffDetailPage = () => {
                 </Box>
             )
         },
+        /*
         {
             label: 'Quá trình làm việc',
             icon: <HistoryIcon />,
@@ -106,6 +107,7 @@ const StaffDetailPage = () => {
                 </Box>
             )
         },
+        */
         {
             label: 'Bảo hiểm',
             icon: <SecurityIcon />,

@@ -52,7 +52,7 @@ const healthCarePlaceOptions = HealthCarePlaceOptions;
 const statusOptions = StatusOptions;
 const positionTitleOptions = PositionTitleOptions;
 
-const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
+const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView, hideActions = false }) => {
     const { addStaff, modifyStaff } = useStaffStore();
     const [departments, setDepartments] = useState([]);
     const [positions, setPositions] = useState([]);
@@ -255,7 +255,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                         <Grid item xs={12} md={3}>
                             <ImageUpload label="Ảnh đại diện" name="imagePath" disabled={isView} />
                         </Grid>
-                        <Grid item xs={12} md={9} sx={{ marginTop: 2 }}>
+                        <Grid item xs={12} md={9}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6} lg={4}>
                                     <TextField label="Họ và tên" name="displayName"  fullWidth disabled={isView} />
@@ -495,9 +495,11 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 </TabAccordion>
 
                 {/* Form actions */}
-                <Box display="flex" justifyContent="flex-end" mt={4} className="pt-4 border-t border-border">
-                    {action}
-                </Box>
+                {!hideActions && (
+                    <Box display="flex" justifyContent="flex-end" mt={4} className="pt-4 border-t border-border">
+                        {action}
+                    </Box>
+                )}
             </div>
         </FormikProvider>
     );

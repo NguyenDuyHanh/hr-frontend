@@ -363,3 +363,9 @@ label,
   color: #9ca3af !important;
   /* text-gray-400 */
 }
+
+/* Tối ưu khoảng cách giữa các hàng input trong Grid */
+.MuiGrid-item > .mb-4,
+[class*="MuiGrid-grid-"] > .mb-4 {
+  margin-bottom: 0px !important;
+}
