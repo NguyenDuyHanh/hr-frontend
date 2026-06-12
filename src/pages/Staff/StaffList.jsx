@@ -187,7 +187,7 @@ const StaffList = () => {
                     <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleView(rowData)}><VisibilityIcon fontSize="small" /></IconButton>
                     <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)}><EditIcon fontSize="small" /></IconButton>
                     <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)}><DeleteIcon fontSize="small" /></IconButton>
-                    <IconButton size="small"><MoreHorizIcon fontSize="small" /></IconButton>
+                    {/* <IconButton size="small"><MoreHorizIcon fontSize="small" /></IconButton> */}
                 </div>
             )
         },
@@ -222,6 +222,7 @@ const StaffList = () => {
         { 
             title: 'Trạng thái nhân viên', 
             field: 'workingStatus',
+            align: 'center',
             width: 150,
             render: (rowData) => (
                 <span>
@@ -229,20 +230,22 @@ const StaffList = () => {
                 </span>
             )
         },
-        { 
-            title: 'Đơn vị', 
-            width: 150,
-            render: () => <span className="uppercase whitespace-nowrap">Thẩm mỹ Linh Anh</span> 
-        },
+        // { 
+        //     title: 'Đơn vị', 
+        //     width: 150,
+        //     render: () => <span className="uppercase whitespace-nowrap">Thẩm mỹ Linh Anh</span> 
+        // },
         { 
             title: 'Phòng ban', 
+            align: 'center',
             width: 180,
-            render: (rowData) => <span className="text-[12px]">{rowData.department?.name || '---'}</span> 
+            render: (rowData) => <span className="whitespace-nowrap">{rowData.departmentName || '---'}</span> 
         },
         { 
-            title: 'Chức danh', 
+            title: 'Vị trí', 
             width: 180,
-            render: (rowData) => <span className="text-[12px]">{rowData.position?.name || '---'}</span> 
+            align: 'center',
+            render: (rowData) => <span className="whitespace-nowrap">{rowData.positionName || '---'}</span> 
         },
         { 
             title: 'Quản lý trực tiếp', 
@@ -304,7 +307,7 @@ const StaffList = () => {
                         });
                     }}
                 >
-                    {() => (
+                    {({ values, setFieldValue }) => (
                         <>
                             {/* Toolbar & Advanced Filter */}
                             <ListToolbar
@@ -338,13 +341,28 @@ const StaffList = () => {
                                             label="Phòng ban"
                                             options={departments}
                                             getOptionLabel={(option) => option?.name || ''}
+                                            onChange={(event, val) => {
+                                                setFieldValue('department', val);
+                                                if (val && values.position) {
+                                                    const posFull = positions.find(p => p.id === values.position.id);
+                                                    if (posFull && posFull.department?.id !== val.id) {
+                                                        setFieldValue('position', null);
+                                                    }
+                                                } else if (!val) {
+                                                    setFieldValue('position', null);
+                                                }
+                                            }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <Autocomplete
                                             name="position"
-                                            label="Chức danh"
-                                            options={positions}
+                                            label="Vị trí"
+                                            options={
+                                                values.department?.id
+                                                    ? positions.filter(pos => pos.department?.id === values.department.id)
+                                                    : positions
+                                            }
                                             getOptionLabel={(option) => option?.name || ''}
                                         />
                                     </Grid>

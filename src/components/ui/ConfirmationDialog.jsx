@@ -1,4 +1,4 @@
-﻿import React, { memo } from "react";
+import React, { memo } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -26,6 +26,8 @@ const ConfirmationDialog = React.forwardRef(({
   handleAfterConfirm,
   needClose = true,
   maxWidth = "xs",
+  disabled = false,
+  children,
   ...otherProps
 }, ref) => {
   const { t } = useTranslation();
@@ -84,12 +86,15 @@ const ConfirmationDialog = React.forwardRef(({
       </DialogTitle>
 
       <DialogContent sx={{ p: 3, pt: 1 }}>
-        <p 
-          className="text-gray-600 leading-relaxed font-medium"
-          style={{ marginTop: '10px' }}
-        >
-          {text}
-        </p>
+        {text && (
+          <p 
+            className="text-gray-600 leading-relaxed font-medium"
+            style={{ marginTop: '10px', marginBottom: children ? '16px' : '0' }}
+          >
+            {text}
+          </p>
+        )}
+        {children}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2, pt: 1, justifyContent: 'flex-end' }}>
@@ -111,6 +116,7 @@ const ConfirmationDialog = React.forwardRef(({
           variant="contained"
           startIcon={<DoneIcon />}
           onClick={handleConfirm}
+          disabled={disabled}
           sx={{
             textTransform: 'none',
             fontWeight: 600,
