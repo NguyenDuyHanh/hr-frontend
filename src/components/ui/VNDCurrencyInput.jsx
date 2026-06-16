@@ -1,4 +1,4 @@
-﻿/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, memo, useCallback, useMemo } from "react";
 import TextField from "@mui/material/TextField";
 import { FastField, getIn } from "formik";
@@ -87,6 +87,8 @@ const MyVNDCurrencyInput = ({
   variant = "outlined",
   suffix = "",
   textAlignRight,
+  size = "small",
+  noMargin = false,
   ...otherProps
 }) => {
   // DEBUG: console.log(`Render [VNDCurrencyInput]: ${name}`);
@@ -146,11 +148,11 @@ const MyVNDCurrencyInput = ({
   }), [textAlignRight, disabled, readOnly, otherProps.sx]);
 
   return (
-    <div style={{ width: "100%" }}>
+    <div className={clsx("w-full", !noMargin && "mb-4")} style={{ width: "100%" }}>
       {label && (
         <label 
           htmlFor={name} 
-          className={clsx(oldStyle ? 'old-label' : 'label-container', readOnly && 'read-only')}
+          className={clsx("block text-sm font-semibold mb-1.5 text-muted-foreground", oldStyle && "text-xs", readOnly && "read-only")}
         >
           <RequiredLabel label={label} requiredLabel={required} />
         </label>
@@ -167,6 +169,7 @@ const MyVNDCurrencyInput = ({
         placeholder={placeholder}
         disabled={disabled || readOnly}
         type={type}
+        size={size}
         error={isError}
         helperText={isError ? meta.error : ""}
         InputProps={memoInputProps}

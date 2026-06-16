@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
-import { Grid, Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import useStaffStore from '../../../store/staffStore';
 import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
@@ -20,6 +20,10 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
         displayName: staffData?.displayName || '',
         startDate: staffData?.startDate ? new Date(staffData.startDate) : new Date(),
         workingStatus: staffData?.workingStatus || '',
+        bankName: staffData?.bankName || 'MB Bank',
+        bankAccountNumber: staffData?.bankAccountNumber || '0332225159',
+        bankAccountName: staffData?.bankAccountName || staffData?.displayName || '',
+        bankBin: staffData?.bankBin || '970422',
     }), [staffData]);
 
     const validationSchema = Yup.object({
@@ -79,38 +83,46 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
             action={action}
         >
             <FormikProvider value={formik}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <DateTimePicker 
-                            label="Ngày vào làm việc" 
-                            name="startDate" 
-                            notValueMillisecond={true}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField 
-                            label="Mã nhân viên" 
-                            name="staffCode" 
-                            readOnly
-                            required
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField 
-                            label="Họ và tên" 
-                            name="displayName" 
-                            required
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SelectInput 
-                            label="Trạng Thái Nhân Viên" 
-                            name="workingStatus" 
-                            options={WorkingStatusOptions}
-                            required
-                        />
-                    </Grid>
-                </Grid>
+                <Box>
+                    <DateTimePicker 
+                        label="Ngày vào làm việc" 
+                        name="startDate" 
+                        notValueMillisecond={true}
+                    />
+                    <TextField 
+                        label="Mã nhân viên" 
+                        name="staffCode" 
+                        readOnly
+                        required
+                    />
+                    <TextField 
+                        label="Họ và tên" 
+                        name="displayName" 
+                        required
+                    />
+                    <SelectInput 
+                        label="Trạng Thái Nhân Viên" 
+                        name="workingStatus" 
+                        options={WorkingStatusOptions}
+                        required
+                    />
+                    <TextField 
+                        label="Tên Ngân Hàng" 
+                        name="bankName" 
+                    />
+                    <TextField 
+                        label="Số Tài Khoản" 
+                        name="bankAccountNumber" 
+                    />
+                    <TextField 
+                        label="Chủ Tài Khoản" 
+                        name="bankAccountName" 
+                    />
+                    <TextField 
+                        label="Mã BIN Ngân Hàng" 
+                        name="bankBin" 
+                    />
+                </Box>
             </FormikProvider>
         </Popup>
     );

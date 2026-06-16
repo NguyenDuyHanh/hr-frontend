@@ -7,10 +7,14 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import HistoryIcon from '@mui/icons-material/History';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SecurityIcon from '@mui/icons-material/Security';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { toast } from 'sonner';
 
 import TabComponent from '../../components/ui/Tab/TabComponent';
 import StaffGeneralInfoForm from './components/StaffTabs/StaffGeneralInfoForm';
+import StaffSalaryConfigForm from './components/StaffTabs/StaffSalaryConfigForm';
+import StaffBankInfoForm from './components/StaffTabs/StaffBankInfoForm';
 import { getStaffById } from '../../services/StaffService';
 
 const StaffDetailPage = () => {
@@ -74,6 +78,21 @@ const StaffDetailPage = () => {
             )
         },
         {
+            label: 'Tài khoản ngân hàng',
+            icon: <AccountBalanceIcon />,
+            content: (
+                <Box mt={2}>
+                    <StaffBankInfoForm 
+                        staffData={staff} 
+                        isView={isView}
+                        onClose={() => navigate('/staff/all')} 
+                        onSaveSuccess={handleSaveSuccess} 
+                    />
+                </Box>
+            )
+        },
+        /*
+        {
             label: 'Hợp đồng lao động',
             icon: <AssignmentIcon />,
             content: (
@@ -114,6 +133,19 @@ const StaffDetailPage = () => {
                     <Typography variant="body1" className="italic">
                         Thông tin bảo hiểm xã hội đang được phát triển...
                     </Typography>
+                </Box>
+            )
+        },
+        */
+        {
+            label: 'Lương & Phụ cấp',
+            icon: <AttachMoneyIcon />,
+            content: (
+                <Box mt={2}>
+                    <StaffSalaryConfigForm 
+                        staffId={id} 
+                        isView={isView}
+                    />
                 </Box>
             )
         }

@@ -167,7 +167,19 @@ function Table(props) {
   }, [propTotalPages, totalElements, pageSize]);
 
   const displayColumns = useMemo(() => {
-    if (!showIndex) return columns;
+    const processedColumns = (columns || [])
+      .filter(col => col && typeof col === 'object')
+      .map(col => {
+        if (col.title === 'Thao tác') {
+          return {
+            ...col,
+            width: '1%',
+          };
+        }
+        return col;
+      });
+
+    if (!showIndex) return processedColumns;
 
     const indexColumn = {
       title: "STT",
@@ -180,7 +192,7 @@ function Table(props) {
       },
     };
 
-    return [indexColumn, ...columns];
+    return [indexColumn, ...processedColumns];
   }, [columns, showIndex, page, pageSize]);
 
   const defaultIcons = useMemo(() => {
@@ -277,6 +289,7 @@ function Table(props) {
           cellStyle: {
             fontSize: "14px",
             color: "hsl(var(--foreground) / 0.75)",
+            whiteSpace: "nowrap",
           },
           headerStyle: {
             padding: "8px",

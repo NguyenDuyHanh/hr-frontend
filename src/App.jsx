@@ -24,6 +24,11 @@ import AiChatbotWidget from "./components/ui/AiChatbotWidget";
 import LoginPage from "./pages/auth/LoginPage";
 import { setNavigate } from "./navigation";
 import { ROLES } from "./constants/roles";
+import SalaryItemPage from "./pages/Salary/SalaryItemPage";
+import SalaryPeriodPage from "./pages/Salary/SalaryPeriodPage";
+import PayrollListPage from "./pages/Salary/PayrollListPage";
+import PayrollDetailPage from "./pages/Salary/PayrollDetailPage";
+import StaffPayslipPage from "./pages/Salary/StaffPayslipPage";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -75,6 +80,10 @@ function App() {
     "/time-sheet-detail": <TimekeepingCalendar />,
     "/check-inout-result": <TimesheetApprovalList />,
     "/time-sheet-summary": <TimekeepingSummary />,
+    "/salary/salary-item": <SalaryItemPage />,
+    "/salary/salary-period": <SalaryPeriodPage />,
+    "/salary/payrolls": <PayrollListPage />,
+    "/salary/salary-staff-payslip": <StaffPayslipPage />,
   };
 
   return (
@@ -161,7 +170,17 @@ function App() {
             } 
           />
 
-{/* Fallback */}
+          {/* Route chi tiết bảng lương */}
+          <Route 
+            path="/salary/payrolls/:id" 
+            element={
+              <AuthGuard roles={[ROLES.ADMIN, ROLES.HR_COMPENSATION_BENEFIT]}>
+                <PayrollDetailPage />
+              </AuthGuard>
+            } 
+          />
+
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>

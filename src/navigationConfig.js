@@ -106,10 +106,9 @@ export const navigations = [
     auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT, HR_EMPLOYEE],
     children: [
       { name: "Khoản lương", path: "/salary/salary-item", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
-      { name: "Mẫu bảng lương", path: "/salary/salary-template", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
       { name: "Kỳ lương", path: "/salary/salary-period", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
       { name: "Tạm ứng lương", path: "/salary/staff-advance-payment", auth: [HR_EMPLOYEE, HR_COMPENSATION_BENEFIT] },
-      { name: "Bảng lương nhân viên", path: "/salary/salary-result", auth: [ADMIN, HR_COMPENSATION_BENEFIT] },
+      { name: "Bảng lương", path: "/salary/payrolls", auth: [ADMIN, HR_COMPENSATION_BENEFIT] },
       { name: "Phiếu lương cá nhân", path: "/salary/salary-staff-payslip", auth: [HR_EMPLOYEE] },
     ],
   },

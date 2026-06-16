@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
-import { Button, Grid } from '@mui/material';
+import { Button, Box } from '@mui/material';
 import Popup from '../../../components/ui/Popup';
 import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
@@ -63,56 +63,46 @@ const RecruitmentFormDialog = ({
             action={actions}
         >
             <FormikProvider value={formik}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <TextField
-                            name="code"
-                            label="Mã tin tuyển dụng"
-                            disabled
-                            fullWidth
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            name="name"
-                            label="Tiêu đề tuyển dụng"
-                            required
-                            fullWidth
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <AsyncAutocomplete
-                            name="personApproveCV"
-                            label="Người duyệt hồ sơ"
-                            required
-                            api={pagingStaffs}
-                            searchObject={staffSearchObj}
-                            placeholder="Chọn người duyệt hồ sơ..."
-                            displayName="displayName"
-                            fullWidth
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SelectInput
-                            name="status"
-                            label="Trạng thái tin"
-                            options={RECRUITMENT_STATUSES}
-                            keyValue="value"
-                            displayvalue="label"
-                            fullWidth
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            name="description"
-                            label="Mô tả công việc chi tiết (JD, yêu cầu, quyền lợi...)"
-                            multiline
-                            rows={6}
-                            placeholder="Nhập thông tin JD..."
-                            fullWidth
-                        />
-                    </Grid>
-                </Grid>
+                <Box>
+                    <TextField
+                        name="code"
+                        label="Mã tin tuyển dụng"
+                        disabled
+                        fullWidth
+                    />
+                    <TextField
+                        name="name"
+                        label="Tiêu đề tuyển dụng"
+                        required
+                        fullWidth
+                    />
+                    <AsyncAutocomplete
+                        name="personApproveCV"
+                        label="Người duyệt hồ sơ"
+                        required
+                        api={pagingStaffs}
+                        searchObject={staffSearchObj}
+                        placeholder="Chọn người duyệt hồ sơ..."
+                        displayName="displayName"
+                        fullWidth
+                    />
+                    <SelectInput
+                        name="status"
+                        label="Trạng thái tin"
+                        options={RECRUITMENT_STATUSES}
+                        keyValue="value"
+                        displayvalue="label"
+                        fullWidth
+                    />
+                    <TextField
+                        name="description"
+                        label="Mô tả công việc chi tiết (JD, yêu cầu, quyền lợi...)"
+                        multiline
+                        rows={6}
+                        placeholder="Nhập thông tin JD..."
+                        fullWidth
+                    />
+                </Box>
             </FormikProvider>
         </Popup>
     );

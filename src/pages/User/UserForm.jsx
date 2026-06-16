@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Button, Grid } from '@mui/material';
+import { Button, Box } from '@mui/material';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import TextField from '../../components/ui/TextField';
@@ -113,65 +113,57 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
             action={action}
         >
             <FormikProvider value={formik}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
+                <Box>
+                    <TextField 
+                        label="Tên đăng nhập" 
+                        name="username" 
+                        required
+                        fullWidth 
+                        disabled={isView}
+                        autoComplete="new-password"
+                    />
+                    {!userData && (
                         <TextField 
-                            label="Tên đăng nhập" 
-                            name="username" 
+                            label="Mật khẩu" 
+                            name="password" 
+                            type="password"
                             required
                             fullWidth 
                             disabled={isView}
                             autoComplete="new-password"
                         />
-                    </Grid>
-                    {!userData && (
-                        <Grid item xs={12}>
-                            <TextField 
-                                label="Mật khẩu" 
-                                name="password" 
-                                type="password"
-                                required
-                                fullWidth 
-                                disabled={isView}
-                                autoComplete="new-password"
-                            />
-                        </Grid>
                     )}
-                    <Grid item xs={12}>
-                        <TextField 
-                            label="Email" 
-                            name="email" 
-                            fullWidth 
-                            disabled={isView}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <PagingAutocomplete 
-                            label="Nhân viên liên kết" 
-                            name="staff"
-                            api={pagingStaffs}
-                            disabled={isView}
-                            getOptionLabel={(option) => {
-                                if (!option) return "";
-                                const codePart = option.staffCode ? ` (${option.staffCode})` : "";
-                                return `${option.displayName || option.staffName || ''}${codePart}`;
-                            }}
-                            onChange={(event, value) => {
-                                formik.setFieldValue('staff', value);
-                                
-                                // Auto-populate email and username if selecting a staff for a new user
-                                if (value && !userData) {
-                                    if (value.email && !formik.values.email) {
-                                        formik.setFieldValue('email', value.email);
-                                    }
-                                    if (value.staffCode && !formik.values.username) {
-                                        formik.setFieldValue('username', value.staffCode);
-                                    }
+                    <TextField 
+                        label="Email" 
+                        name="email" 
+                        fullWidth 
+                        disabled={isView}
+                    />
+                    <PagingAutocomplete 
+                        label="Nhân viên liên kết" 
+                        name="staff"
+                        api={pagingStaffs}
+                        disabled={isView}
+                        getOptionLabel={(option) => {
+                            if (!option) return "";
+                            const codePart = option.staffCode ? ` (${option.staffCode})` : "";
+                            return `${option.displayName || option.staffName || ''}${codePart}`;
+                        }}
+                        onChange={(event, value) => {
+                            formik.setFieldValue('staff', value);
+                            
+                            // Auto-populate email and username if selecting a staff for a new user
+                            if (value && !userData) {
+                                if (value.email && !formik.values.email) {
+                                    formik.setFieldValue('email', value.email);
                                 }
-                            }}
-                        />
-                    </Grid>
-                    <Grid item xs={12} mt={2}>
+                                if (value.staffCode && !formik.values.username) {
+                                    formik.setFieldValue('username', value.staffCode);
+                                }
+                            }
+                        }}
+                    />
+                    <Box mt={2}>
                         <Autocomplete
                             multiple
                             name="roles"
@@ -182,8 +174,8 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                             disableCloseOnSelect
                             disabled={isView}
                         />
-                    </Grid>
-                </Grid>
+                    </Box>
+                </Box>
             </FormikProvider>
         </Popup>
     );
