@@ -54,7 +54,6 @@ function Popup({
               alignItems: "center",
               justifyContent: "space-between",
               p: 2,
-              marginBottom: 1,
               ...styleTitle 
             }}
             id={popupId || "ui-dialog-title"}
@@ -79,7 +78,7 @@ function Popup({
           sx={{ 
             pb: 0,
             px: 2,
-            pt: '20px !important',
+            pt: '16px !important',
             overflowY: "auto", 
             maxHeight: "75vh", 
             ...styleContent 

@@ -17,6 +17,7 @@ import FilterPanel from '../../components/ui/FilterPanel';
 import Autocomplete from '../../components/ui/Autocomplete';
 import useTimesheetStore from '../../store/useTimesheetStore';
 import { getDepartments, getStaffs } from '../../services/StaffService';
+import { getAllPeriods } from '../../services/periodService';
 import { getLabelFromOptions } from '../../LocalFunction';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import TextField from '../../components/ui/TextField';
@@ -69,6 +70,7 @@ const TimesheetApprovalList = () => {
     // Filter metadata
     const [departments, setDepartments] = useState([]);
     const [staffList, setStaffList] = useState([]);
+    const [periods, setPeriods] = useState([]);
     const [filterOpen, setFilterOpen] = useState(false);
     const [searchDraft, setSearchDraft] = useState('');
 
@@ -83,6 +85,11 @@ const TimesheetApprovalList = () => {
                 setDepartments(depRes?.data || []);
                 const staffRes = await getStaffs();
                 setStaffList(staffRes?.data || []);
+                const periodRes = await getAllPeriods();
+                if (periodRes && periodRes.data) {
+                    const dataList = periodRes.data.data || periodRes.data || [];
+                    setPeriods(Array.isArray(dataList) ? dataList : []);
+                }
             } catch (err) {
                 console.error("Failed to load filter metadata:", err);
             }
@@ -144,6 +151,7 @@ const TimesheetApprovalList = () => {
         if (filters.status) count++;
         if (filters.fromDate) count++;
         if (filters.toDate) count++;
+        if (filters.periodId) count++;
         return count;
     }, [filters]);
 
@@ -159,6 +167,10 @@ const TimesheetApprovalList = () => {
     const initialStatus = useMemo(() => {
         return TIMESHEET_STATUS_OPTIONS.find(s => s.id === filters.status) || null;
     }, [filters.status]);
+
+    const initialPeriod = useMemo(() => {
+        return (periods || []).find(p => p.id === filters.periodId) || null;
+    }, [periods, filters.periodId]);
 
     // Table Columns
     const columns = [
@@ -355,6 +367,7 @@ const TimesheetApprovalList = () => {
                         department: initialDepartment,
                         staff: initialStaff,
                         status: initialStatus,
+                        period: initialPeriod,
                         fromDate: filters.fromDate ? new Date(filters.fromDate) : null,
                         toDate: filters.toDate ? new Date(filters.toDate) : null
                     }}
@@ -364,6 +377,7 @@ const TimesheetApprovalList = () => {
                             departmentId: values.department?.id || null,
                             staffId: values.staff?.id || null,
                             status: values.status?.id || null,
+                            periodId: values.period?.id || null,
                             fromDate: values.fromDate ? dayjs(values.fromDate).format('YYYY-MM-DD') : null,
                             toDate: values.toDate ? dayjs(values.toDate).format('YYYY-MM-DD') : null
                         });
@@ -417,14 +431,22 @@ const TimesheetApprovalList = () => {
                                             getOptionLabel={(option) => option?.name || ''}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={6}>
+                                    <Grid item xs={12} sm={4}>
+                                        <Autocomplete
+                                            name="period"
+                                            label="Kỳ lương"
+                                            options={periods}
+                                            getOptionLabel={(option) => option?.name || ''}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
                                         <DateTimePicker
                                             label="Từ ngày"
                                             name="fromDate"
                                             notValueMillisecond={true}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={6}>
+                                    <Grid item xs={12} sm={4}>
                                         <DateTimePicker
                                             label="Đến ngày"
                                             name="toDate"

@@ -18,7 +18,8 @@ const useTimesheetStore = create((set, get) => ({
         fromDate: null,
         toDate: null,
         status: null,
-        departmentId: null
+        departmentId: null,
+        periodId: null
     },
     loading: false,
     myTimesheets: [],
@@ -38,7 +39,8 @@ const useTimesheetStore = create((set, get) => ({
             fromDate: null,
             toDate: null,
             status: null,
-            departmentId: null
+            departmentId: null,
+            periodId: null
         },
         page: 1
     }),

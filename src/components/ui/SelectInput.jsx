@@ -2,6 +2,9 @@ import React, { memo, useEffect, useState, useCallback, useMemo } from "react";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import ClearIcon from "@mui/icons-material/Clear";
 import { FastField, getIn, useFormikContext } from "formik";
 import { styled } from "@mui/material/styles";
 import clsx from "clsx";
@@ -24,6 +27,7 @@ const SelectInputV2 = (props) => {
       nextProps.options !== currentProps.options ||
       nextProps.keyValue !== currentProps.keyValue ||
       nextProps.displayvalue !== currentProps.displayvalue ||
+      nextProps.isClearable !== currentProps.isClearable ||
       nextProps.formik.isSubmitting !== currentProps.formik.isSubmitting ||
       getIn(nextProps.formik.values, currentProps.name) !== getIn(currentProps.formik.values, currentProps.name) ||
       getIn(nextProps.formik.errors, currentProps.name) !== getIn(currentProps.formik.errors, currentProps.name) ||
@@ -61,6 +65,7 @@ const MySelectInput = ({
   handleChange: externalHandleChange,
   field,
   meta,
+  isClearable = !required,
   ...otherProps
 }) => {
   // DEBUG: console.log(`Render [SelectInputV2]: ${name}`);
@@ -87,19 +92,80 @@ const MySelectInput = ({
     }
   }, [readOnly, name, setFieldValue, externalHandleChange]);
 
+  const handleClear = useCallback((e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setInternalValue("");
+    if (name && setFieldValue) {
+      setFieldValue(name, "");
+    }
+    if (externalHandleChange) {
+      externalHandleChange({ target: { name, value: "" } }, "");
+    }
+  }, [name, setFieldValue, externalHandleChange]);
+
   const isError = Boolean(meta && meta.touched && meta.error);
+
+  const hasValue = useMemo(() => {
+    return internalValue !== "" && internalValue !== null && internalValue !== undefined;
+  }, [internalValue]);
+
+  const showClear = useMemo(() => {
+    return isClearable && hasValue && !readOnly && !otherProps.disabled;
+  }, [isClearable, hasValue, readOnly, otherProps.disabled]);
 
   const memoSx = useMemo(() => ({
     "& .MuiOutlinedInput-root": {
       backgroundColor: (readOnly || otherProps.disabled) ? "rgba(0, 0, 0, 0.05)" : "inherit",
     },
+    "& .MuiSelect-select": {
+      paddingRight: showClear ? "40px !important" : "inherit"
+    },
     ...otherProps.sx
-  }), [readOnly, otherProps.disabled, otherProps.sx]);
+  }), [readOnly, otherProps.disabled, otherProps.sx, showClear]);
 
-  const memoInputProps = useMemo(() => ({
-    ...otherProps.InputProps,
-    readOnly: readOnly,
-  }), [readOnly, otherProps.InputProps]);
+  const memoInputProps = useMemo(() => {
+    const props = {
+      ...otherProps.InputProps,
+      readOnly: readOnly,
+    };
+    if (showClear) {
+      props.endAdornment = (
+        <InputAdornment
+          position="end"
+          sx={{
+            position: "absolute",
+            right: 28,
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 1,
+            margin: 0
+          }}
+        >
+          <IconButton
+            size="small"
+            onClick={handleClear}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            edge="end"
+            sx={{
+              padding: "2px",
+              marginRight: "4px",
+              color: "text.secondary",
+              "&:hover": {
+                color: "text.primary"
+              }
+            }}
+          >
+            <ClearIcon sx={{ fontSize: "16px" }} />
+          </IconButton>
+        </InputAdornment>
+      );
+    }
+    return props;
+  }, [readOnly, otherProps.InputProps, showClear, handleClear]);
 
   return (
     <div className="w-full mb-4">

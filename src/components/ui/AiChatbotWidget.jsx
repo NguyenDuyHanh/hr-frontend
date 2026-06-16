@@ -31,6 +31,7 @@ import {
   HelpOutline
 } from '@mui/icons-material';
 import ConstantList from '../../appConfig';
+import useAuthStore from '../../store/useAuthStore';
 
 const AiChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,11 +46,17 @@ const AiChatbotWidget = () => {
   const [tempModel, setTempModel] = useState(model);
 
   const messagesEndRef = useRef(null);
+  
+  // Retrieve token from authentication store
+  const accessToken = useAuthStore((state) => state.accessToken);
 
   // Configure useChat hook natively
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: ConstantList.API_ENPOINT + '/chat',
-    body: { apiKey, model }
+    body: { apiKey, model },
+    headers: accessToken ? {
+      Authorization: `Bearer ${accessToken}`
+    } : {}
   });
 
   // Auto scroll to bottom of messages
@@ -73,7 +80,12 @@ const AiChatbotWidget = () => {
     // Update input state and submit
     handleInputChange({ target: { value: text } });
     setTimeout(() => {
-      handleSubmit(fakeEvent, { body: { apiKey, model } });
+      handleSubmit(fakeEvent, { 
+        body: { apiKey, model },
+        headers: accessToken ? {
+          Authorization: `Bearer ${accessToken}`
+        } : {}
+      });
     }, 50);
   };
 
@@ -350,7 +362,12 @@ const AiChatbotWidget = () => {
         <Divider />
         <Box
           component="form"
-          onSubmit={(e) => handleSubmit(e, { body: { apiKey, model } })}
+          onSubmit={(e) => handleSubmit(e, { 
+            body: { apiKey, model },
+            headers: accessToken ? {
+              Authorization: `Bearer ${accessToken}`
+            } : {}
+          })}
           sx={{ p: 1.5, bgcolor: 'hsl(var(--card))', display: 'flex', gap: 1, alignItems: 'center' }}
         >
           <TextField
