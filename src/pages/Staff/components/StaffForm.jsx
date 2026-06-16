@@ -20,10 +20,6 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
         displayName: staffData?.displayName || '',
         startDate: staffData?.startDate ? new Date(staffData.startDate) : new Date(),
         workingStatus: staffData?.workingStatus || '',
-        bankName: staffData?.bankName || 'MB Bank',
-        bankAccountNumber: staffData?.bankAccountNumber || '0332225159',
-        bankAccountName: staffData?.bankAccountName || staffData?.displayName || '',
-        bankBin: staffData?.bankBin || '970422',
     }), [staffData]);
 
     const validationSchema = Yup.object({
@@ -105,22 +101,6 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
                         name="workingStatus" 
                         options={WorkingStatusOptions}
                         required
-                    />
-                    <TextField 
-                        label="Tên Ngân Hàng" 
-                        name="bankName" 
-                    />
-                    <TextField 
-                        label="Số Tài Khoản" 
-                        name="bankAccountNumber" 
-                    />
-                    <TextField 
-                        label="Chủ Tài Khoản" 
-                        name="bankAccountName" 
-                    />
-                    <TextField 
-                        label="Mã BIN Ngân Hàng" 
-                        name="bankBin" 
                     />
                 </Box>
             </FormikProvider>
