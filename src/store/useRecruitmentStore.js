@@ -30,7 +30,7 @@ const useRecruitmentStore = create((set, get) => ({
     candidateInput: {
         id: null, candidateCode: '', displayName: '', gender: 'Nam', birthDate: '', 
         email: '', phoneNumber: '', currentResidence: '', 
-        imagePath: '', cvFilePath: '', status: 0, recruitmentId: '', departmentId: '', positionId: '', note: ''
+        imagePath: '', cvFilePath: '', status: 'SCREENING', recruitmentId: '', departmentId: '', positionId: '', note: ''
     },
 
     // Actions
@@ -75,7 +75,7 @@ const useRecruitmentStore = create((set, get) => ({
         candidateInput: {
             id: null, candidateCode: '', displayName: '', gender: 'Nam', birthDate: '', 
             email: '', phoneNumber: '', currentResidence: '', 
-            imagePath: '', cvFilePath: '', status: 0, recruitmentId: '', departmentId: '', positionId: '', note: ''
+            imagePath: '', cvFilePath: '', status: 'SCREENING', recruitmentId: '', departmentId: '', positionId: '', note: ''
         }
     }),
 

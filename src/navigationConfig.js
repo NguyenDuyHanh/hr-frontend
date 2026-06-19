@@ -112,15 +112,15 @@ export const navigations = [
       { name: "Phiếu lương cá nhân", path: "/salary/salary-staff-payslip", auth: [HR_EMPLOYEE] },
     ],
   },
-  {
-    name: "Bảo hiểm",
-    icon: "security",
-    auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT],
-    children: [
-      { name: "BHXH nhân viên", path: "/insurance/staff-social-insurance", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
-      // { name: "Gói bảo hiểm", path: "/insurance-package", auth: [ADMIN, HR_MANAGER] },
-    ],
-  },
+  // {
+  //   name: "Bảo hiểm",
+  //   icon: "security",
+  //   auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT],
+  //   children: [
+  //     { name: "BHXH nhân viên", path: "/insurance/staff-social-insurance", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
+  //     // { name: "Gói bảo hiểm", path: "/insurance-package", auth: [ADMIN, HR_MANAGER] },
+  //   ],
+  // },
   // {
   //   name: "Pháp chế",
   //   icon: "gavel",
@@ -193,7 +193,7 @@ export const navigations = [
       // { name: "Cấu hình hệ thống", path: "/category/system-config", auth: [ADMIN] },
     ],
   },
-  { name: "Chat nội bộ", path: "https://realtimechat.duyhanh.site", icon: "chat", external: true, auth: ALL_ROLES },
+  // { name: "Chat nội bộ", path: "https://realtimechat.duyhanh.site", icon: "chat", external: true, auth: ALL_ROLES },
 ];
 
 export const getBreadcrumbByPath = (pathname) => {

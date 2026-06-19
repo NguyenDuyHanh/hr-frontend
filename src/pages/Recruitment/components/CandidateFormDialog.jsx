@@ -52,7 +52,7 @@ const CandidateFormDialog = ({
         currentResidence: candidateInput.currentResidence || '',
         imagePath: candidateInput.imagePath || '',
         cvFilePath: candidateInput.cvFilePath || '',
-        status: candidateInput.status ?? 0,
+        status: candidateInput.status ?? 'SCREENING',
         recruitmentId: candidateInput.recruitmentId || '',
         departmentId: candidateInput.departmentId || '',
         positionId: candidateInput.positionId || '',
