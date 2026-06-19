@@ -1,0 +1,84 @@
+{
+  "leave": {
+    "title": {
+      "create": "Thêm mới đơn nghỉ phép",
+      "edit": "Chỉnh sửa đơn nghỉ phép",
+      "cancelConfirm": "Xác nhận hủy đơn nghỉ phép",
+      "approveConfirm": "Phê duyệt đơn nghỉ phép",
+      "rejectConfirm": "Từ chối đơn nghỉ phép"
+    },
+    "field": {
+      "staff": "Nhân viên",
+      "staffCode": "Mã nhân viên",
+      "staffName": "Tên nhân viên",
+      "department": "Phòng ban",
+      "position": "Vị trí",
+      "leaveType": "Loại nghỉ phép",
+      "fromDate": "Từ ngày",
+      "toDate": "Đến ngày",
+      "halfDayLeave": "Nghỉ nửa ngày",
+      "halfDayStart": "Nghỉ nửa ngày đầu (ngày bắt đầu)",
+      "halfDayEnd": "Nghỉ nửa ngày cuối (ngày kết thúc)",
+      "shiftOff": "Ca nghỉ phép",
+      "shiftStartOff": "Ca nghỉ ngày bắt đầu",
+      "shiftEndOff": "Ca nghỉ ngày kết thúc",
+      "reason": "Lý do nghỉ phép",
+      "status": "Trạng thái",
+      "rejectReason": "Ý kiến phản hồi / Lý do từ chối",
+      "totalDays": "Số ngày nghỉ",
+      "year": "Chọn năm báo cáo"
+    },
+    "type": {
+      "annual": "Phép năm",
+      "unpaid": "Phép không lương"
+    },
+    "status": {
+      "pending": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Từ chối"
+    },
+    "action": {
+      "create": "Tạo đơn xin nghỉ",
+      "createHR": "Tạo hộ đơn nghỉ",
+      "approve": "Phê duyệt",
+      "reject": "Từ chối"
+    },
+    "balance": {
+      "title": "Thông tin định mức phép năm",
+      "limit": "Định mức phép",
+      "used": "Đã nghỉ",
+      "remaining": "Còn lại"
+    },
+    "validation": {
+      "staffRequired": "Nhân viên là bắt buộc",
+      "typeRequired": "Loại phép là bắt buộc",
+      "fromDateRequired": "Ngày bắt đầu là bắt buộc",
+      "toDateRequired": "Ngày kết thúc là bắt buộc",
+      "dateOrder": "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu"
+    },
+    "message": {
+      "createSuccess": "Tạo đơn nghỉ phép thành công",
+      "updateSuccess": "Cập nhật đơn nghỉ phép thành công",
+      "deleteSuccess": "Xóa/Hủy đơn nghỉ phép thành công",
+      "approveSuccess": "Phê duyệt đơn nghỉ phép thành công",
+      "rejectSuccess": "Từ chối đơn nghỉ phép thành công",
+      "deleteError": "Lỗi khi xóa đơn",
+      "approveError": "Lỗi khi phê duyệt",
+      "rejectError": "Lỗi khi từ chối",
+      "cancelConfirmText": "Bạn có chắc chắn muốn hủy đơn nghỉ phép này không? Thao tác này không thể hoàn tác.",
+      "approveConfirmText": "Bạn có chắc chắn muốn phê duyệt đơn nghỉ phép này không?",
+      "rejectConfirmText": "Bạn có chắc chắn muốn từ chối đơn nghỉ phép này không?",
+      "deleteConfirmText": "Bạn có chắc chắn muốn xóa đơn nghỉ phép này không? Thao tác này không thể phục hồi.",
+      "error": "Đã xảy ra lỗi khi lưu đơn nghỉ phép"
+    }
+  },
+  "general": {
+    "actions": "Thao tác",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "cancel": "Hủy bỏ",
+    "save": "Lưu lại",
+    "confirm": "Xác nhận",
+    "all": "Tất cả"
+  }
+}
