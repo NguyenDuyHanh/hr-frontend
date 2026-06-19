@@ -29,6 +29,9 @@ import SalaryPeriodPage from "./pages/Salary/SalaryPeriodPage";
 import PayrollListPage from "./pages/Salary/PayrollListPage";
 import PayrollDetailPage from "./pages/Salary/PayrollDetailPage";
 import StaffPayslipPage from "./pages/Salary/StaffPayslipPage";
+import LeaveRequestList from "./pages/Leave/LeaveRequestList";
+import MyLeaveRequests from "./pages/Leave/MyLeaveRequests";
+import LeaveBalance from "./pages/Leave/LeaveBalance";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -84,6 +87,9 @@ function App() {
     "/salary/salary-period": <SalaryPeriodPage />,
     "/salary/payrolls": <PayrollListPage />,
     "/salary/salary-staff-payslip": <StaffPayslipPage />,
+    "/leave-requests": <LeaveRequestList />,
+    "/my-leave": <MyLeaveRequests />,
+    "/leave-balance": <LeaveBalance />,
   };
 
   return (

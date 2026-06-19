@@ -11,6 +11,7 @@ import TabAccordion from '../../../../components/ui/Tab/TabAccordion';
 import ImageUpload from '../../../../components/ui/ImageUpload';
 import { 
     WorkingStatusOptions,
+    GenderOptions,
     MaritalStatusOptions,
     NationalityOptions,
     EthnicsOptions,
@@ -261,10 +262,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                                     <TextField label="Họ và tên" name="displayName"  fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <SelectInput label="Giới tính" name="gender" options={[
-                                        { value: 'M', name: 'Nam' },
-                                        { value: 'F', name: 'Nữ' },
-                                    ]} fullWidth disabled={isView} />
+                                    <SelectInput label="Giới tính" name="gender" options={GenderOptions} fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
                                     <DateTimePicker label="Ngày sinh" name="birthDate" notValueMillisecond={true} fullWidth disabled={isView} />

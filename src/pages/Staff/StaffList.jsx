@@ -15,8 +15,8 @@ import Table from '../../components/ui/Table';
 import StaffForm from './components/StaffForm';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import useStaffStore from '../../store/staffStore';
-import { WorkingStatusOptions } from '../../constants';
-import { getLabelFromOptions, getActiveFilterCount } from '../../LocalFunction';
+import { WorkingStatusOptions, GenderOptions } from '../../constants';
+import { getLabelFromOptions, getActiveFilterCount, formatDate } from '../../LocalFunction';
 import { getDepartments, getPositions } from '../../services/StaffService';
 import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
@@ -203,9 +203,9 @@ const StaffList = () => {
             render: (rowData) => (
                 <div className="py-1">
                     <div className="font-bold leading-tight whitespace-nowrap">{rowData.displayName}</div>
-                    <div className="mt-1 whitespace-nowrap">Ngày sinh: {rowData.birthDate || '---'}</div>
-                    <div className="whitespace-nowrap">Ngày vào làm: {rowData.startDate || '---'}</div>
-                    <div>Giới tính: {rowData.gender || '---'}</div> 
+                    <div className="mt-1 whitespace-nowrap">Ngày sinh: {formatDate(rowData.birthDate) || '---'}</div>
+                    <div className="whitespace-nowrap">Ngày vào làm: {formatDate(rowData.startDate) || '---'}</div>
+                    <div>Giới tính: {getLabelFromOptions(GenderOptions, rowData.gender) || '---'}</div>
                 </div>
             )
         },

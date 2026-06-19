@@ -81,11 +81,20 @@ export const navigations = [
       // { name: "Phân công lịch trực", path: "/staff-work-schedule", auth: [ADMIN, HR_MANAGER] },
       // { name: "Bảng phân ca", path: "/work-schedule-calendar", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       // { name: "Thiết bị chấm công", path: "/timekeeping-device", auth: [ADMIN, HR_MANAGER] },
-      // { name: "Yêu cầu nghỉ phép", path: "/category/leave-request", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       // { name: "Yêu cầu làm thêm", path: "/category/overtime-request", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       // { name: "Xác nhận lịch trực", path: "/category/confirm-staff-work-schedule", auth: [ADMIN, HR_MANAGER] },
       { name: "Phê duyệt chấm công", path: "/check-inout-result", auth: [ADMIN, HR_MANAGER] },
       { name: "Thống kê công", path: "/time-sheet-summary", auth: [ADMIN, HR_MANAGER, HR_TIMEKEEPING_MANAGER] },
+    ],
+  },
+  {
+    name: "Nghỉ phép",
+    icon: "event",
+    auth: ALL_ROLES,
+    children: [
+      { name: "Đơn xin nghỉ phép", path: "/my-leave", auth: ALL_ROLES },
+      { name: "Phê duyệt nghỉ phép", path: "/leave-requests", auth: [ADMIN, HR_MANAGER] },
+      { name: "Số dư phép năm", path: "/leave-balance", auth: [ADMIN, HR_MANAGER] },
     ],
   },
   // {

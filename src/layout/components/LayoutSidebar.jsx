@@ -22,6 +22,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import TokenIcon from "@mui/icons-material/Token";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import ListAltIcon from "@mui/icons-material/ListAlt";
+import EventIcon from "@mui/icons-material/Event";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Tooltip from "@mui/material/Tooltip";
@@ -49,6 +50,7 @@ const IconMapper = memo(({ iconName, ...props }) => {
     token: TokenIcon,
     bookmark: BookmarkIcon,
     list_alt: ListAltIcon,
+    event: EventIcon,
   };
   const IconComponent = icons[iconName];
   return IconComponent ? <IconComponent {...props} /> : null;

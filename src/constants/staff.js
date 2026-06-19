@@ -1,3 +1,15 @@
+export const GENDER = {
+    MALE: 'MALE',
+    FEMALE: 'FEMALE',
+    OTHER: 'OTHER',
+};
+
+export const GenderOptions = [
+    { value: GENDER.MALE,   name: 'Nam' },
+    { value: GENDER.FEMALE, name: 'Nữ' },
+    { value: GENDER.OTHER,  name: 'Khác' },
+];
+
 export const WorkingStatusOptions = [
     { value: 1, name: 'Chờ nhận việc' },
     { value: 2, name: 'Tạm dừng công việc' },

@@ -1,0 +1,83 @@
+{
+  "leave": {
+    "title": {
+      "create": "Create Leave Request",
+      "edit": "Edit Leave Request",
+      "cancelConfirm": "Confirm Cancellation",
+      "approveConfirm": "Approve Leave Request",
+      "rejectConfirm": "Reject Leave Request"
+    },
+    "field": {
+      "staff": "Employee",
+      "staffCode": "Employee Code",
+      "staffName": "Employee Name",
+      "department": "Department",
+      "leaveType": "Leave Type",
+      "fromDate": "From Date",
+      "toDate": "To Date",
+      "halfDayLeave": "Half-day Leave",
+      "halfDayStart": "Half-day off (start date)",
+      "halfDayEnd": "Half-day off (end date)",
+      "shiftOff": "Shift Off",
+      "shiftStartOff": "Shift Off on Start Date",
+      "shiftEndOff": "Shift Off on End Date",
+      "reason": "Leave Reason",
+      "status": "Status",
+      "rejectReason": "Feedback / Rejection Reason",
+      "totalDays": "Total Days",
+      "year": "Report Year"
+    },
+    "type": {
+      "annual": "Annual Leave",
+      "unpaid": "Unpaid Leave"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "action": {
+      "create": "Submit Leave Request",
+      "createHR": "Submit for Employee",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "balance": {
+      "title": "Annual Leave Balance",
+      "limit": "Leave Allowance",
+      "used": "Used Days",
+      "remaining": "Remaining"
+    },
+    "validation": {
+      "staffRequired": "Employee is required",
+      "typeRequired": "Leave type is required",
+      "fromDateRequired": "Start date is required",
+      "toDateRequired": "End date is required",
+      "dateOrder": "End date must be on or after start date"
+    },
+    "message": {
+      "createSuccess": "Leave request created successfully",
+      "updateSuccess": "Leave request updated successfully",
+      "deleteSuccess": "Leave request cancelled/deleted successfully",
+      "approveSuccess": "Leave request approved successfully",
+      "rejectSuccess": "Leave request rejected successfully",
+      "deleteError": "Error deleting leave request",
+      "approveError": "Error approving leave request",
+      "rejectError": "Error rejecting leave request",
+      "cancelConfirmText": "Are you sure you want to cancel this leave request? This action cannot be undone.",
+      "approveConfirmText": "Are you sure you want to approve this leave request?",
+      "rejectConfirmText": "Are you sure you want to reject this leave request?",
+      "deleteConfirmText": "Are you sure you want to delete this leave request? This action cannot be recovered.",
+      "error": "An error occurred while saving the leave request"
+    }
+  },
+  "general": {
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirm": "Confirm",
+    "all": "All"
+  }
+}
