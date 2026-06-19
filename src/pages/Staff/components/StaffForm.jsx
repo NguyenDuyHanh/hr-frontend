@@ -10,6 +10,7 @@ import Popup from '../../../components/ui/Popup';
 import { WorkingStatusOptions } from '../../../constants';
 import { generateStaffCode } from '../../../services/StaffService';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
     const { addStaff, modifyStaff } = useStaffStore();
@@ -18,6 +19,7 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
         id: staffData?.id || null,
         staffCode: staffData?.staffCode || '',
         displayName: staffData?.displayName || '',
+        email: staffData?.email || '',
         startDate: staffData?.startDate ? new Date(staffData.startDate) : new Date(),
         workingStatus: staffData?.workingStatus || '',
     }), [staffData]);
@@ -25,6 +27,7 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
     const validationSchema = Yup.object({
         staffCode: Yup.string().required('Mã nhân viên là bắt buộc'),
         displayName: Yup.string().required('Họ và tên là bắt buộc'),
+        email: Yup.string().trim().email('Email không đúng định dạng').required('Email là bắt buộc'),
         workingStatus: Yup.mixed().required('Trạng thái là bắt buộc'),
     });
 
@@ -32,19 +35,27 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
         initialValues: initialValues,
         enableReinitialize: true,
         validationSchema: validationSchema,
-        onSubmit: async (values) => {
+        onSubmit: async (values, { setErrors }) => {
             // Format date to YYYY-MM-DD before sending to backend
             const submitValues = { ...values };
             if (values.startDate) {
                 submitValues.startDate = format(new Date(values.startDate), 'yyyy-MM-dd');
             }
 
-            if (values.id) {
-                await modifyStaff(values.id, submitValues);
-            } else {
-                await addStaff(submitValues);
+            try {
+                if (values.id) {
+                    await modifyStaff(values.id, submitValues);
+                } else {
+                    await addStaff(submitValues);
+                }
+                if (onSaveSuccess) onSaveSuccess();
+            } catch (error) {
+                const errorMsg = error?.response?.data?.message || 'Có lỗi xảy ra khi lưu nhân viên';
+                toast.error(errorMsg);
+                if (error?.response?.data?.message?.includes('Email')) {
+                    setErrors({ email: 'Email đã tồn tại trong hệ thống' });
+                }
             }
-            if (onSaveSuccess) onSaveSuccess();
         },
     });
     
@@ -94,6 +105,11 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
                     <TextField 
                         label="Họ và tên" 
                         name="displayName" 
+                        required
+                    />
+                    <TextField 
+                        label="Email" 
+                        name="email" 
                         required
                     />
                     <SelectInput 

@@ -275,7 +275,7 @@ const RecruitmentDetail = () => {
     const handleStatusChangeClick = (cand, newStatus) => {
         setSelectedCandidate(cand);
         setTargetCandidateStatus(newStatus);
-        if (newStatus === 5) {
+        if (newStatus === 'REJECTED') {
             setRefusalReason(cand.note || '');
             setOpenStatusDialog(true);
         } else {
@@ -415,11 +415,11 @@ const RecruitmentDetail = () => {
                 return (
                     <Box display="flex" flexDirection="column" gap={0.5}>
                         <Box display="flex" alignItems="center" gap={1}>
-                            {row.status !== 4 && row.status !== 5 ? (
+                            {row.status !== 'ONBOARDED' && row.status !== 'REJECTED' ? (
                                 <FormControl size="small" sx={{ minWidth: 130 }}>
                                     <Select
                                         value={row.status}
-                                        onChange={(e) => handleStatusChangeClick(row, parseInt(e.target.value, 10))}
+                                        onChange={(e) => handleStatusChangeClick(row, e.target.value)}
                                         sx={{ fontSize: '12px', height: '30px' }}
                                         disabled={isViewMode}
                                     >
@@ -434,7 +434,7 @@ const RecruitmentDetail = () => {
                                 <Chip label={st.label} color={st.color} size="small" variant="outlined" />
                             )}
                             
-                            {row.status === 3 && (
+                            {row.status === 'WAITING' && (
                                 <Button 
                                     size="small" 
                                     variant="contained" 
@@ -630,7 +630,7 @@ const RecruitmentDetail = () => {
                     onSubmit={(values) => {
                         const filtersObj = {};
                         if (values.status !== '') {
-                            filtersObj.status = parseInt(values.status, 10);
+                            filtersObj.status = values.status;
                         }
                         setCandidateFilters(filtersObj);
                     }}

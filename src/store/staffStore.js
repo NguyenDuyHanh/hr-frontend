@@ -68,6 +68,7 @@ const useStaffStore = create((set, get) => ({
             set({ openForm: false });
         } catch (error) {
             console.error('Error adding staff:', error);
+            throw error;
         }
     },
 
@@ -77,6 +78,7 @@ const useStaffStore = create((set, get) => ({
             set({ openForm: false });
         } catch (error) {
             console.error('Error modifying staff:', error);
+            throw error;
         }
     },
 }));
