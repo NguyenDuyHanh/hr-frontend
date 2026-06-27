@@ -49,9 +49,9 @@ const CandidateFormDialog = ({
         birthDate: candidateInput.birthDate ? new Date(candidateInput.birthDate) : null,
         email: candidateInput.email || '',
         phoneNumber: candidateInput.phoneNumber || '',
-        currentResidence: candidateInput.currentResidence || '',
-        imagePath: candidateInput.imagePath || '',
-        cvFilePath: candidateInput.cvFilePath || '',
+        address: candidateInput.address || '',
+        avatarUrl: candidateInput.avatarUrl || '',
+        cvFileUrl: candidateInput.cvFileUrl || '',
         status: candidateInput.status ?? 'SCREENING',
         recruitmentId: candidateInput.recruitmentId || '',
         departmentId: candidateInput.departmentId || '',
@@ -100,7 +100,7 @@ const CandidateFormDialog = ({
         setLocalUploadingCV(true);
         try {
             const url = await uploadFile(file);
-            formik.setFieldValue('cvFilePath', url);
+            formik.setFieldValue('cvFileUrl', url);
             toast.success("Tải tệp CV thành công");
         } catch (err) {
             toast.error(err.message || "Lỗi tải CV lên");
@@ -176,7 +176,7 @@ const CandidateFormDialog = ({
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <TextField
-                            name="currentResidence"
+                            name="address"
                             label="Địa chỉ"
                             fullWidth
                         />
@@ -240,10 +240,10 @@ const CandidateFormDialog = ({
                                 {localUploadingCV ? 'Đang tải lên...' : 'Tải CV (.pdf)'}
                                 <input type="file" hidden accept=".pdf,.doc,.docx" onChange={handleLocalCVChange} />
                             </Button>
-                             {formik.values.cvFilePath && (
+                             {formik.values.cvFileUrl && (
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <Link 
-                                        href={formik.values.cvFilePath} 
+                                        href={formik.values.cvFileUrl} 
                                         target="_blank" 
                                         rel="noopener" 
                                         sx={{ 
@@ -261,13 +261,13 @@ const CandidateFormDialog = ({
                                     >
                                         <PictureAsPdfIcon />
                                         <span style={{ fontSize: '12px', fontWeight: '500' }}>
-                                            {getFileNameFromUrl(formik.values.cvFilePath)}
+                                            {getFileNameFromUrl(formik.values.cvFileUrl)}
                                         </span>
                                     </Link>
                                     <IconButton 
                                         size="small" 
                                         onClick={() => {
-                                            let downloadUrl = formik.values.cvFilePath;
+                                            let downloadUrl = formik.values.cvFileUrl;
                                             if (downloadUrl.includes('res.cloudinary.com')) {
                                                 downloadUrl = downloadUrl.replace('/upload/', '/upload/fl_attachment/');
                                             }

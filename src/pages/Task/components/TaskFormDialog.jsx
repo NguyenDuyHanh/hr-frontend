@@ -31,7 +31,6 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
             id: taskData?.id || null,
             name: taskData?.name || '',
             description: taskData?.description || '',
-            comment: taskData?.comment || '',
             priority: taskData?.priority || 1,
             startTime: taskData?.startTime ? new Date(taskData.startTime).getTime() : null,
             endTime: taskData?.endTime ? new Date(taskData.endTime).getTime() : null,
@@ -52,7 +51,6 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
             activityId: taskData?.activityId || null,
             statusId: taskData?.statusId || null,
             assigneeId: taskData?.assigneeId ? { id: taskData.assigneeId, displayName: taskData.assigneeName } : null,
-            followerIds: taskData?.followers ? taskData.followers.map(f => ({ id: f.id, displayName: f.displayName })) : [],
             attachments: taskData?.attachments || []
         };
     }, [taskData]);
@@ -73,7 +71,6 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
                 id: values.id,
                 name: values.name.trim(),
                 description: values.description,
-                comment: values.comment,
                 priority: Number(values.priority),
                 startTime: values.startTime ? new Date(values.startTime).toISOString() : null,
                 endTime: values.endTime ? new Date(values.endTime).toISOString() : null,
@@ -81,8 +78,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
                 projectId: values.projectId?.id || values.projectId,
                 activityId: values.activityId?.id || values.activityId || null,
                 statusId: values.statusId,
-                assigneeId: values.assigneeId?.id || values.assigneeId || null,
-                followerIds: values.followerIds ? values.followerIds.map(f => f.id || f) : []
+                assigneeId: values.assigneeId?.id || values.assigneeId || null
             };
 
             try {
@@ -109,7 +105,6 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
     useEffect(() => {
         if (projectId !== prevProjectId) {
             formik.setFieldValue('assigneeId', null);
-            formik.setFieldValue('followerIds', []);
             formik.setFieldValue('statusId', '');
             formik.setFieldValue('activityId', null);
             setPrevProjectId(projectId);
@@ -351,16 +346,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
                                 disabled={isViewMode || !projectId}
                             />
 
-                            <AsyncAutocomplete
-                                name="followerIds"
-                                label="Người theo dõi"
-                                api={fetchProjectStaffsApi}
-                                searchObject={projectStaffSearchObj}
-                                placeholder="Chọn người theo dõi..."
-                                displayName="displayName"
-                                multiple
-                                disabled={isViewMode || !projectId}
-                            />
+
 
                             <SelectInput
                                 name="statusId"

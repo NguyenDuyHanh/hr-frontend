@@ -110,7 +110,7 @@ const TaskList = () => {
             const projId = filters.projectId?.id || filters.projectId;
             loadKanbanData(projId);
         }
-    }, [filters.projectId, filters.assigneeId, filters.priority, filters.followerId, filters.activityId, keyword, activeTab]);
+    }, [filters.projectId, filters.assigneeId, filters.priority, filters.activityId, keyword, activeTab]);
 
     const handleSearch = () => {
         setKeyword(searchDraft);
@@ -125,7 +125,6 @@ const TaskList = () => {
                 projectId: null,
                 assigneeId: null,
                 priority: '',
-                followerId: null,
                 statusId: null,
                 activityId: null
             }
@@ -280,7 +279,6 @@ const TaskList = () => {
                         projectId: localStorageService.getItem(projectKey) || null,
                         assigneeId: localStorageService.getItem(assigneeKey) || null,
                         priority: '',
-                        followerId: null,
                         statusId: null,
                         activityId: null
                     }}
@@ -297,9 +295,6 @@ const TaskList = () => {
                                 localStorageService.removeItem(assigneeKey);
                             }
 
-                            if (values.followerId) {
-                                newFilters.followerId = values.followerId.id || values.followerId;
-                            }
                             if (values.statusId) {
                                 newFilters.statusId = values.statusId.id || values.statusId;
                             }

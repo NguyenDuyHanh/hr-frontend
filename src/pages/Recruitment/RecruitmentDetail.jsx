@@ -191,9 +191,9 @@ const RecruitmentDetail = () => {
                 birthDate: '',
                 email: '',
                 phoneNumber: '',
-                currentResidence: '',
-                imagePath: '',
-                cvFilePath: '',
+                address: '',
+                avatarUrl: '',
+                cvFileUrl: '',
                 status: 0,
                 recruitmentId: selectedRecruitment.id,
                 departmentId: '',
@@ -215,9 +215,9 @@ const RecruitmentDetail = () => {
             birthDate: cand.birthDate || '',
             email: cand.email || '',
             phoneNumber: cand.phoneNumber || '',
-            currentResidence: cand.currentResidence || '',
-            imagePath: cand.imagePath || '',
-            cvFilePath: cand.cvFilePath || '',
+            address: cand.address || '',
+            avatarUrl: cand.avatarUrl || '',
+            cvFileUrl: cand.cvFileUrl || '',
             status: cand.status,
             recruitmentId: cand.recruitmentId || selectedRecruitment.id,
             departmentId: cand.departmentId || '',
@@ -377,13 +377,13 @@ const RecruitmentDetail = () => {
         },
         {
             title: 'CV Đính kèm',
-            field: 'cvFilePath',
+            field: 'cvFileUrl',
             align: 'center',
             width: 150,
-            render: (row) => row.cvFilePath ? (
+            render: (row) => row.cvFileUrl ? (
                 <Box display="flex" alignItems="center" gap={1} justifyContent="center">
                     <Tooltip title="Xem CV ứng viên">
-                        <Link href={row.cvFilePath} target="_blank" rel="noopener" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, color: '#d32f2f', textDecoration: 'none' }}>
+                        <Link href={row.cvFileUrl} target="_blank" rel="noopener" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, color: '#d32f2f', textDecoration: 'none' }}>
                             <PictureAsPdfIcon fontSize="small" />
                             <span style={{ fontSize: '12px', fontWeight: '500' }}>Xem</span>
                         </Link>
@@ -392,7 +392,7 @@ const RecruitmentDetail = () => {
                         <IconButton 
                             size="small" 
                             onClick={() => {
-                                let downloadUrl = row.cvFilePath;
+                                let downloadUrl = row.cvFileUrl;
                                 if (downloadUrl.includes('res.cloudinary.com')) {
                                     downloadUrl = downloadUrl.replace('/upload/', '/upload/fl_attachment/');
                                 }

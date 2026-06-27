@@ -200,7 +200,7 @@ const MyLeaveRequests = () => {
                     onSearch={handleSearch}
                     onReset={handleReset}
                     onAdd={handleAdd}
-                    addLabel={t('leave.action.create', 'Tạo đơn xin nghỉ')}
+                    addLabel={t('leave.action.create', 'Tạo yêu cầu nghỉ phép')}
                 />
 
                 <Table

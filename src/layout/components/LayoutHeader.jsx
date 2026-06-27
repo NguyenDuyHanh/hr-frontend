@@ -368,7 +368,7 @@ const LayoutHeader = () => {
         >
           <Avatar 
             name={user?.fullName || user?.username} 
-            imgPath={user?.imagePath} 
+            imgPath={user?.avatarUrl} 
             className="w-full h-full text-[12px] font-bold" 
           />
         </div>
@@ -393,7 +393,7 @@ const LayoutHeader = () => {
           <div className="flex items-center gap-3 px-4 py-2">
             <Avatar 
               name={user?.fullName || user?.username} 
-              imgPath={user?.imagePath} 
+              imgPath={user?.avatarUrl} 
               className="w-12 h-12 border-2 border-background shadow-sm flex-shrink-0 text-lg font-semibold" 
             />
             <div className="flex flex-col min-w-0">

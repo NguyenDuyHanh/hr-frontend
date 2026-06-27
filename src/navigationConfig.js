@@ -92,7 +92,7 @@ export const navigations = [
     icon: "event",
     auth: ALL_ROLES,
     children: [
-      { name: "Đơn xin nghỉ phép", path: "/my-leave", auth: ALL_ROLES },
+      { name: "Yêu cầu nghỉ phép", path: "/my-leave", auth: ALL_ROLES },
       { name: "Phê duyệt nghỉ phép", path: "/leave-requests", auth: [ADMIN, HR_MANAGER] },
       { name: "Số dư phép năm", path: "/leave-balance", auth: [ADMIN, HR_MANAGER] },
     ],
@@ -206,8 +206,9 @@ export const navigations = [
 ];
 
 export const getBreadcrumbByPath = (pathname) => {
-  const segments = [{ name: "Trang chủ", path: "/dashboard" }];
-  if (pathname === "/" || pathname === "/dashboard") return segments;
+  if (pathname === "/" || pathname === "/dashboard") {
+    return [{ name: "Trang chủ", path: "/dashboard" }];
+  }
 
   const findPathInMenu = (items, currentPath) => {
     for (const item of items) {
@@ -230,9 +231,8 @@ export const getBreadcrumbByPath = (pathname) => {
 
   const result = findPathInMenu(navigations, pathname);
   if (result) {
-    // Lọc bỏ các segment không có path (nếu muốn) hoặc giữ lại tên để hiển thị
-    return [...segments, ...result];
+    return result;
   }
 
-  return segments;
+  return [];
 };

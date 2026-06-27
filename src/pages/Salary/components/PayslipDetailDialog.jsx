@@ -70,8 +70,8 @@ const PayslipDetailDialog = ({
 
     const getTransferContent = (payslipDetail) => {
         if (!payslipDetail) return '';
-        const month = activePayroll?.payrollPeriod?.month || 6;
-        const year = activePayroll?.payrollPeriod?.year || 2026;
+        const month = activePayroll?.period?.month || 6;
+        const year = activePayroll?.period?.year || 2026;
         const displayName = removeAccents(payslipDetail.staff?.displayName || '');
         const position = (payslipDetail.staff?.positionName || '').toLowerCase();
         const isIntern = position.includes('thực tập') || position.includes('thuc tap') || position.includes('intern');
@@ -211,7 +211,7 @@ const PayslipDetailDialog = ({
                                         Số giờ công tiêu chuẩn
                                     </Typography>
                                     <Typography variant="body2" fontWeight="bold" color="text.primary">
-                                        {(activePayroll?.payrollPeriod?.standardWorkDays || 30) * 8}
+                                        {(activePayroll?.period?.standardWorkDays || 30) * 8}
                                     </Typography>
                                 </Box>
                             </Tooltip>
@@ -268,7 +268,7 @@ const PayslipDetailDialog = ({
                             {detail.items?.map((item, idx) => {
                                 const formula = (() => {
                                     const base = item.amount || 0;
-                                    const std = activePayroll?.payrollPeriod?.standardWorkDays || 26;
+                                    const std = activePayroll?.period?.standardWorkDays || 26;
                                     const wd = Number((detail.totalWorkDays || 0).toFixed(2));
                                     const ot = Number((detail.totalOtHours || 0).toFixed(2));
                                     if (item.salaryItem?.code === 'OT') {
@@ -349,7 +349,7 @@ const PayslipDetailDialog = ({
                             <Formik
                                 initialValues={{
                                     displayName: `${detail.staff?.displayName || ''} - ${detail.staff?.staffCode || ''}`,
-                                    payrollPeriodName: activePayroll?.payrollPeriod?.name || '',
+                                    payrollPeriodName: activePayroll?.period?.name || '',
                                     payrollName: activePayroll?.name || '',
                                     paidStatus: localPaidStatus,
                                     note: localNote
@@ -414,7 +414,7 @@ const PayslipDetailDialog = ({
                                 <Box>
                                     <Typography variant="caption" color="text.secondary">Kỳ lương</Typography>
                                     <Typography variant="body2" fontWeight="medium">
-                                        {activePayroll?.payrollPeriod?.name || ''}
+                                        {activePayroll?.period?.name || ''}
                                     </Typography>
                                 </Box>
 
