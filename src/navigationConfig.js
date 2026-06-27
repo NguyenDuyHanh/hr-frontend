@@ -33,8 +33,8 @@ export const navigations = [
     children: [
       // { name: "Sơ đồ tổ chức", path: "/organization/diagram", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       // { name: "Cây tổ chức", path: "/organization/tree", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
-      { name: "Phòng ban", path: "/department", auth: [ADMIN, HR_MANAGER] },
-      { name: "Quản lý vị trí", path: "/category/staff/position", auth: [ADMIN, HR_MANAGER] },
+      { name: "Phòng ban", path: "/department", auth: [ADMIN] },
+      { name: "Quản lý vị trí", path: "/category/staff/position", auth: [ADMIN] },
       // { name: "Nhóm ngạch", path: "/organization/group-position-title", auth: [ADMIN, HR_MANAGER] },
       // { name: "Ngạch lương", path: "/organization/rank-title", auth: [ADMIN, HR_MANAGER] },
       // { name: "Chức danh", path: "/organization/position-title", auth: [ADMIN, HR_MANAGER] },

@@ -32,6 +32,8 @@ import StaffPayslipPage from "./pages/Salary/StaffPayslipPage";
 import LeaveRequestList from "./pages/Leave/LeaveRequestList";
 import MyLeaveRequests from "./pages/Leave/MyLeaveRequests";
 import LeaveBalance from "./pages/Leave/LeaveBalance";
+import DepartmentPage from "./pages/Department/DepartmentPage";
+import PositionPage from "./pages/Position/PositionPage";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -90,6 +92,8 @@ function App() {
     "/leave-requests": <LeaveRequestList />,
     "/my-leave": <MyLeaveRequests />,
     "/leave-balance": <LeaveBalance />,
+    "/department": <DepartmentPage />,
+    "/category/staff/position": <PositionPage />,
   };
 
   return (
