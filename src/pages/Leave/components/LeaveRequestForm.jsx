@@ -54,10 +54,7 @@ const LeaveRequestForm = ({ open, onClose, requestData, onSaveSuccess }) => {
         toDate: requestData?.toDate ? new Date(requestData.toDate) : new Date(),
         requestReason: requestData?.requestReason || '',
         halfDayLeave: requestData?.halfDayLeave ?? false,
-        halfDayLeaveStart: requestData?.halfDayLeaveStart ?? false,
-        halfDayLeaveEnd: requestData?.halfDayLeaveEnd ?? false,
-        shiftWorkStartId: requestData?.shiftWorkStartId || '',
-        shiftWorkEndId: requestData?.shiftWorkEndId || '',
+        shiftWorkId: requestData?.shiftWorkId || '',
     }), [requestData, user, isAdminOrHR]);
 
     const validationSchema = Yup.object({
@@ -82,10 +79,7 @@ const LeaveRequestForm = ({ open, onClose, requestData, onSaveSuccess }) => {
                     toDate: format(new Date(values.toDate), 'yyyy-MM-dd'),
                     requestReason: values.requestReason,
                     halfDayLeave: values.halfDayLeave,
-                    halfDayLeaveStart: values.halfDayLeaveStart,
-                    halfDayLeaveEnd: values.halfDayLeaveEnd,
-                    shiftWorkStartId: values.shiftWorkStartId || null,
-                    shiftWorkEndId: values.shiftWorkEndId || null,
+                    shiftWorkId: values.shiftWorkId || null,
                 };
 
                 if (values.id) {
@@ -120,6 +114,13 @@ const LeaveRequestForm = ({ open, onClose, requestData, onSaveSuccess }) => {
         const d2 = format(new Date(formik.values.toDate), 'yyyy-MM-dd');
         return d1 === d2;
     }, [formik.values.fromDate, formik.values.toDate]);
+
+    useEffect(() => {
+        if (!isSingleDay) {
+            formik.setFieldValue('halfDayLeave', false);
+            formik.setFieldValue('shiftWorkId', '');
+        }
+    }, [isSingleDay]);
 
     const action = (
         <>
@@ -204,90 +205,42 @@ const LeaveRequestForm = ({ open, onClose, requestData, onSaveSuccess }) => {
                     </Grid>
 
                     {/* Checkbox nghỉ nửa ngày */}
-                    <Grid item xs={12}>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={formik.values.halfDayLeave}
-                                    onChange={(e) => {
-                                        const checked = e.target.checked;
-                                        formik.setFieldValue('halfDayLeave', checked);
-                                        if (!checked) {
-                                            formik.setFieldValue('halfDayLeaveStart', false);
-                                            formik.setFieldValue('halfDayLeaveEnd', false);
-                                            formik.setFieldValue('shiftWorkStartId', '');
-                                            formik.setFieldValue('shiftWorkEndId', '');
-                                        } else {
-                                            // Mặc định chọn ca đầu tiên cho nửa ngày
-                                            if (shifts.length > 0) {
-                                                formik.setFieldValue('shiftWorkStartId', shifts[0].id);
+                    {isSingleDay && (
+                        <Grid item xs={12}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={formik.values.halfDayLeave}
+                                        onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            formik.setFieldValue('halfDayLeave', checked);
+                                            if (!checked) {
+                                                formik.setFieldValue('shiftWorkId', '');
+                                            } else {
+                                                // Mặc định chọn ca đầu tiên cho nửa ngày
+                                                if (shifts.length > 0) {
+                                                    formik.setFieldValue('shiftWorkId', shifts[0].id);
+                                                }
                                             }
-                                        }
-                                    }}
-                                />
-                            }
-                            label={t('leave.field.halfDayLeave', 'Nghỉ nửa ngày')}
-                        />
-                    </Grid>
+                                        }}
+                                    />
+                                }
+                                label={t('leave.field.halfDayLeave', 'Nghỉ nửa ngày')}
+                            />
+                        </Grid>
+                    )}
 
                     {/* Các cấu hình chi tiết cho nghỉ nửa ngày */}
                     {formik.values.halfDayLeave && (
-                        <>
-                            {isSingleDay ? (
-                                <Grid item xs={12} sm={6}>
-                                    <SelectInput
-                                        name="shiftWorkStartId"
-                                        label={t('leave.field.shiftOff', 'Ca nghỉ phép')}
-                                        options={shifts}
-                                        keyValue="id"
-                                        displayvalue="name"
-                                    />
-                                </Grid>
-                            ) : (
-                                <>
-                                    <Grid item xs={12} sm={6} className="flex flex-col">
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={formik.values.halfDayLeaveStart}
-                                                    onChange={(e) => formik.setFieldValue('halfDayLeaveStart', e.target.checked)}
-                                                />
-                                            }
-                                            label={t('leave.field.halfDayStart', 'Nghỉ nửa ngày đầu (ngày bắt đầu)')}
-                                        />
-                                        {formik.values.halfDayLeaveStart && (
-                                            <SelectInput
-                                                name="shiftWorkStartId"
-                                                label={t('leave.field.shiftStartOff', 'Ca nghỉ ngày bắt đầu')}
-                                                options={shifts}
-                                                keyValue="id"
-                                                displayvalue="name"
-                                            />
-                                        )}
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} className="flex flex-col">
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={formik.values.halfDayLeaveEnd}
-                                                    onChange={(e) => formik.setFieldValue('halfDayLeaveEnd', e.target.checked)}
-                                                />
-                                            }
-                                            label={t('leave.field.halfDayEnd', 'Nghỉ nửa ngày cuối (ngày kết thúc)')}
-                                        />
-                                        {formik.values.halfDayLeaveEnd && (
-                                            <SelectInput
-                                                name="shiftWorkEndId"
-                                                label={t('leave.field.shiftEndOff', 'Ca nghỉ ngày kết thúc')}
-                                                options={shifts}
-                                                keyValue="id"
-                                                displayvalue="name"
-                                            />
-                                        )}
-                                    </Grid>
-                                </>
-                            )}
-                        </>
+                        <Grid item xs={12} sm={6}>
+                            <SelectInput
+                                name="shiftWorkId"
+                                label={t('leave.field.shiftOff', 'Ca nghỉ phép')}
+                                options={shifts}
+                                keyValue="id"
+                                displayvalue="name"
+                            />
+                        </Grid>
                     )}
 
                     {/* Lý do nghỉ */}

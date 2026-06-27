@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DeleteIcon from '@mui/icons-material/Delete';
-import LockIcon from '@mui/icons-material/Lock';
+import CheckIcon from '@mui/icons-material/Check';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PrintIcon from '@mui/icons-material/Print';
@@ -94,7 +94,7 @@ const PayrollDetailPage = () => {
     const handleRecalculate = async () => {
         if (!payrollId) return;
         if (activePayroll && activePayroll.status !== 'DRAFT') {
-            toast.warning('Bảng lương này đã được khóa. Không thể tính toán lại!');
+            toast.warning('Bảng lương này đã được xác nhận. Không thể tính toán lại!');
             return;
         }
         try {
@@ -109,20 +109,20 @@ const PayrollDetailPage = () => {
 
     const handleConfirmPayroll = async () => {
         if (!payrollId) return;
-        if (!window.confirm('Bạn có chắc chắn muốn duyệt và khóa bảng lương này? Sau khi khóa sẽ không thể tính toán lại.')) return;
+        if (!window.confirm('Bạn có chắc chắn muốn xác nhận bảng lương này? Sau khi xác nhận sẽ không thể tính toán lại.')) return;
         try {
             await storeConfirmPayroll(payrollId);
-            toast.success('Đã duyệt và khóa bảng lương thành công!');
+            toast.success('Đã xác nhận bảng lương thành công!');
         } catch (error) {
             console.error('Failed to confirm payroll:', error);
-            toast.error('Không thể khóa bảng lương');
+            toast.error('Không thể xác nhận bảng lương');
         }
     };
 
     const handleDeletePayroll = async () => {
         if (!payrollId) return;
         if (activePayroll && activePayroll.status !== 'DRAFT') {
-            toast.warning('Không thể xóa bảng lương đã khóa!');
+            toast.warning('Không thể xóa bảng lương đã xác nhận!');
             return;
         }
         if (!window.confirm('Bạn có chắc chắn muốn xóa bảng lương này và toàn bộ phiếu lương liên quan?')) return;
@@ -132,7 +132,7 @@ const PayrollDetailPage = () => {
             navigate('/salary/payrolls');
         } catch (error) {
             console.error('Failed to delete payroll:', error);
-            toast.error('Không thể xóa bảng lương');
+            toast.error(error.response?.data?.message || 'Không thể xóa bảng lương');
         }
     };
 
@@ -280,13 +280,13 @@ const PayrollDetailPage = () => {
                     <Button
                         variant="contained"
                         color="success"
-                        startIcon={<LockIcon />}
+                        startIcon={<CheckIcon />}
                         onClick={handleConfirmPayroll}
                         disabled={calculating || loading || confirming || deleting}
                         size="small"
                         className="normal-case font-medium bg-emerald-600 hover:bg-emerald-700 text-white"
                     >
-                        Duyệt & Khóa
+                        Xác nhận
                     </Button>
                 </>
             )}

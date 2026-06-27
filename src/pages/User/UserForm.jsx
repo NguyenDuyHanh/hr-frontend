@@ -21,7 +21,6 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
         id: userData?.id || null,
         username: userData?.username || '',
         password: userData?.password || '',
-        email: userData?.email || '',
         active: userData?.active !== undefined ? userData.active : true,
         roles: userData?.roles || [],
         staff: userData?.staffId ? { id: userData.staffId, displayName: userData.staffName, staffCode: '' } : null,
@@ -30,7 +29,6 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
     const validationSchema = Yup.object({
         username: Yup.string().required('Tên đăng nhập không được để trống'),
         password: userData?.id ? Yup.string().nullable() : Yup.string().required('Mật khẩu không được để trống'),
-        email: Yup.string().email('Email không hợp lệ').nullable(),
     });
 
     const formik = useFormik({
@@ -43,7 +41,6 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                     id: values.id,
                     username: values.username,
                     password: values.password || undefined,
-                    email: values.email || null,
                     active: values.active,
                     roles: values.roles,
                     staffId: values.staff?.id || null,
@@ -133,12 +130,6 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                             autoComplete="new-password"
                         />
                     )}
-                    <TextField 
-                        label="Email" 
-                        name="email" 
-                        fullWidth 
-                        disabled={isView}
-                    />
                     <PagingAutocomplete 
                         label="Nhân viên liên kết" 
                         name="staff"
@@ -152,11 +143,8 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                         onChange={(event, value) => {
                             formik.setFieldValue('staff', value);
                             
-                            // Auto-populate email and username if selecting a staff for a new user
+                            // Auto-populate username if selecting a staff for a new user
                             if (value && !userData) {
-                                if (value.email && !formik.values.email) {
-                                    formik.setFieldValue('email', value.email);
-                                }
                                 if (value.staffCode && !formik.values.username) {
                                     formik.setFieldValue('username', value.staffCode);
                                 }

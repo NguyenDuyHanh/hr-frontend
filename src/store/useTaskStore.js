@@ -103,7 +103,6 @@ const useTaskStore = create((set, get) => ({
         set({ loading: true });
         try {
             const assigneeId = filters.assigneeId?.id || filters.assigneeId;
-            const followerId = filters.followerId?.id || filters.followerId;
             const statusId = filters.statusId?.id || filters.statusId;
             const activityId = filters.activityId?.id || filters.activityId;
             const priority = filters.priority;
@@ -114,7 +113,6 @@ const useTaskStore = create((set, get) => ({
                 keyword,
                 projectId,
                 ...(assigneeId && { assigneeId }),
-                ...(followerId && { followerId }),
             };
             if (priority !== undefined && priority !== '') {
                 searchParams.priorities = [priority];
@@ -145,7 +143,6 @@ const useTaskStore = create((set, get) => ({
         try {
             const { filters, keyword } = get();
             const assigneeId = filters.assigneeId?.id || filters.assigneeId;
-            const followerId = filters.followerId?.id || filters.followerId;
             const activityId = filters.activityId?.id || filters.activityId;
             const priority = filters.priority;
 
@@ -154,7 +151,6 @@ const useTaskStore = create((set, get) => ({
                 pageIndex: 1,
                 pageSize: KANBAN_PAGE_SIZE,
                 ...(assigneeId && { assigneeId }),
-                ...(followerId && { followerId }),
                 ...(keyword && { keyword }),
             };
             if (priority !== undefined && priority !== '') {
@@ -205,7 +201,6 @@ const useTaskStore = create((set, get) => ({
         const nextPage = currentPage + 1;
 
         const assigneeId = filters.assigneeId?.id || filters.assigneeId;
-        const followerId = filters.followerId?.id || filters.followerId;
         const activityId = filters.activityId?.id || filters.activityId;
         const priority = filters.priority;
 
@@ -215,7 +210,6 @@ const useTaskStore = create((set, get) => ({
             pageIndex: nextPage,
             pageSize: KANBAN_PAGE_SIZE,
             ...(assigneeId && { assigneeId }),
-            ...(followerId && { followerId }),
         };
         if (priority !== undefined && priority !== '') {
             params.priorities = [priority];
@@ -364,13 +358,11 @@ const useTaskStore = create((set, get) => ({
             if (projId) {
                 const { filters, keyword } = get();
                 const assigneeId = filters.assigneeId?.id || filters.assigneeId;
-                const followerId = filters.followerId?.id || filters.followerId;
                 const activityId = filters.activityId?.id || filters.activityId;
                 const priority = filters.priority;
 
                 const countParams = {
                     ...(assigneeId && { assigneeId }),
-                    ...(followerId && { followerId }),
                     ...(keyword && { keyword }),
                 };
                 if (priority !== undefined && priority !== '') {
