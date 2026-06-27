@@ -107,10 +107,10 @@ const LeaveBalance = () => {
         },
         {
             title: t('leave.balance.limit', 'Định mức phép năm'),
-            field: 'annualLeaveLimit',
+            field: 'annualLeave',
             width: 160,
             align: 'center',
-            render: (rowData) => <span>{rowData.annualLeaveLimit}</span>
+            render: (rowData) => <span>{rowData.annualLeave}</span>
         },
         {
             title: t('leave.balance.used', 'Đã nghỉ (APPROVED)'),

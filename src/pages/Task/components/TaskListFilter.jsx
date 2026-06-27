@@ -19,7 +19,6 @@ const TaskListFilter = () => {
     React.useEffect(() => {
         if (projectId !== prevProjectIdRef.current) {
             setFieldValue('assigneeId', null);
-            setFieldValue('followerId', null);
             setFieldValue('statusId', null);
             setFieldValue('activityId', null);
             prevProjectIdRef.current = projectId;
@@ -82,17 +81,6 @@ const TaskListFilter = () => {
                 />
             </Grid>
 
-            <Grid item xs={12} sm={4}>
-                <AsyncAutocomplete
-                    name="followerId"
-                    label="Người theo dõi"
-                    api={fetchProjectStaffsApi}
-                    searchObject={staffSearchObject}
-                    placeholder="Chọn người theo dõi..."
-                    displayName="displayName"
-                    disabled={!projectId}
-                />
-            </Grid>
             <Grid item xs={12} sm={4}>
                 <AsyncAutocomplete
                     name="statusId"

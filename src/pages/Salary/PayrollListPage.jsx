@@ -16,7 +16,7 @@ import TextField from '../../components/ui/TextField';
 import Popup from '../../components/ui/Popup';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
-import LockIcon from '@mui/icons-material/Lock';
+import CheckIcon from '@mui/icons-material/Check';
 import { toast } from 'sonner';
 import { Formik } from 'formik';
 
@@ -77,13 +77,13 @@ const PayrollListPage = () => {
 
     const handleConfirmPayroll = async (payrollId) => {
         if (!payrollId) return;
-        if (!window.confirm('Bạn có chắc chắn muốn duyệt và khóa bảng lương này? Sau khi khóa sẽ không thể tính toán lại.')) return;
+        if (!window.confirm('Bạn có chắc chắn muốn xác nhận bảng lương này? Sau khi xác nhận sẽ không thể tính toán lại.')) return;
         try {
             await confirmPayroll(payrollId);
-            toast.success('Đã duyệt và khóa bảng lương thành công!');
+            toast.success('Đã xác nhận bảng lương thành công!');
         } catch (error) {
             console.error('Failed to confirm payroll:', error);
-            toast.error('Không thể khóa bảng lương');
+            toast.error('Không thể xác nhận bảng lương');
         }
     };
 
@@ -91,7 +91,7 @@ const PayrollListPage = () => {
         if (!payrollId) return;
         const payrollObj = allPayrolls.find(p => p.id === payrollId);
         if (payrollObj && payrollObj.status !== 'DRAFT') {
-            toast.warning('Không thể xóa bảng lương đã khóa!');
+            toast.warning('Không thể xóa bảng lương đã xác nhận!');
             return;
         }
         if (!window.confirm('Bạn có chắc chắn muốn xóa bảng lương này và toàn bộ phiếu lương liên quan?')) return;
@@ -101,7 +101,7 @@ const PayrollListPage = () => {
             await loadAllPayrolls();
         } catch (error) {
             console.error('Failed to delete payroll:', error);
-            toast.error('Không thể xóa bảng lương');
+            toast.error(error.response?.data?.message || 'Không thể xóa bảng lương');
         }
     };
 
@@ -109,7 +109,7 @@ const PayrollListPage = () => {
 
     const filteredPayrolls = useMemo(() => {
         return allPayrolls.filter(p => {
-            const matchesPeriod = !selectedPeriodId || p.payrollPeriod?.id === selectedPeriodId;
+            const matchesPeriod = !selectedPeriodId || p.period?.id === selectedPeriodId;
             const matchesKeyword = !searchKeyword ||
                 p.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
                 (p.code && p.code.toLowerCase().includes(searchKeyword.toLowerCase()));
@@ -143,9 +143,9 @@ const PayrollListPage = () => {
                     </Tooltip>
                     {row.status === 'DRAFT' && (
                         <>
-                            <Tooltip title="Duyệt & Khóa bảng lương" arrow>
+                            <Tooltip title="Xác nhận bảng lương" arrow>
                                 <IconButton size="small" color="success" onClick={() => handleConfirmPayroll(row.id)}>
-                                    <LockIcon fontSize="small" />
+                                    <CheckIcon fontSize="small" />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Xóa bảng lương" arrow>
@@ -186,7 +186,7 @@ const PayrollListPage = () => {
         {
             title: 'Kỳ tính lương',
             align: 'center',
-            render: (row) => <span>{row.payrollPeriod?.name || '---'}</span>
+            render: (row) => <span>{row.period?.name || '---'}</span>
         },
         {
             title: 'Trạng thái',
@@ -298,7 +298,7 @@ const PayrollListPage = () => {
                             }
                         } catch (error) {
                             console.error('Failed to create payroll:', error);
-                            toast.error('Không thể tạo bảng lương mới');
+                            toast.error(error.response?.data?.message || 'Không thể tạo bảng lương mới');
                         }
                     }}
                 >
