@@ -80,5 +80,78 @@
     "save": "Lưu lại",
     "confirm": "Xác nhận",
     "all": "Tất cả"
+  },
+  "dashboard": {
+    "title": "Bảng Điều Khiển Tổng Quan",
+    "subtitle": "Theo dõi nhanh tình trạng hoạt động và nhân sự công ty",
+    "greeting": {
+      "morning": "Chào buổi sáng",
+      "afternoon": "Chào buổi chiều",
+      "evening": "Chào buổi tối"
+    },
+    "alerts": {
+      "pending_leaves": "đơn nghỉ phép chờ duyệt",
+      "near_deadline_projects": "dự án sắp quá hạn",
+      "new_staff_this_month": "nhân viên mới tháng này",
+      "pending_timesheets_today": "chấm công chờ duyệt trong ngày"
+    },
+    "kpi": {
+      "total_staff": "Tổng nhân viên",
+      "new_staff": "Nhân viên mới tháng này",
+      "pending_timesheets": "Chấm công chờ duyệt trong ngày",
+      "pending_leaves": "Đơn nghỉ chờ duyệt",
+      "active_projects": "Dự án đang triển khai",
+      "vs_last_month": "vs tháng trước",
+      "vs_prev": "so với tháng trước",
+      "vs_yesterday": "so với hôm qua",
+      "need_approve": "Yêu cầu xử lý ngay",
+      "no_requests": "Không có đơn tồn đọng",
+      "near_deadline": "dự án sắp quá hạn"
+    },
+    "trend": {
+      "title": "Biến động nhân sự (12 tháng)",
+      "month": "Tháng",
+      "new_hires": "Tuyển mới",
+      "resignations": "Nghỉ việc",
+      "no_data": "Không có dữ liệu biến động"
+    },
+    "dept": {
+      "title": "Phân bố nhân sự theo phòng ban",
+      "total": "Tổng số",
+      "no_data": "Không có dữ liệu phòng ban"
+    },
+    "activity": {
+      "title": "Hoạt động gần đây",
+      "no_data": "Không có hoạt động nào gần đây"
+    },
+    "leaves": {
+      "title": "Phê duyệt nghỉ phép nhanh",
+      "view_all": "Xem tất cả",
+      "col_staff": "Nhân viên",
+      "col_type": "Loại phép",
+      "col_days": "Số ngày",
+      "col_date": "Thời gian nghỉ",
+      "col_actions": "Thao tác",
+      "approve": "Phê duyệt",
+      "reject": "Từ chối",
+      "all_done": "Đã duyệt hết!",
+      "no_requests": "Không có yêu cầu nghỉ phép nào cần xử lý.",
+      "reject_title": "Lý do từ chối",
+      "reject_reason_label": "Lý do từ chối"
+    },
+    "projects": {
+      "title": "Tổng quan dự án công ty",
+      "planning": "Lên kế hoạch",
+      "active": "Đang thực hiện",
+      "completed": "Hoàn thành"
+    },
+    "recruit": {
+      "title": "Phễu tuyển dụng hiện tại",
+      "screening": "Sàng lọc CV",
+      "interview": "Phỏng vấn",
+      "qualified": "Đạt yêu cầu",
+      "waiting": "Chờ việc",
+      "onboarded": "Đã nhận việc"
+    }
   }
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import useAuthStore from '@/store/useAuthStore';
+import { ROLES } from '@/constants/roles';
 
 /**
  * AuthGuard - Bảo vệ các tuyến đường (Route Protection)
@@ -22,10 +23,16 @@ const AuthGuard = ({ children, roles }) => {
     const hasPermission = roles.some(r => userRoles.includes(r));
     
     if (!hasPermission) {
-      // Nếu không có quyền, chuyển hướng về trang dashboard hoặc trang 403
-      // Ở đây tạm thời về dashboard
+      // Nếu không có quyền, chuyển hướng về trang dashboard (nếu là Admin) hoặc trang chủ của nhân viên (/profile-page/home)
       console.warn(`User ${user.staffName || user.username} attempted unauthorized access to ${location.pathname}`);
-      return <Navigate to="/dashboard" replace />;
+      const isAdmin = userRoles.includes(ROLES.ADMIN);
+      const defaultPath = isAdmin ? "/dashboard" : "/profile-page/home";
+      
+      // Tránh lặp vô hạn nếu người dùng cố tình truy cập chính trang default
+      if (defaultPath === location.pathname) {
+        return <Navigate to="/login" replace />;
+      }
+      return <Navigate to={defaultPath} replace />;
     }
   }
 

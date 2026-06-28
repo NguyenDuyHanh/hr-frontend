@@ -13,8 +13,13 @@ const ALL_ROLES = Object.values(ROLES);
 
 export const navigations = [
   {
-    name: "Trang chủ",
+    name: "Dashboard",
     path: "/dashboard",
+    icon: "assessment",
+    auth: [ADMIN]
+  },
+  {
+    name: "Trang chủ",
     icon: "home",
     auth: ALL_ROLES,
     children: [
@@ -207,7 +212,7 @@ export const navigations = [
 
 export const getBreadcrumbByPath = (pathname) => {
   if (pathname === "/" || pathname === "/dashboard") {
-    return [{ name: "Trang chủ", path: "/dashboard" }];
+    return [{ name: "Dashboard", path: "/dashboard" }];
   }
 
   const findPathInMenu = (items, currentPath) => {

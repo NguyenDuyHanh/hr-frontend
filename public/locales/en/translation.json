@@ -79,5 +79,78 @@
     "save": "Save",
     "confirm": "Confirm",
     "all": "All"
+  },
+  "dashboard": {
+    "title": "Overview Dashboard",
+    "subtitle": "Quick tracking of company operations and headcount status",
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "alerts": {
+      "pending_leaves": "pending leave requests",
+      "near_deadline_projects": "projects near deadline",
+      "new_staff_this_month": "new staff this month",
+      "pending_timesheets_today": "pending timesheets today"
+    },
+    "kpi": {
+      "total_staff": "Total Headcount",
+      "new_staff": "New Hires This Month",
+      "pending_timesheets": "Pending Timesheets Today",
+      "pending_leaves": "Pending Leaves",
+      "active_projects": "Active Projects",
+      "vs_last_month": "vs last month",
+      "vs_prev": "vs previous month",
+      "vs_yesterday": "vs yesterday",
+      "need_approve": "Immediate action required",
+      "no_requests": "No backlog requests",
+      "near_deadline": "projects near deadline"
+    },
+    "trend": {
+      "title": "Headcount Fluctuation (12 Months)",
+      "month": "Month",
+      "new_hires": "New Hires",
+      "resignations": "Resigned",
+      "no_data": "No fluctuation data"
+    },
+    "dept": {
+      "title": "Headcount by Department",
+      "total": "Total",
+      "no_data": "No department data"
+    },
+    "activity": {
+      "title": "Recent Activities",
+      "no_data": "No recent activities"
+    },
+    "leaves": {
+      "title": "Quick Leave Approvals",
+      "view_all": "View All",
+      "col_staff": "Employee",
+      "col_type": "Leave Type",
+      "col_days": "Days",
+      "col_date": "Period",
+      "col_actions": "Actions",
+      "approve": "Approve",
+      "reject": "Reject",
+      "all_done": "All approved!",
+      "no_requests": "No leave requests need processing.",
+      "reject_title": "Rejection Reason",
+      "reject_reason_label": "Reason"
+    },
+    "projects": {
+      "title": "Company Projects Overview",
+      "planning": "Planning",
+      "active": "Active",
+      "completed": "Completed"
+    },
+    "recruit": {
+      "title": "Recruitment Pipeline",
+      "screening": "CV Screening",
+      "interview": "Interviewing",
+      "qualified": "Qualified",
+      "waiting": "Waiting List",
+      "onboarded": "Onboarded"
+    }
   }
 }

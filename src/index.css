@@ -363,3 +363,15 @@ label,
   color: #9ca3af !important;
   /* text-gray-400 */
 }
+
+/* Remove black borders / outlines when clicking on Recharts components */
+.recharts-wrapper,
+.recharts-surface,
+.recharts-responsive-container,
+.recharts-wrapper *,
+.recharts-surface *,
+.recharts-responsive-container * {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
