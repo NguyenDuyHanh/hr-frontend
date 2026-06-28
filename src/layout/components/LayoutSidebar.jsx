@@ -142,21 +142,30 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
         href={item.path}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border no-underline text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
+        className="no-underline block w-full"
       >
-        <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
+        <div
+          className="flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
+        >
+          <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
+        </div>
       </a>
     ) : (
       <NavLink
         to={item.path}
-        className={({ isActive }) =>
-          `flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border no-underline
-          ${isActive 
-            ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
-            : "text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
-        }
+        className="no-underline block w-full"
       >
-        <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
+        {({ isActive }) => (
+          <div
+            className={`flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border ${
+              isActive 
+                ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
+                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
+            }`}
+          >
+            <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
+          </div>
+        )}
       </NavLink>
     );
 

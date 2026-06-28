@@ -6,6 +6,7 @@ import { Toaster } from 'sonner';
 import MainLayout from "./layout/MainLayout";
 import AuthGuard from "./components/auth/AuthGuard";
 import { navigations } from "./navigationConfig";
+import useAuthStore from "./store/useAuthStore";
 import StaffList from "./pages/Staff/StaffList";
 import UserList from "./pages/User/UserList";
 import StaffDetailPage from "./pages/Staff/StaffDetailPage";
@@ -34,6 +35,7 @@ import MyLeaveRequests from "./pages/Leave/MyLeaveRequests";
 import LeaveBalance from "./pages/Leave/LeaveBalance";
 import DepartmentPage from "./pages/Department/DepartmentPage";
 import PositionPage from "./pages/Position/PositionPage";
+import DashboardPage from "./pages/Dashboard/DashboardPage";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -48,6 +50,13 @@ const PagePlaceholder = ({ title }) => (
 );
 
 // Real LoginPage is imported above
+
+const RootRedirect = () => {
+  const user = useAuthStore((state) => state.user);
+  if (!user) return <Navigate to="/login" replace />;
+  const isAdmin = user.role?.includes(ROLES.ADMIN);
+  return <Navigate to={isAdmin ? "/dashboard" : "/profile-page/home"} replace />;
+};
 
 function App() {
   const navigate = useNavigate();
@@ -76,8 +85,9 @@ function App() {
 
   // Map các component đặc biệt
   const componentMap = {
-    "/dashboard": <PagePlaceholder title="Bảng điều khiển" />,
+    "/dashboard": <DashboardPage />,
     "/staff/all": <StaffList />,
+
     "/administration/accounts": <UserList />,
     "/projects": <ProjectList />,
     "/tasks": <TaskList />,
@@ -115,7 +125,7 @@ function App() {
 
         {/* Routes được bảo vệ (Protected) */}
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<RootRedirect />} />
           
           {/* Tự động tạo Route từ cấu hình Menu */}
           {allRoutes.map((route, index) => (
@@ -191,7 +201,7 @@ function App() {
           />
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<RootRedirect />} />
         </Route>
       </Routes>
     </>

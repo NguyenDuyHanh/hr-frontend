@@ -6,7 +6,7 @@ import { getBreadcrumbByPath } from "@/navigationConfig";
 const Breadcrumb = () => {
   const location = useLocation();
   const routeSegments = getBreadcrumbByPath(location.pathname);
-  const displayTitle = routeSegments && routeSegments.length > 1 ? routeSegments[routeSegments.length - 1].name : "";
+  const displayTitle = routeSegments && routeSegments.length > 0 ? routeSegments[routeSegments.length - 1].name : "";
 
   return (
     <div className="flex items-center justify-between h-15 py-4 bg-background">
