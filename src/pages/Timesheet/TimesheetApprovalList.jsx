@@ -520,8 +520,9 @@ const TimesheetApprovalList = () => {
                 action={
                     <Button 
                         onClick={() => setDetailOpen(false)} 
-                        variant="contained" 
-                        className="bg-gray-700 text-white rounded-lg hover:bg-gray-800 font-bold px-5 py-1.5"
+                        variant="outlined" 
+                        color="inherit"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 font-bold px-5 py-1.5 rounded-lg"
                     >
                         Đóng
                     </Button>

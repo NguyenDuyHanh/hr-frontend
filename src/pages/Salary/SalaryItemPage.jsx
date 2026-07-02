@@ -354,7 +354,6 @@ const SalaryItemPage = () => {
                                 name="code"
                                 required
                                 placeholder="Ví dụ: LCB, AN_TRUA, PC_DT"
-                                helperText="Viết hoa không dấu, không khoảng trắng"
                                 disabled={selectedItem !== null}
                             />
                         </Grid>

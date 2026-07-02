@@ -78,7 +78,6 @@ const RecruitmentDetail = () => {
         addCandidate,
         removeCandidate,
         changeCandidateStatus,
-        onboardCandidate,
         resetStore
     } = useRecruitmentStore();
 
@@ -294,19 +293,6 @@ const RecruitmentDetail = () => {
         }
     };
 
-    const handleOnboardClick = async (cand) => {
-        if (!cand.departmentId || !cand.positionId) {
-            toast.error("Ứng viên cần được gán Phòng ban và Vị trí tiếp nhận trước khi Onboard!");
-            handleEditCandidate(cand);
-            return;
-        }
-        try {
-            await onboardCandidate(cand.id);
-            toast.success("Tiếp nhận ứng viên thành nhân viên chính thức thành công!");
-        } catch (err) {
-            toast.error(err?.response?.data?.message || "Lỗi khi onboard ứng viên");
-        }
-    };
 
     // Candidate Columns
     const candidateColumns = [
@@ -434,19 +420,7 @@ const RecruitmentDetail = () => {
                                 <Chip label={st.label} color={st.color} size="small" variant="outlined" />
                             )}
                             
-                            {row.status === 'WAITING' && (
-                                <Button 
-                                    size="small" 
-                                    variant="contained" 
-                                    color="success" 
-                                    startIcon={<CheckCircleIcon />}
-                                    onClick={() => handleOnboardClick(row)}
-                                    sx={{ fontSize: '10px', py: 0.2, px: 1, textTransform: 'none', height: '24px' }}
-                                    disabled={isViewMode}
-                                >
-                                    Onboard
-                                </Button>
-                            )}
+
                         </Box>
                         {row.note && (
                             <Tooltip title={row.note}>

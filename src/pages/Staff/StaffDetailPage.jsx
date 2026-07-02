@@ -54,7 +54,6 @@ const StaffDetailPage = () => {
     }, [id]);
 
     const handleSaveSuccess = () => {
-        toast.success('Lưu thông tin nhân viên thành công');
         fetchStaffDetails();
     };
 
@@ -202,7 +201,7 @@ const StaffDetailPage = () => {
             </Paper> */}
 
             {/* Tab view */}
-            <Paper elevation={0} className="p-4 border border-border">
+            <Paper elevation={0} className="px-4 border border-border">
                 <TabComponent 
                     tabList={tabList} 
                     value={tabValue} 

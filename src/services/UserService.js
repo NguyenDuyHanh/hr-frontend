@@ -32,3 +32,13 @@ export const deleteUser = async (id) => {
     const response = await axios.delete(`${API_PATH}/${id}`);
     return response.data;
 };
+
+export const lockUser = async (id) => {
+    const response = await axios.put(`${API_PATH}/${id}/lock`);
+    return response.data;
+};
+
+export const unlockUser = async (id) => {
+    const response = await axios.put(`${API_PATH}/${id}/unlock`);
+    return response.data;
+};

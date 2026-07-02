@@ -50,8 +50,6 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
                 }
                 if (onSaveSuccess) onSaveSuccess();
             } catch (error) {
-                const errorMsg = error?.response?.data?.message || 'Có lỗi xảy ra khi lưu nhân viên';
-                toast.error(errorMsg);
                 if (error?.response?.data?.message?.includes('Email')) {
                     setErrors({ email: 'Email đã tồn tại trong hệ thống' });
                 }

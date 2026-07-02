@@ -17,7 +17,7 @@ import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import useStaffStore from '../../store/staffStore';
 import { WorkingStatusOptions, GenderOptions } from '../../constants';
 import { getLabelFromOptions, getActiveFilterCount, formatDate } from '../../LocalFunction';
-import { getDepartments, getPositions } from '../../services/StaffService';
+import { getDepartments, getPositions, exportStaffExcel } from '../../services/StaffService';
 import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import { Formik } from 'formik';
@@ -173,8 +173,14 @@ const StaffList = () => {
     ], []);
 
     const handleExport = async () => {
-        console.log('Xuất Excel danh sách nhân viên...');
-        return new Blob([""], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        const searchDto = {
+            pageIndex: 1,
+            pageSize: 10000,
+            keyword: keyword || null,
+            ...filters,
+        };
+        const blob = await exportStaffExcel(searchDto);
+        return blob;
     };
 
     const columns = [
@@ -247,47 +253,7 @@ const StaffList = () => {
             align: 'center',
             render: (rowData) => <span className="whitespace-nowrap">{rowData.positionName || '---'}</span> 
         },
-        { 
-            title: 'Quản lý trực tiếp', 
-            width: 200,
-            render: (rowData) => (
-                <div className="leading-tight">
-                    - {rowData.managerName || 'Chưa xác định'}
-                </div>
-            )
-        },
-        { 
-            title: 'Nơi ở hiện tại', 
-            width: 250,
-            render: (rowData) => <span className="leading-tight">{rowData.currentAddress || '---'}</span> 
-        },
-        { 
-            title: 'Mã số BHXH', 
-            field: 'socialInsuranceCode',
-            width: 150,
-            render: (rowData) => <span>{rowData.socialInsuranceCode || '---'}</span>
-        },
-        { 
-            title: 'Trạng thái hồ sơ', 
-            width: 150,
-            render: () => <span className="text-[12px] text-green-600">---</span>
-        },
-        { 
-            title: 'Tên đăng nhập', 
-            width: 180,
-            render: (rowData) => (
-                <div className="flex items-center space-x-2">
-                    <span>{rowData.username || '---'}</span>
-                    {rowData.username && <span>✔</span>}
-                </div>
-            )
-        },
-        { 
-            title: 'Cấp bậc', 
-            field: 'level',
-            width: 100,
-            render: (rowData) => <span className="text-[12px] font-bold">{rowData.level || '---'}</span> 
-        },
+       
     ];
 
     return (
@@ -302,8 +268,8 @@ const StaffList = () => {
                     enableReinitialize={true}
                     onSubmit={(values) => {
                         setFilters({
-                            departmentId: values.department?.id || '',
-                            positionId: values.position?.id || ''
+                            departmentId: values.department?.id || null,
+                            positionId: values.position?.id || null
                         });
                     }}
                 >
@@ -389,9 +355,6 @@ const StaffList = () => {
                     open={openForm} 
                     onClose={() => setOpenForm(false)} 
                     staffData={selectedStaff}
-                    onSaveSuccess={() => {
-                        setOpenForm(false);
-                    }}
                 />
             )}
 

@@ -15,7 +15,7 @@ import FilterPanel from '../../components/ui/FilterPanel';
 import Autocomplete from '../../components/ui/Autocomplete';
 import DateTimePicker from '../../components/ui/DateTimePicker';
 import { getDepartments, getStaffs } from '../../services/StaffService';
-import { searchTimesheets } from '../../services/timesheetService';
+import { searchTimesheets, exportTimesheetsExcel } from '../../services/timesheetService';
 import useAuthStore from '../../store/useAuthStore';
 
 // Helper to format shift time (removing seconds, e.g. "08:00:00" -> "08:00")
@@ -285,97 +285,21 @@ const TimekeepingSummary = () => {
         };
     }, [aggregatedData]);
 
-    // CSV Export Blob Generator
-    const handleExportBlob = async () => {
+    // Excel Export Generator
+    const handleExport = async () => {
         try {
-            let csvContent = "\uFEFF"; // BOM for UTF-8 in Excel
+            const req = {
+                fromDate: filters.fromDate ? dayjs(filters.fromDate).format('YYYY-MM-DD') : null,
+                toDate: filters.toDate ? dayjs(filters.toDate).format('YYYY-MM-DD') : null,
+                departmentId: filters.departmentId,
+                staffId: filters.staffId,
+                keyword: keywordFilter || null
+            };
 
-            if (filters.staffId) {
-                // Export Single Employee Details
-                const staff = staffList.find(s => s.id === filters.staffId);
-                csvContent += `BÁO CÁO CHI TIẾT CHẤM CÔNG CÁ NHÂN\n`;
-                csvContent += `Nhân viên:;${staff?.displayName} (${staff?.staffCode})\n`;
-                csvContent += `Bộ phận:;${staff?.departmentName || '---'}\n`;
-                csvContent += `Thời gian:;Từ ${dayjs(filters.fromDate).format('DD/MM/YYYY')} đến ${dayjs(filters.toDate).format('DD/MM/YYYY')}\n\n`;
-                csvContent += `Ngày;Thứ;Giờ Vào;Giờ Ra;Ca áp dụng;Công;Giờ chuẩn;Giờ OT;Đi muộn (phút);Về sớm (phút);Trạng thái\n`;
-
-                singleEmployeeData.forEach(row => {
-                    let minCheckIn = '--:--';
-                    let maxCheckOut = '--:--';
-                    let shiftsStr = '---';
-                    let workRatio = 0;
-                    let stdHours = 0;
-                    let otHours = 0;
-                    let late = 0;
-                    let early = 0;
-                    let statusStr = 'Vắng/Nghỉ';
-
-                    if (row.record) {
-                        const details = row.record.details || [];
-                        let minCi = null;
-                        let maxCo = null;
-                        
-                        details.forEach(d => {
-                            if (d.checkInTime) {
-                                const ci = dayjs(d.checkInTime);
-                                if (!minCi || ci.isBefore(minCi)) minCi = ci;
-                            }
-                            if (d.checkOutTime) {
-                                const co = dayjs(d.checkOutTime);
-                                if (!maxCo || co.isAfter(maxCo)) maxCo = co;
-                            }
-                            late += d.lateMinutes || 0;
-                            early += d.earlyMinutes || 0;
-                        });
-
-                        if (minCi) minCheckIn = minCi.format('HH:mm');
-                        if (maxCo) maxCheckOut = maxCo.format('HH:mm');
-
-                        shiftsStr = details.map(d => d.shift ? `${d.shift.name} (${formatShiftTime(d.shift.startTime)}-${formatShiftTime(d.shift.endTime)})` : '').filter(Boolean).join(' | ') || '---';
-                        workRatio = row.record.totalWorkRatio || 0;
-                        stdHours = row.record.standardHours || 0;
-                        otHours = row.record.overtimeHours || 0;
-                        
-                        statusStr = row.record.status === 'APPROVED' ? 'Đã duyệt' : 
-                                    row.record.status === 'SUBMITTED' ? 'Chờ duyệt' : 
-                                    row.record.status === 'REJECTED' ? 'Từ chối' : 'Nháp';
-                    }
-
-                    const dayOfWeek = row.dateObj.format('dddd') === 'Sunday' ? 'Chủ Nhật' : 
-                                     row.dateObj.format('dddd') === 'Saturday' ? 'Thứ Bảy' : 
-                                     row.dateObj.format('dddd') === 'Monday' ? 'Thứ Hai' : 
-                                     row.dateObj.format('dddd') === 'Tuesday' ? 'Thứ Ba' : 
-                                     row.dateObj.format('dddd') === 'Wednesday' ? 'Thứ Tư' : 
-                                     row.dateObj.format('dddd') === 'Thursday' ? 'Thứ Năm' : 'Thứ Sáu';
-
-                    csvContent += `${row.dateObj.format('DD/MM/YYYY')};${dayOfWeek};${minCheckIn};${maxCheckOut};"${shiftsStr}";${workRatio};${stdHours};${otHours};${late};${early};${statusStr}\n`;
-                });
-
-                // Total row
-                csvContent += `TỔNG CỘNG;;;;;${singleEmployeeSummary.totalWorkRatio.toFixed(2)};${singleEmployeeSummary.totalStandardHours.toFixed(2)};${singleEmployeeSummary.totalOvertimeHours.toFixed(2)};${singleEmployeeSummary.totalLateMinutes};${singleEmployeeSummary.totalEarlyMinutes};\n`;
-
-            } else {
-                // Export Multiple Employees Summary
-                csvContent += `BÁO CÁO THỐNG KÊ TỔNG CÔNG NHÂN VIÊN\n`;
-                if (filters.departmentId) {
-                    const dept = departments.find(d => d.id === filters.departmentId);
-                    csvContent += `Bộ phận:;${dept?.name}\n`;
-                }
-                csvContent += `Thời gian:;Từ ${dayjs(filters.fromDate).format('DD/MM/YYYY')} đến ${dayjs(filters.toDate).format('DD/MM/YYYY')}\n\n`;
-                csvContent += `Mã NV;Họ tên;Phòng ban;Vị trí;Tổng công;Tổng giờ chuẩn;Tổng giờ OT;Đi muộn (phút);Về sớm (phút)\n`;
-
-                aggregatedData.forEach(row => {
-                    csvContent += `${row.staffCode};${row.displayName};${row.departmentName};${row.positionName};${row.totalWorkRatio.toFixed(2)};${row.standardHours.toFixed(2)};${row.overtimeHours.toFixed(2)};${row.lateMinutes};${row.earlyMinutes}\n`;
-                });
-
-                // Total row
-                csvContent += `TỔNG CỘNG;;;;${overallAggregatedSummary.totalWorkRatio.toFixed(2)};${overallAggregatedSummary.totalStandardHours.toFixed(2)};${overallAggregatedSummary.totalOvertimeHours.toFixed(2)};${overallAggregatedSummary.totalLateMinutes};${overallAggregatedSummary.totalEarlyMinutes}\n`;
-            }
-
-            toast.success("Xuất báo cáo thành công");
-            return new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const blob = await exportTimesheetsExcel(req);
+            return blob;
         } catch (error) {
-            console.error("Failed to export CSV:", error);
+            console.error("Failed to export Excel:", error);
             toast.error("Không thể xuất file báo cáo");
             return null;
         }
@@ -626,24 +550,11 @@ const TimekeepingSummary = () => {
                                 onSearch={() => setKeywordFilter(searchDraft)}
                                 onReset={handleResetFilters}
                                 showAdd={false}
-                                onExport={handleExportBlob}
+                                onExport={handleExport}
                                 exportFileName={
                                     filters.staffId 
-                                        ? `ThongKeCong_ChiTiet_${staffList.find(s => s.id === filters.staffId)?.staffCode || ''}.csv`
-                                        : `ThongKeTongCong.csv`
-                                }
-                                extraButtons={
-                                    <Button
-                                        variant="outlined"
-                                        color="inherit"
-                                        size="small"
-                                        onClick={loadData}
-                                        disabled={loading}
-                                        startIcon={<Refresh />}
-                                        className="normal-case whitespace-nowrap h-[32px] font-medium border border-border text-foreground hover:bg-muted"
-                                    >
-                                        Tải lại
-                                    </Button>
+                                        ? `ThongKeCong_ChiTiet_${staffList.find(s => s.id === filters.staffId)?.staffCode || ''}.xlsx`
+                                        : `ThongKeTongCong.xlsx`
                                 }
                                 filter={{
                                     open: filterOpen,
