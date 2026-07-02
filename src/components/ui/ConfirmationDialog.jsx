@@ -33,14 +33,18 @@ const ConfirmationDialog = React.forwardRef(({
   const { t } = useTranslation();
 
   const handleConfirm = async () => {
-    if (onYesClick) {
-      await onYesClick();
-    }
-    if (typeof handleAfterConfirm === "function") {
-      handleAfterConfirm();
-    }
-    if (needClose) {
-      onConfirmDialogClose();
+    try {
+      if (onYesClick) {
+        await onYesClick();
+      }
+      if (typeof handleAfterConfirm === "function") {
+        handleAfterConfirm();
+      }
+      if (needClose) {
+        onConfirmDialogClose();
+      }
+    } catch (error) {
+      console.error("Confirmation Dialog error:", error);
     }
   };
 

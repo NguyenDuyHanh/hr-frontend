@@ -47,3 +47,10 @@ export const getPositions = async () => {
     const response = await axios.get(`${API_PATH}/positions`);
     return response.data;
 };
+
+export const exportStaffExcel = async (searchDto) => {
+    const response = await axios.post(`${API_PATH}/export-excel`, searchDto || {}, {
+        responseType: 'blob',
+    });
+    return response.data; // Blob
+};

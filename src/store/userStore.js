@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { getUsers, deleteUser, saveUser, pagingUsers } from '../services/UserService';
+import { getUsers, deleteUser, saveUser, pagingUsers, lockUser, unlockUser } from '../services/UserService';
 import { getRoles } from '../services/RoleService';
+import { toast } from 'sonner';
 
 const useUserStore = create((set, get) => ({
     users: [],
@@ -78,29 +79,67 @@ const useUserStore = create((set, get) => ({
     removeUser: async (id) => {
         try {
             await deleteUser(id);
+            toast.success('Xóa người dùng thành công');
             get().loadUsers();
         } catch (error) {
             console.error('Error removing user:', error);
+            const msg = error.response?.data?.message || 'Lỗi khi xóa người dùng';
+            toast.error(msg);
+            throw error;
         }
     },
 
     addUser: async (user) => {
         try {
             await saveUser(user);
+            toast.success('Thêm người dùng thành công');
             get().loadUsers();
             set({ openForm: false });
         } catch (error) {
             console.error('Error adding user:', error);
+            const msg = error.response?.data?.message || 'Lỗi khi thêm người dùng';
+            toast.error(msg);
+            throw error;
         }
     },
 
     modifyUser: async (id, user) => {
         try {
             await saveUser({ ...user, id });
+            toast.success('Cập nhật người dùng thành công');
             get().loadUsers();
             set({ openForm: false });
         } catch (error) {
             console.error('Error modifying user:', error);
+            const msg = error.response?.data?.message || 'Lỗi khi chỉnh sửa người dùng';
+            toast.error(msg);
+            throw error;
+        }
+    },
+
+    lockUserAccount: async (id) => {
+        try {
+            await lockUser(id);
+            toast.success('Khóa tài khoản thành công');
+            get().loadUsers();
+        } catch (error) {
+            console.error('Error locking user:', error);
+            const msg = error.response?.data?.message || 'Lỗi khi khóa tài khoản';
+            toast.error(msg);
+            throw error;
+        }
+    },
+
+    unlockUserAccount: async (id) => {
+        try {
+            await unlockUser(id);
+            toast.success('Mở khóa tài khoản thành công');
+            get().loadUsers();
+        } catch (error) {
+            console.error('Error unlocking user:', error);
+            const msg = error.response?.data?.message || 'Lỗi khi mở khóa tài khoản';
+            toast.error(msg);
+            throw error;
         }
     },
 

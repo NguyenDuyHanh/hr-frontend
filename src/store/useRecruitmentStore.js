@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { pagingRecruitments, saveRecruitment, deleteRecruitment } from '../services/recruitmentService';
-import { pagingCandidates, saveCandidate, deleteCandidate, updateCandidateStatus, convertToStaff } from '../services/candidateService';
+import { pagingCandidates, saveCandidate, deleteCandidate, updateCandidateStatus } from '../services/candidateService';
 
 const useRecruitmentStore = create((set, get) => ({
     // Recruitment states
@@ -174,16 +174,6 @@ const useRecruitmentStore = create((set, get) => ({
             get().loadCandidates();
         } catch (err) {
             console.error("Error changing candidate status:", err);
-            throw err;
-        }
-    },
-
-    onboardCandidate: async (id) => {
-        try {
-            await convertToStaff(id);
-            get().loadCandidates();
-        } catch (err) {
-            console.error("Error onboarding candidate:", err);
             throw err;
         }
     }

@@ -11,47 +11,10 @@ import TabAccordion from '../../../../components/ui/Tab/TabAccordion';
 import ImageUpload from '../../../../components/ui/ImageUpload';
 import { 
     WorkingStatusOptions,
-    GenderOptions,
-    MaritalStatusOptions,
-    NationalityOptions,
-    EthnicsOptions,
-    ReligionOptions,
-    EducationDegreeOptions,
-    ProvinceOptions,
-    WardOptionsMap,
-    WorkingFormatOptions,
-    StaffPhaseOptions,
-    PositionTypeOptions,
-    ShiftTypeOptions,
-    FixShiftWorkOptions,
-    LeaveShiftTypeOptions,
-    WeekDayOptions,
-    OrganizationOptions,
-    HealthCarePlaceOptions,
-    StatusOptions,
-    PositionTitleOptions
+    GenderOptions
 } from '../../../../constants';
 import { getDepartments, getPositions } from '../../../../services/StaffService';
 import { format } from 'date-fns';
-
-const maritalStatusOptions = MaritalStatusOptions;
-const nationalityOptions = NationalityOptions;
-const ethnicsOptions = EthnicsOptions;
-const religionOptions = ReligionOptions;
-const educationDegreeOptions = EducationDegreeOptions;
-const provinceOptions = ProvinceOptions;
-const wardOptionsMap = WardOptionsMap;
-const workingFormatOptions = WorkingFormatOptions;
-const staffPhaseOptions = StaffPhaseOptions;
-const positionTypeOptions = PositionTypeOptions;
-const shiftTypeOptions = ShiftTypeOptions;
-const fixShiftWorkOptions = FixShiftWorkOptions;
-const leaveShiftTypeOptions = LeaveShiftTypeOptions;
-const weekDayOptions = WeekDayOptions;
-const organizationOptions = OrganizationOptions;
-const healthCarePlaceOptions = HealthCarePlaceOptions;
-const statusOptions = StatusOptions;
-const positionTitleOptions = PositionTitleOptions;
 
 const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
     const { addStaff, modifyStaff } = useStaffStore();
@@ -91,9 +54,9 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
         // 1. Personal Info
         avatarUrl: staffData?.avatarUrl || '',
         birthPlace: staffData?.birthPlace || '',
-        nationality: staffData?.nationality || 'VN',
-        ethnics: staffData?.ethnics || 'KINH',
-        religion: staffData?.religion || 'NONE',
+        nationality: staffData?.nationality || '',
+        ethnics: staffData?.ethnics || '',
+        religion: staffData?.religion || '',
         educationDegree: staffData?.educationDegree || '',
 
         // 2. Address
@@ -193,16 +156,16 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                                     <TextField label="Nơi sinh" name="birthPlace" fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <SelectInput label="Quốc tịch" name="nationality" options={nationalityOptions} fullWidth disabled={isView} />
+                                    <TextField label="Quốc tịch" name="nationality" fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <SelectInput label="Dân tộc" name="ethnics" options={ethnicsOptions} fullWidth disabled={isView} />
+                                    <TextField label="Dân tộc" name="ethnics" fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <SelectInput label="Tôn giáo" name="religion" options={religionOptions} fullWidth disabled={isView} />
+                                    <TextField label="Tôn giáo" name="religion" fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <SelectInput label="Trình độ học vấn" name="educationDegree" options={educationDegreeOptions} fullWidth disabled={isView} />
+                                    <TextField label="Trình độ học vấn" name="educationDegree" fullWidth disabled={isView} />
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -271,7 +234,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 </TabAccordion>
 
                 {/* 5. Tổ chức */}
-                <TabAccordion title="Tổ chức" open={false}>
+                <TabAccordion title="Phòng ban" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={6}>
                             <Autocomplete 

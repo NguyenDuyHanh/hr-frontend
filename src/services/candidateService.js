@@ -44,8 +44,3 @@ export const updateCandidateStatus = async (id, status, refusalReason) => {
     });
     return response.data;
 };
-
-export const convertToStaff = async (id) => {
-    const response = await axios.post(`${API_PATH}/${id}/convert-to-staff`);
-    return response.data;
-};

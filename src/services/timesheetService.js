@@ -41,3 +41,10 @@ export const getRawLogs = async (staffId, date) => {
     });
     return response.data;
 };
+
+export const exportTimesheetsExcel = async (searchRequest) => {
+    const response = await axios.post(`${TIMESHEET_API_PATH}/export-excel`, searchRequest || {}, {
+        responseType: 'blob',
+    });
+    return response.data; // Blob
+};

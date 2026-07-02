@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { getStaffs, deleteStaff, saveStaff, pagingStaffs } from '../services/StaffService';
+import { toast } from 'sonner';
 
 const useStaffStore = create((set, get) => ({
     staffs: [],
@@ -55,19 +56,23 @@ const useStaffStore = create((set, get) => ({
     removeStaff: async (id) => {
         try {
             await deleteStaff(id);
+            toast.success('Xóa nhân viên thành công');
             get().loadStaffs();
         } catch (error) {
             console.error('Error removing staff:', error);
+            toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi xóa nhân viên');
         }
     },
 
     addStaff: async (staff) => {
         try {
             await saveStaff(staff);
+            toast.success('Thêm mới nhân viên thành công');
             get().loadStaffs();
             set({ openForm: false });
         } catch (error) {
             console.error('Error adding staff:', error);
+            toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi thêm mới nhân viên');
             throw error;
         }
     },
@@ -75,9 +80,12 @@ const useStaffStore = create((set, get) => ({
     modifyStaff: async (id, staff) => {
         try {
             await saveStaff({ ...staff, id });
+            toast.success('Cập nhật nhân viên thành công');
+            get().loadStaffs();
             set({ openForm: false });
         } catch (error) {
             console.error('Error modifying staff:', error);
+            toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật nhân viên');
             throw error;
         }
     },

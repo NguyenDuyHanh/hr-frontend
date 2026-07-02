@@ -238,9 +238,6 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Box>
                         <Typography variant="h6" fontWeight="bold">Cấu hình Lương & Phụ cấp</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                            Thiết lập các khoản lương cố định, phụ cấp hoặc các khoản giảm trừ định kỳ hàng tháng cho nhân viên.
-                        </Typography>
                     </Box>
                     {!isView && (
                         <Button 

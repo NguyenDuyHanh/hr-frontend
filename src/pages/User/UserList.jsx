@@ -53,7 +53,9 @@ const UserList = () => {
         loadUsers,
         loadRoles,
         removeUser,
-        resetFilters
+        resetFilters,
+        lockUserAccount,
+        unlockUserAccount
     } = useUserStore();
     const [departments, setDepartments] = useState([]);
     const [positions, setPositions] = useState([]);
@@ -163,13 +165,9 @@ const UserList = () => {
 
     const confirmDelete = async () => {
         if (selectedUser?.id) {
-            try {
-                await removeUser(selectedUser.id);
-                setSelectedUser(null);
-                setOpenConfirm(false);
-            } catch (error) {
-                console.error('Error deleting user', error);
-            }
+            await removeUser(selectedUser.id);
+            setSelectedUser(null);
+            setOpenConfirm(false);
         }
     };
 
@@ -180,18 +178,13 @@ const UserList = () => {
 
     const confirmToggleActive = async () => {
         if (selectedUser) {
-            const actionText = selectedUser.active ? 'khóa' : 'mở khóa';
-            try {
-                await saveUser({
-                    ...selectedUser,
-                    active: !selectedUser.active
-                });
-                setSelectedUser(null);
-                setOpenLockConfirm(false);
-                loadUsers();
-            } catch (error) {
-                console.error(`Lỗi khi ${actionText} tài khoản:`, error);
+            if (selectedUser.active) {
+                await lockUserAccount(selectedUser.id);
+            } else {
+                await unlockUserAccount(selectedUser.id);
             }
+            setSelectedUser(null);
+            setOpenLockConfirm(false);
         }
     };
 
@@ -232,7 +225,6 @@ const UserList = () => {
             ),
         },
         { title: 'Tên tài khoản', field: 'username' },
-        { title: 'Email', field: 'email' },
         { 
             title: 'Vai trò', 
             render: (rowData) => {
