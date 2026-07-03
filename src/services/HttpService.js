@@ -74,6 +74,13 @@ HttpService.interceptors.response.use(
         useUiStore.getState().stopLoading();
         const originalRequest = error.config;
 
+        // Xử lý 403 Forbidden — không có quyền truy cập
+        if (error.response && error.response.status === 403) {
+            const message = error.response?.data?.message || 'Bạn không có quyền thực hiện hành động này';
+            toast.error(message);
+            return Promise.reject(error);
+        }
+
         if (error.response && error.response.status === 401 && originalRequest) {
             // Nếu đã retry rồi nhưng vẫn bị 401 -> Token mới cũng không hợp lệ hoặc đã hết hạn
             if (originalRequest._retry) {

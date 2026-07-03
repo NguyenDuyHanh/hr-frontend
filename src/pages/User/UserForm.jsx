@@ -26,6 +26,13 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
         staff: userData?.staffId ? { id: userData.staffId, displayName: userData.staffName, staffCode: '' } : null,
     }), [userData]);
 
+    const searchObject = useMemo(() => {
+        if (userData?.id) {
+            return { extWhereClause: `no_account_${userData.id}` };
+        }
+        return { extWhereClause: 'no_account' };
+    }, [userData]);
+
     const validationSchema = Yup.object({
         username: Yup.string().required('Tên đăng nhập không được để trống'),
         password: userData?.id ? Yup.string().nullable() : Yup.string().required('Mật khẩu không được để trống'),
@@ -134,6 +141,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                         label="Nhân viên liên kết" 
                         name="staff"
                         api={pagingStaffs}
+                        searchObject={searchObject}
                         disabled={isView}
                         getOptionLabel={(option) => {
                             if (!option) return "";
@@ -142,13 +150,6 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                         }}
                         onChange={(event, value) => {
                             formik.setFieldValue('staff', value);
-                            
-                            // Auto-populate username if selecting a staff for a new user
-                            if (value && !userData) {
-                                if (value.staffCode && !formik.values.username) {
-                                    formik.setFieldValue('username', value.staffCode);
-                                }
-                            }
                         }}
                     />
                     <Box mt={2}>

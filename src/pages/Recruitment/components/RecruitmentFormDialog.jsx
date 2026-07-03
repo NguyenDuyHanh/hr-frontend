@@ -7,7 +7,8 @@ import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
 import AsyncAutocomplete from '../../../components/ui/AsyncAutocomplete';
 import { pagingStaffs } from '../../../services/StaffService';
-import { RECRUITMENT_STATUSES } from '../../../constants';
+import { RECRUITMENT_STATUSES, ROLES } from '../../../constants';
+import useAuthStore from '../../../store/useAuthStore';
 
 const RecruitmentFormDialog = ({
     open,
@@ -15,7 +16,11 @@ const RecruitmentFormDialog = ({
     recruitmentInput,
     onSave
 }) => {
-    const staffSearchObj = useMemo(() => ({ pageIndex: 1, pageSize: 100 }), []);
+    const { user } = useAuthStore();
+    const userRoles = user?.role || [];
+    const isRecruiterOnly = userRoles.includes(ROLES.HR_RECRUITMENT) && !userRoles.includes(ROLES.ADMIN) && !userRoles.includes(ROLES.HR_MANAGER);
+
+    const staffSearchObj = useMemo(() => ({ pageIndex: 1, pageSize: 100, extWhereClause: 'recruitment_approvers' }), []);
 
     const initialValues = useMemo(() => ({
         id: recruitmentInput.id || null,
@@ -23,10 +28,10 @@ const RecruitmentFormDialog = ({
         name: recruitmentInput.name || '',
         personApproveCV: recruitmentInput.personApproveCVId 
             ? { id: recruitmentInput.personApproveCVId, displayName: recruitmentInput.personApproveCVName || '' } 
-            : null,
+            : (isRecruiterOnly && user?.staffId ? { id: user.staffId, displayName: user.staffName || '' } : null),
         status: recruitmentInput.status ?? 1,
         description: recruitmentInput.description || ''
-    }), [recruitmentInput]);
+    }), [recruitmentInput, isRecruiterOnly, user]);
 
     const validationSchema = Yup.object({
         name: Yup.string().trim().required('Tiêu đề tuyển dụng là bắt buộc'),
@@ -85,6 +90,7 @@ const RecruitmentFormDialog = ({
                         placeholder="Chọn người duyệt hồ sơ..."
                         displayName="displayName"
                         fullWidth
+                        disabled={isRecruiterOnly}
                     />
                     <SelectInput
                         name="status"

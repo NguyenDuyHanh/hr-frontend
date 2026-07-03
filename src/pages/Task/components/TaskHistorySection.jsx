@@ -173,7 +173,7 @@ const TaskHistorySection = ({ taskId }) => {
                             return (
                                 <Box key={item.id} className="pl-4 py-2 border-l-2 border-primary/30 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/10 rounded-r-md">
                                     <Box className="flex gap-2 items-center">
-                                        <Typography variant="caption" className="font-semibold text-primary">
+                                        <Typography variant="caption" className="font-semibold text-primary-light">
                                             {modifierName}
                                         </Typography>
                                         <Typography variant="body2" className="text-gray-600 dark:text-gray-400">

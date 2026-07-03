@@ -144,16 +144,17 @@ const MyTextField = React.forwardRef(({
 
   const sxMemo = useMemo(() => ({
     '& .MuiInputBase-root': {
-      backgroundColor: (theme) => readOnly 
+      backgroundColor: (theme) => (readOnly || otherProps.disabled) 
         ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') 
         : 'inherit',
       transition: 'all 0.2s ease-in-out',
       '&.Mui-disabled': {
-        color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.87) !important' : 'rgba(255, 255, 255, 0.38) !important',
-        WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.87) !important' : 'rgba(255, 255, 255, 0.38) !important',
+        backgroundColor: (theme) => theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important',
+        color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+        WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
         '& .MuiInputBase-input': {
-          color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.87) !important' : 'rgba(255, 255, 255, 0.38) !important',
-          WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.87) !important' : 'rgba(255, 255, 255, 0.38) !important',
+          color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+          WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
         }
       },
       '&.Mui-error .MuiOutlinedInput-notchedOutline': {
@@ -196,7 +197,7 @@ const MyTextField = React.forwardRef(({
       marginRight: "0 !important",
     },
     ...sxProp,
-  }), [readOnly, multiline, isTextArea, sxProp]);
+  }), [readOnly, otherProps.disabled, multiline, isTextArea, sxProp]);
 
   const classNameMemo = useMemo(() => (
     `${oldStyle ? '' : 'input-container'} ${readOnly ? 'read-only' : ''} ${classNameProp || ''}`

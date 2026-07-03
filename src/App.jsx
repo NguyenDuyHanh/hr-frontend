@@ -36,6 +36,7 @@ import LeaveBalance from "./pages/Leave/LeaveBalance";
 import DepartmentPage from "./pages/Department/DepartmentPage";
 import PositionPage from "./pages/Position/PositionPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
+import WelcomePage from "./pages/Home/WelcomePage";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -54,12 +55,14 @@ const PagePlaceholder = ({ title }) => (
 const RootRedirect = () => {
   const user = useAuthStore((state) => state.user);
   if (!user) return <Navigate to="/login" replace />;
-  const isAdmin = user.role?.includes(ROLES.ADMIN);
-  return <Navigate to={isAdmin ? "/dashboard" : "/profile-page/home"} replace />;
+  const userRoles = user.role || [];
+  const canViewDashboard = userRoles.includes(ROLES.ADMIN);
+  return <Navigate to={canViewDashboard ? "/dashboard" : "/home"} replace />;
 };
 
 function App() {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   
   useEffect(() => {
     setNavigate(navigate);
@@ -85,6 +88,7 @@ function App() {
 
   // Map các component đặc biệt
   const componentMap = {
+    "/home": <WelcomePage />,
     "/dashboard": <DashboardPage />,
     "/staff/all": <StaffList />,
 
@@ -117,7 +121,7 @@ function App() {
       {showLoading && <Loading fixed />}
       
       {/* Widget Trợ lý AI */}
-      <AiChatbotWidget />
+      {user && <AiChatbotWidget />}
 
       <Routes>
         {/* Route công khai (Public) */}
@@ -149,6 +153,17 @@ function App() {
               </AuthGuard>
             } 
           />
+
+          {/* Route trang cá nhân */}
+          <Route 
+            path="/profile" 
+            element={
+              <AuthGuard>
+                <StaffDetailPage />
+              </AuthGuard>
+            } 
+          />
+
 
           {/* Route chi tiết dự án - chế độ xem */}
           <Route 

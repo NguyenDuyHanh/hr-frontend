@@ -16,9 +16,9 @@ import { toast } from 'sonner';
 import { CANDIDATE_STATUSES } from '../../../constants';
 
 const genderOptions = [
-    { value: 'Nam', name: 'Nam' },
-    { value: 'Nữ', name: 'Nữ' },
-    { value: 'Khác', name: 'Khác' }
+    { value: 'MALE', name: 'Nam' },
+    { value: 'FEMALE', name: 'Nữ' },
+    { value: 'OTHER', name: 'Khác' }
 ];
 
 const getFileNameFromUrl = (url) => {
@@ -45,7 +45,7 @@ const CandidateFormDialog = ({
         id: candidateInput.id || null,
         candidateCode: candidateInput.candidateCode || '',
         displayName: candidateInput.displayName || '',
-        gender: candidateInput.gender || 'Nam',
+        gender: candidateInput.gender || 'MALE',
         birthDate: candidateInput.birthDate ? new Date(candidateInput.birthDate) : null,
         email: candidateInput.email || '',
         phoneNumber: candidateInput.phoneNumber || '',
@@ -237,7 +237,7 @@ const CandidateFormDialog = ({
                                 disabled={localUploadingCV}
                                 sx={{ textTransform: 'none' }}
                             >
-                                {localUploadingCV ? 'Đang tải lên...' : 'Tải CV (.pdf)'}
+                                {localUploadingCV ? 'Đang tải lên...' : 'Tải lên CV (.pdf)'}
                                 <input type="file" hidden accept=".pdf,.doc,.docx" onChange={handleLocalCVChange} />
                             </Button>
                              {formik.values.cvFileUrl && (

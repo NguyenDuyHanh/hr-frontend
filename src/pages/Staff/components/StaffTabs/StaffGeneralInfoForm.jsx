@@ -40,10 +40,10 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
         staffCode: staffData?.staffCode || '',
         displayName: staffData?.displayName || '',
         birthDate: staffData?.birthDate ? new Date(staffData.birthDate) : null,
-        gender: staffData?.gender || '',
+        gender: staffData?.gender || 'MALE',
         phoneNumber: staffData?.phoneNumber || '',
         email: staffData?.email || '',
-        workingStatus: staffData?.workingStatus || '',
+        workingStatus: staffData?.workingStatus || 'ACTIVE',
         idNumber: staffData?.idNumber || '',
         startDate: staffData?.startDate ? new Date(staffData.startDate) : null,
         currentAddress: staffData?.currentAddress || '',
@@ -69,6 +69,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
         idNumberIssueDate: staffData?.idNumberIssueDate ? new Date(staffData.idNumberIssueDate) : null,
         idNumberIssueBy: staffData?.idNumberIssueBy || '',
         companyEmail: staffData?.companyEmail || '',
+        annualLeave: staffData?.annualLeave !== undefined && staffData?.annualLeave !== null ? staffData.annualLeave : 12.0,
 
         // 7. Tax & Insurance
         taxCode: staffData?.taxCode || '',
@@ -229,6 +230,9 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
                             <TextField label="Email công ty" name="companyEmail" fullWidth disabled={isView} />
+                        </Grid>
+                        <Grid item xs={12} sm={6} lg={3}>
+                            <TextField type="number" label="Số ngày nghỉ phép" name="annualLeave" fullWidth disabled={isView} />
                         </Grid>
                     </Grid>
                 </TabAccordion>

@@ -16,9 +16,10 @@ import { generateRecruitmentCode } from '../../services/recruitmentService';
 import { pagingStaffs } from '../../services/StaffService';
 
 import RecruitmentFormDialog from './components/RecruitmentFormDialog';
-import { RECRUITMENT_STATUSES } from '../../constants';
+import { RECRUITMENT_STATUSES, ROLES } from '../../constants';
 
 import useRecruitmentStore from '../../store/useRecruitmentStore';
+import useAuthStore from '../../store/useAuthStore';
 import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import SelectInput from '../../components/ui/SelectInput';
@@ -27,7 +28,7 @@ import AsyncAutocomplete from '../../components/ui/AsyncAutocomplete';
 
 const RecruitmentList = () => {
     const navigate = useNavigate();
-    const staffSearchObj = useMemo(() => ({ pageIndex: 1, pageSize: 100 }), []);
+    const staffSearchObj = useMemo(() => ({ pageIndex: 1, pageSize: 100, extWhereClause: 'recruitment_approvers' }), []);
 
     // Confirmation Dialog states
     const [openConfirmDeleteRecruitment, setOpenConfirmDeleteRecruitment] = useState(false);
@@ -57,6 +58,10 @@ const RecruitmentList = () => {
         resetStore
     } = useRecruitmentStore();
 
+    const { user } = useAuthStore();
+    const userRoles = user?.role || [];
+    const isRecruiterOnly = userRoles.includes(ROLES.HR_RECRUITMENT) && !userRoles.includes(ROLES.ADMIN) && !userRoles.includes(ROLES.HR_MANAGER);
+
     // Toolbar & Filter states for Recruitments
     const recruitmentFormikRef = useRef();
     const [recruitmentSearchDraft, setRecruitmentSearchDraft] = useState(recruitmentKeyword || '');
@@ -68,14 +73,23 @@ const RecruitmentList = () => {
     }, [recruitmentKeyword]);
 
     useEffect(() => {
-        loadRecruitments();
-    }, [recruitmentPage, recruitmentPageSize, recruitmentKeyword, recruitmentFilters]);
-
-    useEffect(() => {
+        if (isRecruiterOnly && user?.staffId) {
+            setRecruitmentFilters({ personApproveCVId: user.staffId });
+        } else {
+            setRecruitmentFilters({});
+        }
         return () => {
             resetStore();
         };
-    }, []);
+    }, [isRecruiterOnly, user?.staffId]);
+
+    useEffect(() => {
+        // Skip initial fetch if recruiter filter is not populated yet
+        if (isRecruiterOnly && user?.staffId && !recruitmentFilters.personApproveCVId) {
+            return;
+        }
+        loadRecruitments();
+    }, [recruitmentPage, recruitmentPageSize, recruitmentKeyword, recruitmentFilters, isRecruiterOnly, user?.staffId]);
 
     // Recruitment CRUD Handlers
     const handleAddRecruitment = async () => {
@@ -87,8 +101,8 @@ const RecruitmentList = () => {
                 name: '', 
                 description: '', 
                 status: 1, 
-                personApproveCVId: '',
-                personApproveCVName: ''
+                personApproveCVId: isRecruiterOnly && user?.staffId ? user.staffId : '',
+                personApproveCVName: isRecruiterOnly && user?.staffName ? user.staffName : ''
             });
             setOpenRecruitmentForm(true);
         } catch (err) {
@@ -137,7 +151,11 @@ const RecruitmentList = () => {
         setRecruitmentSearchDraft('');
         recruitmentFormikRef.current?.resetForm();
         setRecruitmentKeyword('');
-        setRecruitmentFilters({});
+        if (isRecruiterOnly && user?.staffId) {
+            setRecruitmentFilters({ personApproveCVId: user.staffId });
+        } else {
+            setRecruitmentFilters({});
+        }
     };
 
     // Recruitment Columns
@@ -188,11 +206,14 @@ const RecruitmentList = () => {
             <Paper elevation={0} className="p-4 border border-border">
                 <Formik
                     innerRef={recruitmentFormikRef}
+                    enableReinitialize={true}
                     initialValues={{
                         status: '',
                         code: '',
                         name: '',
-                        personApproveCV: null
+                        personApproveCV: isRecruiterOnly && user?.staffId 
+                            ? { id: user.staffId, displayName: user.staffName || '' } 
+                            : null
                     }}
                     onSubmit={(values) => {
                         const filtersObj = {};
@@ -259,6 +280,7 @@ const RecruitmentList = () => {
                                             placeholder="Chọn người duyệt hồ sơ..."
                                             displayName="displayName"
                                             fullWidth
+                                            disabled={isRecruiterOnly}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>

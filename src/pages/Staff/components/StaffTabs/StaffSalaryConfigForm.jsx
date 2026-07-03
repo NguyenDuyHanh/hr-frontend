@@ -3,11 +3,10 @@ import {
     Box, 
     Typography, 
     Button, 
-    Paper, 
     IconButton, 
-    Grid,
     Tooltip,
-    Divider
+    Divider,
+    TextField
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -17,7 +16,7 @@ import { useFormik, FormikProvider } from 'formik';
 
 // Common Components
 import Table from '../../../../components/ui/Table';
-import SelectInput from '../../../../components/ui/SelectInput';
+import Autocomplete from '../../../../components/ui/Autocomplete';
 import VNDCurrencyInput from '../../../../components/ui/VNDCurrencyInput';
 
 import { getAllSalaryItems, getStaffSalaryItems, saveStaffSalaryItems } from '../../../../services/salaryItemService';
@@ -41,7 +40,11 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
                 setAllSalaryItems(allItemsRes.data.data || allItemsRes.data || []);
             }
             if (configRes && configRes.data) {
-                setConfiguredItems(configRes.data.data || configRes.data || []);
+                const configItems = configRes.data.data || configRes.data || [];
+                setConfiguredItems(configItems.map(item => ({
+                    ...item,
+                    isNew: false
+                })));
             }
         } catch (error) {
             console.error('Failed to load staff salary config:', error);
@@ -61,8 +64,19 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
             return;
         }
 
+        const hasInvalidRow = values.configuredItems.some(item => !item.salaryItem?.id);
+        if (hasInvalidRow) {
+            toast.error('Vui lòng chọn khoản lương cho tất cả các dòng trước khi lưu');
+            return;
+        }
+
+        const itemsToSave = values.configuredItems.map(item => ({
+            salaryItem: { id: item.salaryItem.id },
+            amount: parseFloat(item.amount) || 0
+        }));
+
         try {
-            const response = await saveStaffSalaryItems(staffId, values.configuredItems);
+            const response = await saveStaffSalaryItems(staffId, itemsToSave);
             if (response && response.data) {
                 toast.success('Lưu cấu hình lương nhân viên thành công');
                 loadData();
@@ -76,44 +90,35 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
     // Formik Setup
     const formik = useFormik({
         initialValues: {
-            selectedItemId: '',
-            amount: '',
             configuredItems: configuredItems
         },
         enableReinitialize: true,
         onSubmit: handleSaveConfig
     });
 
+    const getRowIndex = (row) => {
+        return formik.values.configuredItems.findIndex(item => {
+            if (row.salaryItem?.id && item.salaryItem?.id) {
+                return item.salaryItem.id === row.salaryItem.id;
+            }
+            if (row.tempId && item.tempId) {
+                return item.tempId === row.tempId;
+            }
+            return item === row;
+        });
+    };
+
     const handleAddItem = () => {
-        const { selectedItemId, amount, configuredItems: currentConfigured } = formik.values;
-
-        if (!selectedItemId) {
-            toast.warning('Vui lòng chọn một khoản lương');
-            return;
-        }
-        if (!amount || isNaN(amount) || parseFloat(amount) < 0) {
-            toast.warning('Vui lòng nhập số tiền hợp lệ (>= 0)');
-            return;
-        }
-
-        // Check duplicates
-        const exists = currentConfigured.some(item => item.salaryItem?.id === selectedItemId);
-        if (exists) {
-            toast.warning('Khoản lương này đã được cấu hình cho nhân viên');
-            return;
-        }
-
-        const selectedItem = allSalaryItems.find(item => item.id === selectedItemId);
         const newItem = {
-            salaryItem: selectedItem,
-            amount: parseFloat(amount)
+            tempId: Date.now() + Math.random(),
+            salaryItem: null,
+            amount: '',
+            isNew: true
         };
 
-        const updated = [...currentConfigured, newItem];
+        const updated = [...formik.values.configuredItems, newItem];
         setConfiguredItems(updated);
         formik.setFieldValue('configuredItems', updated);
-        formik.setFieldValue('selectedItemId', '');
-        formik.setFieldValue('amount', '');
     };
 
     const handleRemoveItem = (index) => {
@@ -123,22 +128,8 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
         formik.setFieldValue('configuredItems', updated);
     };
 
-    // Filter available items for dropdown to avoid duplicates
-    const availableItems = useMemo(() => {
-        return allSalaryItems.filter(
-            item => !formik.values.configuredItems.some(config => config.salaryItem?.id === item.id)
-        );
-    }, [allSalaryItems, formik.values.configuredItems]);
-
-    // Format options for SelectInput
-    const availableItemsOptions = useMemo(() => {
-        return availableItems.map(item => ({
-            id: item.id,
-            displayName: `${item.name} (${item.code}) - ${item.type === SalaryItemType.INCOME ? 'Thu nhập' : 'Giảm trừ'}`
-        }));
-    }, [availableItems]);
-
     const formatMoney = (val) => {
+        if (val === '' || val === null || val === undefined) return '0 ₫';
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
     };
 
@@ -147,31 +138,72 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
         { 
             title: 'Khoản lương', 
             field: 'salaryItem.name',
-            render: (rowData) => <span className="font-semibold">{rowData.salaryItem?.name}</span>
+            render: (row) => {
+                const index = getRowIndex(row);
+                const isNewRow = row.isNew === true;
+                
+                if (isView || !isNewRow) {
+                    return <span className="font-semibold">{row.salaryItem?.name}</span>;
+                }
+                
+                const cellAvailableItems = allSalaryItems.filter(item => 
+                    !formik.values.configuredItems.some((config, idx) => 
+                        idx !== index && config.salaryItem?.id === item.id
+                    )
+                );
+                
+                return (
+                    <Autocomplete
+                        name={`configuredItems[${index}].salaryItem`}
+                        options={cellAvailableItems}
+                        displayData="name"
+                        placeholder="Chọn khoản lương..."
+                        onChange={(_, newValue) => {
+                            const idx = getRowIndex(row);
+                            if (idx !== -1) {
+                                formik.setFieldValue(`configuredItems[idx].salaryItem`, newValue);
+                                
+                                const updated = [...configuredItems];
+                                if (updated[idx]) {
+                                    updated[idx].salaryItem = newValue;
+                                    setConfiguredItems(updated);
+                                }
+                            }
+                        }}
+                    />
+                );
+            }
         },
         { 
             title: 'Mã', 
             field: 'salaryItem.code',
-            render: (row) => <span className="font-mono text-accent font-bold">{row.salaryItem?.code}</span>
+            render: (row) => {
+                if (row.salaryItem?.code) {
+                    return <span className="font-mono text-accent font-bold">{row.salaryItem.code}</span>;
+                }
+                return <span className="text-gray-400 italic">--</span>;
+            }
         },
         { 
             title: 'Loại', 
             field: 'salaryItem.type', 
-            render: (row) => (
-                row.salaryItem?.type === SalaryItemType.INCOME ? (
+            render: (row) => {
+                if (!row.salaryItem?.type) return <span className="text-gray-400 italic">--</span>;
+                return row.salaryItem.type === SalaryItemType.INCOME ? (
                     <span className="text-emerald-700 font-bold">Thu nhập</span>
                 ) : (
                     <span className="text-rose-700 font-bold">Giảm trừ</span>
-                )
-            )
+                );
+            }
         },
         { 
             title: 'Cách tính', 
             field: 'salaryItem.calculationType',
-            render: (row) => (
-                row.salaryItem?.calculationType === SalaryCalculationType.FIXED ? 'Cố định' : 
-                row.salaryItem?.calculationType === SalaryCalculationType.BY_STANDARD_DAYS ? 'Theo công chuẩn' : 'Nhân trực tiếp công'
-            )
+            render: (row) => {
+                if (!row.salaryItem?.calculationType) return <span className="text-gray-400 italic">--</span>;
+                return row.salaryItem.calculationType === SalaryCalculationType.FIXED ? 'Cố định' : 
+                       row.salaryItem.calculationType === SalaryCalculationType.BY_STANDARD_DAYS ? 'Theo công chuẩn' : 'Nhân trực tiếp công';
+            }
         },
         { 
             title: 'Số tiền gán', 
@@ -180,6 +212,7 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
             width: 220,
             render: (row) => {
                 const index = formik.values.configuredItems.findIndex(item => item.salaryItem?.id === row.salaryItem?.id);
+                const disabled = !row.salaryItem?.id;
                 return isView ? (
                     <Typography variant="body2" fontWeight="bold">
                         {formatMoney(row.amount)}
@@ -192,6 +225,7 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
                         notDelay={true}
                         size="small"
                         noMargin={true}
+                        disabled={disabled}
                         onChange={(e) => {
                             const val = parseFloat(e.target.value) || 0;
                             formik.setFieldValue(`configuredItems[${index}].amount`, val);
@@ -209,18 +243,26 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
             title: 'Thao tác',
             align: 'center',
             width: 80,
-            render: (rowData) => {
-                const index = formik.values.configuredItems.findIndex(item => item.salaryItem?.id === rowData.salaryItem?.id);
+            render: (row) => {
                 return (
                     <Tooltip title="Gỡ bỏ khoản lương này" arrow>
-                        <IconButton color="error" size="small" onClick={() => handleRemoveItem(index)}>
+                        <IconButton 
+                            color="error" 
+                            size="small" 
+                            onClick={() => {
+                                const index = getRowIndex(row);
+                                if (index !== -1) {
+                                    handleRemoveItem(index);
+                                }
+                            }}
+                        >
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                 );
             }
         }] : [])
-    ], [formik.values.configuredItems, isView, configuredItems]);
+    ], [formik.values.configuredItems, isView, configuredItems, allSalaryItems]);
 
     if (staffId === 'new') {
         return (
@@ -240,59 +282,28 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
                         <Typography variant="h6" fontWeight="bold">Cấu hình Lương & Phụ cấp</Typography>
                     </Box>
                     {!isView && (
-                        <Button 
-                            variant="contained" 
-                            color="primary" 
-                            startIcon={<SaveIcon />}
-                            onClick={formik.handleSubmit}
-                        >
-                            Lưu cấu hình
-                        </Button>
+                        <Box className="flex gap-2">
+                            <Button 
+                                variant="outlined" 
+                                color="primary" 
+                                startIcon={<AddIcon />}
+                                onClick={handleAddItem}
+                            >
+                                Thêm dòng
+                            </Button>
+                            <Button 
+                                variant="contained" 
+                                color="primary" 
+                                startIcon={<SaveIcon />}
+                                onClick={formik.handleSubmit}
+                            >
+                                Lưu cấu hình
+                            </Button>
+                        </Box>
                     )}
                 </Box>
 
                 <Divider />
-
-                {/* Add section */}
-                {!isView && (
-                    <Paper variant="outlined" className="p-4 bg-warm/5 border border-border">
-                        <Grid container spacing={2} alignItems="flex-start" pt={2}>
-                            <Grid item xs={12} sm={5}>
-                                <SelectInput
-                                    name="selectedItemId"
-                                    label="Chọn khoản lương"
-                                    options={availableItemsOptions}
-                                    keyValue="id"
-                                    displayvalue="displayName"
-                                    hideNullOption={true}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={5}>
-                                <VNDCurrencyInput
-                                    name="amount"
-                                    label="Số tiền (VND / tháng hoặc công)"
-                                    placeholder="Ví dụ: 10000000"
-                                    size="small"
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={2}>
-                                <label className="hidden sm:block text-sm font-semibold mb-1.5 select-none opacity-0">
-                                    &nbsp;
-                                </label>
-                                <Button 
-                                    variant="outlined" 
-                                    color="primary" 
-                                    startIcon={<AddIcon />}
-                                    onClick={handleAddItem}
-                                    fullWidth
-                                    sx={{ height: '40px' }}
-                                >
-                                    Thêm gán
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Paper>
-                )}
 
                 {/* Configuration list table */}
                 <Table 

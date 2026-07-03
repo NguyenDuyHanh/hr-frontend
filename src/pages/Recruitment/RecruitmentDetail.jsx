@@ -24,9 +24,10 @@ import { getStaffs, getDepartments, getPositions, pagingStaffs } from '../../ser
 
 import CandidateFormDialog from './components/CandidateFormDialog';
 import RejectionDialog from './components/RejectionDialog';
-import { RECRUITMENT_STATUSES, CANDIDATE_STATUSES } from '../../constants';
+import { RECRUITMENT_STATUSES, CANDIDATE_STATUSES, ROLES } from '../../constants';
 
 import useRecruitmentStore from '../../store/useRecruitmentStore';
+import useAuthStore from '../../store/useAuthStore';
 import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import SelectInput from '../../components/ui/SelectInput';
@@ -40,10 +41,14 @@ const RecruitmentDetail = () => {
     const location = useLocation();
     const isViewMode = location.pathname.endsWith('/view');
 
+    const { user } = useAuthStore();
+    const userRoles = user?.role || [];
+    const isRecruiterOnly = userRoles.includes(ROLES.HR_RECRUITMENT) && !userRoles.includes(ROLES.ADMIN) && !userRoles.includes(ROLES.HR_MANAGER);
+
     const [loading, setLoading] = useState(true);
     const [departments, setDepartments] = useState([]);
     const [positions, setPositions] = useState([]);
-    const staffSearchObj = useMemo(() => ({ pageIndex: 1, pageSize: 100 }), []);
+    const staffSearchObj = useMemo(() => ({ pageIndex: 1, pageSize: 100, extWhereClause: 'recruitment_approvers' }), []);
 
     // Dialog state for candidate status update
     const [openStatusDialog, setOpenStatusDialog] = useState(false);
@@ -146,10 +151,10 @@ const RecruitmentDetail = () => {
         name: selectedRecruitment?.name || '',
         personApproveCV: selectedRecruitment?.personApproveCVId 
             ? { id: selectedRecruitment.personApproveCVId, displayName: selectedRecruitment.personApproveCVName || '' } 
-            : null,
+            : (isRecruiterOnly && user?.staffId ? { id: user.staffId, displayName: user.staffName || '' } : null),
         status: selectedRecruitment?.status ?? 1,
         description: selectedRecruitment?.description || ''
-    }), [selectedRecruitment]);
+    }), [selectedRecruitment, isRecruiterOnly, user]);
 
     const validationSchema = Yup.object({
         name: Yup.string().trim().required('Tiêu đề tuyển dụng là bắt buộc'),
@@ -186,7 +191,7 @@ const RecruitmentDetail = () => {
                 id: null,
                 candidateCode: codeRes?.data || '',
                 displayName: '',
-                gender: 'Nam',
+                gender: 'MALE',
                 birthDate: '',
                 email: '',
                 phoneNumber: '',
@@ -210,7 +215,7 @@ const RecruitmentDetail = () => {
             id: cand.id,
             candidateCode: cand.candidateCode,
             displayName: cand.displayName,
-            gender: cand.gender || 'Nam',
+            gender: cand.gender || 'MALE',
             birthDate: cand.birthDate || '',
             email: cand.email || '',
             phoneNumber: cand.phoneNumber || '',
@@ -247,7 +252,7 @@ const RecruitmentDetail = () => {
     const handleSaveCandidate = async (values) => {
         try {
             await addCandidate(values);
-            toast.success(values.id ? "Cập nhật ứng viên thành công" : "Tạo ứng viên thành công");
+            toast.success(values.id ? "Cập nhật ứng viên thành công" : "Thêm ứng viên thành công");
         } catch (err) {
             toast.error(err?.response?.data?.message || "Lỗi lưu thông tin ứng viên");
         }
@@ -335,7 +340,7 @@ const RecruitmentDetail = () => {
                         <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{row.displayName}</Typography>
                         <Typography variant="caption" color="text.secondary">Ngày sinh: {row.birthDate || '---'}</Typography>
                         <Box>
-                            <Typography variant="caption" color="text.secondary">Giới tính: {row.gender || '---'}</Typography>
+                            <Typography variant="caption" color="text.secondary">Giới tính: {row.gender === 'MALE' ? 'Nam' : row.gender === 'FEMALE' ? 'Nữ' : row.gender === 'OTHER' ? 'Khác' : (row.gender || '---')}</Typography>
                         </Box>
                     </Box>
                 </Box>
@@ -540,7 +545,7 @@ const RecruitmentDetail = () => {
                                 name="personApproveCV"
                                 label="Người duyệt hồ sơ"
                                 required
-                                disabled={isViewMode}
+                                disabled={isViewMode || isRecruiterOnly}
                                 api={pagingStaffs}
                                 searchObject={staffSearchObj}
                                 placeholder="Chọn người duyệt hồ sơ..."

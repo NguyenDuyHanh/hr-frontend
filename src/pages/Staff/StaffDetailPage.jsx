@@ -11,6 +11,8 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { toast } from 'sonner';
 
+import useAuthStore from '../../store/useAuthStore';
+
 import TabComponent from '../../components/ui/Tab/TabComponent';
 import StaffGeneralInfoForm from './components/StaffTabs/StaffGeneralInfoForm';
 import StaffSalaryConfigForm from './components/StaffTabs/StaffSalaryConfigForm';
@@ -18,15 +20,19 @@ import StaffBankInfoForm from './components/StaffTabs/StaffBankInfoForm';
 import { getStaffById } from '../../services/StaffService';
 
 const StaffDetailPage = () => {
-    const { id } = useParams();
+    const { id: paramId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
     const [staff, setStaff] = useState(null);
     const [loading, setLoading] = useState(true);
     const [tabValue, setTabValue] = useState(0);
 
-    const isEdit = location.state?.isEdit || false;
-    const isView = location.state?.isView || !isEdit;
+    const user = useAuthStore((state) => state.user);
+    const isProfile = location.pathname === '/profile';
+    const id = isProfile ? user?.staffId : paramId;
+
+    const isEdit = isProfile ? false : (location.state?.isEdit || false);
+    const isView = isProfile ? true : (location.state?.isView || !isEdit);
 
     const fetchStaffDetails = async () => {
         try {
@@ -70,7 +76,7 @@ const StaffDetailPage = () => {
                     <StaffGeneralInfoForm 
                         staffData={staff} 
                         isView={isView}
-                        onClose={() => navigate('/staff/all')} 
+                        onClose={() => navigate(isProfile ? '/home' : '/staff/all')} 
                         onSaveSuccess={handleSaveSuccess} 
                     />
                 </Box>
@@ -84,7 +90,7 @@ const StaffDetailPage = () => {
                     <StaffBankInfoForm 
                         staffData={staff} 
                         isView={isView}
-                        onClose={() => navigate('/staff/all')} 
+                        onClose={() => navigate(isProfile ? '/home' : '/staff/all')} 
                         onSaveSuccess={handleSaveSuccess} 
                     />
                 </Box>
@@ -150,20 +156,47 @@ const StaffDetailPage = () => {
         }
     ];
 
+    if (!loading && isProfile && !id) {
+        return (
+            <Box p={4} textAlign="center" className="text-text-secondary">
+                <Typography variant="h6" color="error" gutterBottom>
+                    Không tìm thấy hồ sơ nhân sự
+                </Typography>
+                <Typography variant="body1">
+                    Tài khoản của bạn chưa được liên kết với hồ sơ nhân viên nào trong hệ thống.
+                </Typography>
+                <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={() => navigate('/home')}
+                    sx={{ mt: 2, textTransform: 'none' }}
+                >
+                    Quay lại trang chủ
+                </Button>
+            </Box>
+        );
+    }
+
     return (
         <Box className="space-y-4">
             {/* Header / Breadcrumb navigation */}
-            <Box display="flex" alignItems="center" gap={1}>
-                <Button
-                    variant="text"
-                    size="small"
-                    startIcon={<ArrowBackIcon />}
-                    onClick={() => navigate('/staff/all')}
-                    sx={{ textTransform: 'none', color: 'text.secondary' }}
-                >
-                    Danh sách nhân viên
-                </Button>
-            </Box>
+            {!isProfile ? (
+                <Box display="flex" alignItems="center" gap={1}>
+                    <Button
+                        variant="text"
+                        size="small"
+                        startIcon={<ArrowBackIcon />}
+                        onClick={() => navigate('/staff/all')}
+                        sx={{ textTransform: 'none', color: 'text.secondary' }}
+                    >
+                        Danh sách nhân viên
+                    </Button>
+                </Box>
+            ) : (
+                <Typography variant="h5" fontWeight="bold" className="text-text-primary px-1">
+                    Trang cá nhân
+                </Typography>
+            )}
 
             {/* Profile Overview Card */}
             {/* <Paper elevation={0} className="p-6 border border-border">

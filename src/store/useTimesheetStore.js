@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import dayjs from 'dayjs';
 import { 
     searchTimesheets, 
     getTimesheetById, 
@@ -15,11 +16,10 @@ const useTimesheetStore = create((set, get) => ({
     pageSize: 10,
     filters: {
         staffId: null,
-        fromDate: null,
-        toDate: null,
+        fromDate: dayjs().startOf('month').format('YYYY-MM-DD'),
+        toDate: dayjs().endOf('month').format('YYYY-MM-DD'),
         status: null,
-        departmentId: null,
-        periodId: null
+        departmentId: null
     },
     loading: false,
     myTimesheets: [],
@@ -36,11 +36,10 @@ const useTimesheetStore = create((set, get) => ({
     resetFilters: () => set({
         filters: {
             staffId: null,
-            fromDate: null,
-            toDate: null,
+            fromDate: dayjs().startOf('month').format('YYYY-MM-DD'),
+            toDate: dayjs().endOf('month').format('YYYY-MM-DD'),
             status: null,
-            departmentId: null,
-            periodId: null
+            departmentId: null
         },
         page: 1
     }),

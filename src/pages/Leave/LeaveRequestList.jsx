@@ -132,10 +132,10 @@ const LeaveRequestList = () => {
             try {
                 await rejectRequest(selectedRequest.id, rejectReason);
                 toast.success(t('leave.message.rejectSuccess', 'Từ chối đơn nghỉ phép thành công'));
-                setOpenRejectDialog(false);
-                setSelectedRequest(null);
+                setRejectReason('');
             } catch (error) {
                 toast.error(error.response?.data?.message || t('leave.message.rejectError', 'Lỗi khi từ chối'));
+                throw error;
             }
         }
     };
@@ -393,31 +393,32 @@ const LeaveRequestList = () => {
             />
 
             {/* Hộp thoại Từ chối kèm lý do */}
-            <Dialog open={openRejectDialog} onClose={() => setOpenRejectDialog(false)} fullWidth maxWidth="xs">
-                <DialogTitle>{t('leave.title.rejectConfirm', 'Từ chối đơn nghỉ phép')}</DialogTitle>
-                <DialogContent>
-                    <div className="pt-2">
-                        <MuiTextField
-                            label={t('leave.field.rejectReason', 'Ý kiến phản hồi / Lý do từ chối')}
-                            value={rejectReason}
-                            onChange={(e) => setRejectReason(e.target.value)}
-                            fullWidth
-                            multiline
-                            rows={3}
-                            variant="outlined"
-                            size="small"
-                        />
-                    </div>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setOpenRejectDialog(false)} color="inherit" variant="outlined" sx={{ textTransform: 'none' }}>
-                        {t('general.cancel', 'Hủy bỏ')}
-                    </Button>
-                    <Button onClick={confirmReject} color="primary" variant="contained" sx={{ textTransform: 'none', px: 3 }}>
-                        {t('general.confirm', 'Từ chối')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <ConfirmationDialog
+                open={openRejectDialog}
+                onConfirmDialogClose={() => {
+                    setOpenRejectDialog(false);
+                    setSelectedRequest(null);
+                    setRejectReason('');
+                }}
+                onYesClick={confirmReject}
+                title={t('leave.title.rejectConfirm', 'Từ chối đơn nghỉ phép')}
+                agree={t('general.confirm', 'Từ chối')}
+                cancel={t('general.cancel', 'Hủy bỏ')}
+            >
+                <div className="pt-2">
+                    <MuiTextField
+                        label={t('leave.field.rejectReason', 'Ý kiến phản hồi / Lý do từ chối')}
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                        fullWidth
+                        multiline
+                        rows={3}
+                        variant="outlined"
+                        size="small"
+                        sx={{ mt: 1 }}
+                    />
+                </div>
+            </ConfirmationDialog>
 
             {/* Hộp thoại Xóa đơn */}
             <ConfirmationDialog

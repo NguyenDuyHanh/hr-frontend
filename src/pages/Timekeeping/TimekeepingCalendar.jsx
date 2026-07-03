@@ -55,7 +55,7 @@ const TimekeepingCalendar = () => {
         myTimesheets.forEach(ts => {
             totalWorkRatio += ts.totalWorkRatio || 0;
             totalStandardHours += ts.standardHours || 0;
-            totalOvertimeHours += ts.overtimeHours || 0;
+            totalOvertimeHours += (ts.overtimeHours || 0) + (ts.weekendOvertimeHours || 0) + (ts.holidayOvertimeHours || 0);
             
             if (ts.totalWorkRatio && ts.totalWorkRatio > 0) {
                 daysPresent++;
@@ -319,8 +319,8 @@ const TimekeepingCalendar = () => {
                                                              }
                                                          });
 
-                                                         const displayHours = (record.standardHours !== undefined && record.standardHours !== null && record.overtimeHours !== undefined && record.overtimeHours !== null)
-                                                             ? (record.standardHours + record.overtimeHours)
+                                                         const displayHours = (record.standardHours !== undefined && record.standardHours !== null)
+                                                             ? (record.standardHours + (record.overtimeHours || 0) + (record.weekendOvertimeHours || 0) + (record.holidayOvertimeHours || 0))
                                                              : cellHours;
 
                                                          return (
@@ -396,7 +396,7 @@ const TimekeepingCalendar = () => {
                                                     earlyMinutes += d.earlyMinutes || 0;
                                                 });
                                                 displayStd = record.standardHours || 0;
-                                                displayOt = record.overtimeHours || 0;
+                                                displayOt = (record.overtimeHours || 0) + (record.weekendOvertimeHours || 0) + (record.holidayOvertimeHours || 0);
                                             }
 
                                             return (
@@ -618,7 +618,7 @@ const TimekeepingCalendar = () => {
                         : localStdHours;
 
                     const displayOvertimeHours = (selectedDayRecord.overtimeHours !== undefined && selectedDayRecord.overtimeHours !== null)
-                        ? selectedDayRecord.overtimeHours
+                        ? ((selectedDayRecord.overtimeHours || 0) + (selectedDayRecord.weekendOvertimeHours || 0) + (selectedDayRecord.holidayOvertimeHours || 0))
                         : localOtHours;
 
                     const displayTotalHours = displayStandardHours + displayOvertimeHours;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { 
   IconButton, Button, Menu, MenuItem, Divider, Typography, Box, 
   CircularProgress, Chip 
@@ -38,10 +38,15 @@ import WebcamCapture from '@/pages/Timekeeping/components/WebcamCapture'
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog'
 import Avatar from '@/components/ui/Avatar'
 import Popup from '@/components/ui/Popup'
+import PagingAutocomplete from '@/components/ui/PagingAutocomplete'
+import { pagingStaffs } from '@/services/StaffService'
 
 const LayoutHeader = () => {
+  const navigate = useNavigate();
   const { toggleCollapsed, toggleMobileOpen } = useSidebarStore();
   const { user, logout } = useAuthStore();
+  const hasRole = useAuthStore(state => state.hasRole);
+  const isManagerOrAdmin = hasRole(['ROLE_ADMIN', 'HR_MANAGER', 'HR_TIMEKEEPING_MANAGER']);
   const { mode, toggleTheme } = useThemeStore();
   const { checkInOut, loadMyTimesheets } = useTimesheetStore();
   const { allShifts, loadAllShifts } = useShiftWorkStore();
@@ -131,16 +136,18 @@ const LayoutHeader = () => {
   const initialValues = useMemo(() => ({
     shiftId: defaultShiftId,
     recordType: 'CHECK_IN',
+    staff: user?.staffId ? { id: user.staffId, displayName: user.staffName || user.fullName || user.username || '' } : null,
     staffName: user?.staffName || user?.fullName || user?.username || '',
     recordTime: modalOpenedAt
-  }), [defaultShiftId, user?.staffId, modalOpenedAt]);
+  }), [defaultShiftId, user?.staffId, user?.staffName, user?.fullName, user?.username, modalOpenedAt]);
 
   const formik = useFormik({
     initialValues,
     enableReinitialize: true,
     onSubmit: async (values) => {
-      if (!user?.staffId) {
-        toast.error("Không tìm thấy thông tin nhân viên đăng nhập");
+      const selectedStaffId = values.staff?.id || user?.staffId;
+      if (!selectedStaffId) {
+        toast.error("Không tìm thấy thông tin nhân viên");
         return;
       }
 
@@ -164,7 +171,7 @@ const LayoutHeader = () => {
         }
 
         const checkInOutDto = {
-          staffId: user.staffId,
+          staffId: selectedStaffId,
           recordTime: dayjs(values.recordTime).second(0).millisecond(0).format('YYYY-MM-DDTHH:mm:ss'),
           ipAddress: ipAddress,
           latitude: location.lat,
@@ -179,10 +186,10 @@ const LayoutHeader = () => {
         toast.success(`Điểm danh ${values.recordType === 'CHECK_IN' ? 'Vào ca' : 'Ra ca'} thành công!`);
         
         // Reload current month timesheets to immediately update the calendar view if open
-        if (user?.staffId) {
+        if (selectedStaffId) {
           const startOfMonth = dayjs(values.recordTime).startOf('month').format('YYYY-MM-DD');
           const endOfMonth = dayjs(values.recordTime).endOf('month').format('YYYY-MM-DD');
-          loadMyTimesheets(user.staffId, startOfMonth, endOfMonth).catch(err => 
+          loadMyTimesheets(selectedStaffId, startOfMonth, endOfMonth).catch(err => 
             console.error("Failed to refresh monthly timesheets after check-in/out:", err)
           );
         }
@@ -207,10 +214,12 @@ const LayoutHeader = () => {
     return values.recordTime ? dayjs(values.recordTime).format('YYYY-MM-DD') : '';
   }, [values.recordTime]);
 
+  const currentStaffId = values.staff?.id || user?.staffId;
+
   // Fetch selected date timesheet status when modal opens or selectedDateStr changes
   useEffect(() => {
-    if (timekeepingOpen && user?.staffId && selectedDateStr) {
-      getTimesheetByStaffAndRange(user.staffId, selectedDateStr, selectedDateStr)
+    if (timekeepingOpen && currentStaffId && selectedDateStr) {
+      getTimesheetByStaffAndRange(currentStaffId, selectedDateStr, selectedDateStr)
         .then(res => {
           if (res && res.data && res.data.length > 0) {
             setTodayTimesheet(res.data[0]);
@@ -225,7 +234,7 @@ const LayoutHeader = () => {
     } else {
       setTodayTimesheet(null);
     }
-  }, [timekeepingOpen, user?.staffId, selectedDateStr]);
+  }, [timekeepingOpen, currentStaffId, selectedDateStr]);
 
   const handleToggle = () => {
     if (window.innerWidth < 768) {
@@ -305,7 +314,7 @@ const LayoutHeader = () => {
     <div className='bg-background h-[48px] flex items-center justify-between px-4 text-foreground border-b border-border shadow-sm'>
       {/* Left side: Logo and Toggle */}
       <div className='flex items-center md:ml-10 space-x-6'>
-        <NavLink to="/dashboard" className='bg-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline hidden md:block shadow-sm hover:opacity-95'>
+        <NavLink to="/" className='bg-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline hidden md:block shadow-sm hover:opacity-95'>
           H R M
         </NavLink>
  
@@ -348,9 +357,9 @@ const LayoutHeader = () => {
           <span className='absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-background'></span>
         </div> */}
  
-        <div className='flex items-center bg-muted hover:bg-primary/10 dark:hover:bg-primary/20 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'>
+        {/* <div className='flex items-center bg-muted hover:bg-primary/10 dark:hover:bg-primary/20 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'>
           <AppsIcon sx={{ fontSize: '18px' }} />
-        </div>
+        </div> */}
  
         {/* Nút bật/tắt chế độ Sáng/Tối */}
         <div 
@@ -415,7 +424,10 @@ const LayoutHeader = () => {
           <Divider className="my-1 border-border" />
           
           <MenuItem 
-            onClick={handleClose}
+            onClick={() => {
+              handleClose();
+              navigate('/profile');
+            }}
             className="mx-1 my-0.5 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground flex items-center gap-3 group transition-colors cursor-pointer"
           >
             <PersonOutlineIcon className="text-foreground group-hover:text-sidebar-accent-foreground w-[18px] h-[18px] min-w-[18px]" />
@@ -637,13 +649,30 @@ const LayoutHeader = () => {
                     </Box>
                   </Box>
 
-                  <TextField
-                    label="Nhân viên chấm công"
-                    name="staffName"
-                    disabled
-                    readOnly
-                    fullWidth
-                  />
+                  {isManagerOrAdmin ? (
+                    <PagingAutocomplete 
+                      label="Nhân viên chấm công" 
+                      name="staff"
+                      api={pagingStaffs}
+                      getOptionLabel={(option) => {
+                        if (!option) return "";
+                        const codePart = option.staffCode ? ` (${option.staffCode})` : "";
+                        return `${option.displayName || option.staffName || ''}${codePart}`;
+                      }}
+                      onChange={(event, value) => {
+                        setFieldValue('staff', value);
+                        setFieldValue('staffName', value?.displayName || value?.staffName || '');
+                      }}
+                    />
+                  ) : (
+                    <TextField
+                      label="Nhân viên chấm công"
+                      name="staffName"
+                      disabled
+                      readOnly
+                      fullWidth
+                    />
+                  )}
 
                   <DateTimePicker
                     label="Ngày làm việc"

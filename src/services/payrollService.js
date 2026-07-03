@@ -26,6 +26,10 @@ export const confirmPayroll = (payrollId) => {
     return HttpService.put(`/payrolls/${payrollId}/confirm`);
 };
 
+export const unconfirmPayroll = (payrollId) => {
+    return HttpService.put(`/payrolls/${payrollId}/unconfirm`);
+};
+
 export const deletePayroll = (payrollId) => {
     return HttpService.delete(`/payrolls/${payrollId}`);
 };

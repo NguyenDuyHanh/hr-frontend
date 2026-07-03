@@ -38,11 +38,9 @@ const AiChatbotWidget = () => {
   const [showSettings, setShowSettings] = useState(false);
   
   // Persisted state
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('groq_api_key') || '');
   const [model, setModel] = useState(() => localStorage.getItem('groq_model') || 'llama-3.3-70b-versatile');
   
   // Local inputs for settings
-  const [tempApiKey, setTempApiKey] = useState(apiKey);
   const [tempModel, setTempModel] = useState(model);
 
   const messagesEndRef = useRef(null);
@@ -53,7 +51,7 @@ const AiChatbotWidget = () => {
   // Configure useChat hook natively
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: ConstantList.API_ENPOINT + '/chat',
-    body: { apiKey, model },
+    body: { model },
     headers: accessToken ? {
       Authorization: `Bearer ${accessToken}`
     } : {}
@@ -65,9 +63,7 @@ const AiChatbotWidget = () => {
   }, [messages]);
 
   const handleSaveSettings = () => {
-    localStorage.setItem('groq_api_key', tempApiKey);
     localStorage.setItem('groq_model', tempModel);
-    setApiKey(tempApiKey);
     setModel(tempModel);
     setShowSettings(false);
   };
@@ -81,7 +77,7 @@ const AiChatbotWidget = () => {
     handleInputChange({ target: { value: text } });
     setTimeout(() => {
       handleSubmit(fakeEvent, { 
-        body: { apiKey, model },
+        body: { model },
         headers: accessToken ? {
           Authorization: `Bearer ${accessToken}`
         } : {}
@@ -182,20 +178,6 @@ const AiChatbotWidget = () => {
               <Settings fontSize="small" /> Cấu hình Trợ lý AI
             </Typography>
             <Stack spacing={2}>
-              <TextField
-                fullWidth
-                size="small"
-                label="Groq API Key (Tùy chọn)"
-                type="password"
-                value={tempApiKey}
-                onChange={(e) => setTempApiKey(e.target.value)}
-                placeholder="gsk_..."
-                helperText="Bỏ trống để dùng key mặc định của hệ thống"
-                sx={{
-                  '& .MuiInputLabel-root': { color: 'hsl(var(--muted-foreground))' },
-                  '& .MuiFormHelperText-root': { color: 'hsl(var(--muted-foreground))' }
-                }}
-              />
               <FormControl fullWidth size="small">
                 <InputLabel sx={{ color: 'hsl(var(--muted-foreground))' }}>Mô hình AI</InputLabel>
                 <Select
@@ -363,7 +345,7 @@ const AiChatbotWidget = () => {
         <Box
           component="form"
           onSubmit={(e) => handleSubmit(e, { 
-            body: { apiKey, model },
+            body: { model },
             headers: accessToken ? {
               Authorization: `Bearer ${accessToken}`
             } : {}
