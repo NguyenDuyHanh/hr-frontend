@@ -26,6 +26,7 @@ import SelectInput from '../../components/ui/SelectInput';
 import { PayrollStatus, PayrollStatusConfig } from '../../constants';
 import usePayrollStore from '../../store/usePayrollStore';
 import usePeriodStore from '../../store/usePeriodStore';
+import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 
 const PayrollListPage = () => {
     const location = useLocation();
@@ -54,6 +55,11 @@ const PayrollListPage = () => {
     const [openNewPayrollDialog, setOpenNewPayrollDialog] = useState(false);
     const createFormikRef = useRef();
 
+    // Confirm dialogs states
+    const [openConfirmPayroll, setOpenConfirmPayroll] = useState(false);
+    const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
+    const [selectedPayroll, setSelectedPayroll] = useState(null);
+
     // Search
     const [searchKeyword, setSearchKeyword] = useState('');
     const [searchDraft, setSearchDraft] = useState('');
@@ -65,7 +71,6 @@ const PayrollListPage = () => {
 
     useEffect(() => {
         loadAllPeriods();
-        loadAllPayrolls();
     }, []);
 
     // Listen to location state changes
@@ -73,13 +78,24 @@ const PayrollListPage = () => {
         if (location.state?.periodId) setSelectedPeriodId(location.state.periodId);
     }, [location.state]);
 
+    // Load payrolls when selectedPeriodId changes
+    useEffect(() => {
+        loadAllPayrolls(selectedPeriodId);
+    }, [selectedPeriodId]);
+
     // ── Actions ───────────────────────────────────────────────────────────────
 
-    const handleConfirmPayroll = async (payrollId) => {
+    const handleConfirmPayroll = (payrollId) => {
         if (!payrollId) return;
-        if (!window.confirm('Bạn có chắc chắn muốn xác nhận bảng lương này? Sau khi xác nhận sẽ không thể tính toán lại.')) return;
+        const payrollObj = allPayrolls.find(p => p.id === payrollId);
+        setSelectedPayroll(payrollObj);
+        setOpenConfirmPayroll(true);
+    };
+
+    const handleConfirmPayrollSubmit = async () => {
+        if (!selectedPayroll) return;
         try {
-            await confirmPayroll(payrollId);
+            await confirmPayroll(selectedPayroll.id);
             toast.success('Đã xác nhận bảng lương thành công!');
         } catch (error) {
             console.error('Failed to confirm payroll:', error);
@@ -87,18 +103,23 @@ const PayrollListPage = () => {
         }
     };
 
-    const handleDeletePayroll = async (payrollId) => {
+    const handleDeletePayroll = (payrollId) => {
         if (!payrollId) return;
         const payrollObj = allPayrolls.find(p => p.id === payrollId);
         if (payrollObj && payrollObj.status !== 'DRAFT') {
             toast.warning('Không thể xóa bảng lương đã xác nhận!');
             return;
         }
-        if (!window.confirm('Bạn có chắc chắn muốn xóa bảng lương này và toàn bộ phiếu lương liên quan?')) return;
+        setSelectedPayroll(payrollObj);
+        setOpenConfirmDelete(true);
+    };
+
+    const handleDeletePayrollSubmit = async () => {
+        if (!selectedPayroll) return;
         try {
-            await deletePayroll(payrollId);
+            await deletePayroll(selectedPayroll.id);
             toast.success('Xóa bảng lương thành công!');
-            await loadAllPayrolls();
+            await loadAllPayrolls(selectedPeriodId);
         } catch (error) {
             console.error('Failed to delete payroll:', error);
             toast.error(error.response?.data?.message || 'Không thể xóa bảng lương');
@@ -350,6 +371,33 @@ const PayrollListPage = () => {
                     )}
                 </Formik>
             </Popup>
+
+            {/* Confirm Actions */}
+            <ConfirmationDialog
+                open={openConfirmPayroll}
+                onConfirmDialogClose={() => {
+                    setOpenConfirmPayroll(false);
+                    setSelectedPayroll(null);
+                }}
+                onYesClick={handleConfirmPayrollSubmit}
+                title="Xác nhận bảng lương"
+                text={`Bạn có chắc chắn muốn xác nhận bảng lương "${selectedPayroll?.name}"? Sau khi xác nhận sẽ không thể tính toán lại.`}
+                agree="Xác nhận"
+                cancel="Hủy bỏ"
+            />
+
+            <ConfirmationDialog
+                open={openConfirmDelete}
+                onConfirmDialogClose={() => {
+                    setOpenConfirmDelete(false);
+                    setSelectedPayroll(null);
+                }}
+                onYesClick={handleDeletePayrollSubmit}
+                title="Xóa bảng lương"
+                text={`Bạn có chắc chắn muốn xóa bảng lương "${selectedPayroll?.name}" và toàn bộ phiếu lương liên quan?`}
+                agree="Xác nhận xóa"
+                cancel="Hủy bỏ"
+            />
         </div>
     );
 };

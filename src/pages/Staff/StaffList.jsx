@@ -15,6 +15,8 @@ import Table from '../../components/ui/Table';
 import StaffForm from './components/StaffForm';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import useStaffStore from '../../store/staffStore';
+import useAuthStore from '../../store/useAuthStore';
+import { ROLES } from '../../constants/roles';
 import { WorkingStatusOptions, GenderOptions } from '../../constants';
 import { getLabelFromOptions, getActiveFilterCount, formatDate } from '../../LocalFunction';
 import { getDepartments, getPositions, exportStaffExcel } from '../../services/StaffService';
@@ -39,6 +41,9 @@ const FAKE_POSITIONS = [
 
 const StaffList = () => {
     const navigate = useNavigate();
+    const hasRole = useAuthStore((state) => state.hasRole);
+    const canManage = hasRole([ROLES.ADMIN, ROLES.HR_MANAGER]);
+    const canDelete = hasRole([ROLES.ADMIN]);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [departments, setDepartments] = useState([]);
     const [positions, setPositions] = useState([]);
@@ -191,9 +196,12 @@ const StaffList = () => {
             render: (rowData) => (
                 <div className="flex items-center space-x-0">
                     <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleView(rowData)}><VisibilityIcon fontSize="small" /></IconButton>
-                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)}><EditIcon fontSize="small" /></IconButton>
-                    <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)}><DeleteIcon fontSize="small" /></IconButton>
-                    {/* <IconButton size="small"><MoreHorizIcon fontSize="small" /></IconButton> */}
+                    {canManage && (
+                        <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)}><EditIcon fontSize="small" /></IconButton>
+                    )}
+                    {canDelete && (
+                        <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)}><DeleteIcon fontSize="small" /></IconButton>
+                    )}
                 </div>
             )
         },
@@ -253,7 +261,12 @@ const StaffList = () => {
             align: 'center',
             render: (rowData) => <span className="whitespace-nowrap">{rowData.positionName || '---'}</span> 
         },
-       
+        { 
+            title: 'Số ngày phép', 
+            width: 130,
+            align: 'center',
+            render: (rowData) => <span>{rowData.annualLeave !== undefined && rowData.annualLeave !== null ? rowData.annualLeave : '---'}</span> 
+        },
     ];
 
     return (
@@ -281,16 +294,16 @@ const StaffList = () => {
                                 onSearchDraftChange={setSearchDraft}
                                 onSearch={handleSearch}
                                 onReset={handleReset}
-                                onAdd={handleAdd}
+                                onAdd={canManage ? handleAdd : undefined}
                                 addLabel="Thêm mới"
                                 filter={{
                                     open: filterOpen,
                                     onToggle: setFilterOpen,
                                     activeCount: activeFilterCount
                                 }}
-                                downloadTemplateOptions={templateOpts}
-                                importOptions={importOpts}
-                                onExport={handleExport}
+                                downloadTemplateOptions={canManage ? templateOpts : undefined}
+                                importOptions={canManage ? importOpts : undefined}
+                                onExport={canManage ? handleExport : undefined}
                                 exportFileName="Danh_sach_nhan_vien.xlsx"
                             />
 

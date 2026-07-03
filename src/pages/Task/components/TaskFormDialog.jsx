@@ -5,6 +5,7 @@ import { Grid, Button, Paper, Box, Typography, List, ListItem, ListItemText, Lis
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import DownloadIcon from '@mui/icons-material/Download';
 import Popup from '../../../components/ui/Popup';
 import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
@@ -60,6 +61,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
         projectId: Yup.mixed().required('Vui lòng chọn dự án'),
         statusId: Yup.string().required('Vui lòng chọn trạng thái'),
         priority: Yup.number().required('Vui lòng chọn độ ưu tiên'),
+        assigneeId: Yup.mixed().required('Vui lòng chọn người phụ trách'),
     });
 
     const formik = useFormik({
@@ -310,6 +312,17 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
                                                     secondary={`${(file.size / 1024).toFixed(1)} KB`} 
                                                 />
                                                 <ListItemSecondaryAction>
+                                                    {file.filePath && (
+                                                        <IconButton 
+                                                            edge="end" 
+                                                            color="primary" 
+                                                            size="small" 
+                                                            onClick={() => window.open(file.filePath, '_blank')}
+                                                            sx={{ mr: 1 }}
+                                                        >
+                                                            <DownloadIcon />
+                                                        </IconButton>
+                                                    )}
                                                     {!isViewMode && (
                                                         <IconButton edge="end" color="error" size="small" onClick={() => handleDeleteAttachment(file.id)}>
                                                             <DeleteIcon />
@@ -339,6 +352,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
                             <AsyncAutocomplete
                                 name="assigneeId"
                                 label="Người phụ trách"
+                                required
                                 api={fetchProjectStaffsApi}
                                 searchObject={projectStaffSearchObj}
                                 placeholder="Chọn người phụ trách..."

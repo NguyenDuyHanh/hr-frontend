@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { 
     CheckCircle, Cancel, Visibility, Search, CheckCircleOutline,
-    Close, Image, VideocamOff, FilterList
+    Close, Image, VideocamOff, FilterList, SettingsBackupRestore
 } from '@mui/icons-material';
 import { Formik } from 'formik';
 import dayjs from 'dayjs';
@@ -17,7 +17,6 @@ import FilterPanel from '../../components/ui/FilterPanel';
 import Autocomplete from '../../components/ui/Autocomplete';
 import useTimesheetStore from '../../store/useTimesheetStore';
 import { getDepartments, getStaffs } from '../../services/StaffService';
-import { getAllPeriods } from '../../services/periodService';
 import { getLabelFromOptions } from '../../LocalFunction';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import TextField from '../../components/ui/TextField';
@@ -70,7 +69,6 @@ const TimesheetApprovalList = () => {
     // Filter metadata
     const [departments, setDepartments] = useState([]);
     const [staffList, setStaffList] = useState([]);
-    const [periods, setPeriods] = useState([]);
     const [filterOpen, setFilterOpen] = useState(false);
     const [searchDraft, setSearchDraft] = useState('');
 
@@ -85,11 +83,6 @@ const TimesheetApprovalList = () => {
                 setDepartments(depRes?.data || []);
                 const staffRes = await getStaffs();
                 setStaffList(staffRes?.data || []);
-                const periodRes = await getAllPeriods();
-                if (periodRes && periodRes.data) {
-                    const dataList = periodRes.data.data || periodRes.data || [];
-                    setPeriods(Array.isArray(dataList) ? dataList : []);
-                }
             } catch (err) {
                 console.error("Failed to load filter metadata:", err);
             }
@@ -114,7 +107,10 @@ const TimesheetApprovalList = () => {
         setSubmitting(true);
         try {
             await updateTimesheetStatus(selectedTimesheet.id, approvalStatus, note);
-            toast.success(`Đã cập nhật trạng thái ngày công sang: ${approvalStatus === 'APPROVED' ? 'Đã duyệt' : 'Từ chối'}`);
+            let statusText = 'Chờ duyệt';
+            if (approvalStatus === 'APPROVED') statusText = 'Đã duyệt';
+            else if (approvalStatus === 'REJECTED') statusText = 'Từ chối';
+            toast.success(`Đã cập nhật trạng thái ngày công sang: ${statusText}`);
             setApprovalOpen(false);
             setSelectedTimesheet(null);
         } catch (err) {
@@ -138,9 +134,9 @@ const TimesheetApprovalList = () => {
     };
 
     const handleResetFilters = () => {
-        formikRef.current?.resetForm();
-        resetFilters();
         setSearchDraft('');
+        resetFilters();
+        formikRef.current?.resetForm();
     };
 
     // Auto-calculating active filters count
@@ -151,7 +147,6 @@ const TimesheetApprovalList = () => {
         if (filters.status) count++;
         if (filters.fromDate) count++;
         if (filters.toDate) count++;
-        if (filters.periodId) count++;
         return count;
     }, [filters]);
 
@@ -167,10 +162,6 @@ const TimesheetApprovalList = () => {
     const initialStatus = useMemo(() => {
         return TIMESHEET_STATUS_OPTIONS.find(s => s.id === filters.status) || null;
     }, [filters.status]);
-
-    const initialPeriod = useMemo(() => {
-        return (periods || []).find(p => p.id === filters.periodId) || null;
-    }, [periods, filters.periodId]);
 
     // Table Columns
     const columns = [
@@ -208,6 +199,17 @@ const TimesheetApprovalList = () => {
                                 onClick={() => handleOpenApproval(rowData, 'REJECTED')}
                             >
                                 <Cancel fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                    {rowData.status !== 'SUBMITTED' && (
+                        <Tooltip title="Đặt lại chờ duyệt" arrow>
+                            <IconButton 
+                                size="small" 
+                                color="warning" 
+                                onClick={() => handleOpenApproval(rowData, 'SUBMITTED')}
+                            >
+                                <SettingsBackupRestore fontSize="small" />
                             </IconButton>
                         </Tooltip>
                     )}
@@ -321,8 +323,8 @@ const TimesheetApprovalList = () => {
                     }
                 });
 
-                const displayHours = (rowData.standardHours !== undefined && rowData.standardHours !== null && rowData.overtimeHours !== undefined && rowData.overtimeHours !== null)
-                    ? (rowData.standardHours + rowData.overtimeHours)
+                const displayHours = (rowData.standardHours !== undefined && rowData.standardHours !== null)
+                    ? (rowData.standardHours + (rowData.overtimeHours || 0) + (rowData.weekendOvertimeHours || 0) + (rowData.holidayOvertimeHours || 0))
                     : totalHours;
 
                 return (
@@ -367,7 +369,6 @@ const TimesheetApprovalList = () => {
                         department: initialDepartment,
                         staff: initialStaff,
                         status: initialStatus,
-                        period: initialPeriod,
                         fromDate: filters.fromDate ? new Date(filters.fromDate) : null,
                         toDate: filters.toDate ? new Date(filters.toDate) : null
                     }}
@@ -377,7 +378,6 @@ const TimesheetApprovalList = () => {
                             departmentId: values.department?.id || null,
                             staffId: values.staff?.id || null,
                             status: values.status?.id || null,
-                            periodId: values.period?.id || null,
                             fromDate: values.fromDate ? dayjs(values.fromDate).format('YYYY-MM-DD') : null,
                             toDate: values.toDate ? dayjs(values.toDate).format('YYYY-MM-DD') : null
                         });
@@ -431,22 +431,14 @@ const TimesheetApprovalList = () => {
                                             getOptionLabel={(option) => option?.name || ''}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <Autocomplete
-                                            name="period"
-                                            label="Kỳ lương"
-                                            options={periods}
-                                            getOptionLabel={(option) => option?.name || ''}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid item xs={12} sm={6}>
                                         <DateTimePicker
                                             label="Từ ngày"
                                             name="fromDate"
                                             notValueMillisecond={true}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid item xs={12} sm={6}>
                                         <DateTimePicker
                                             label="Đến ngày"
                                             name="toDate"
@@ -476,14 +468,26 @@ const TimesheetApprovalList = () => {
             <ConfirmationDialog
                 open={approvalOpen}
                 onConfirmDialogClose={() => setApprovalOpen(false)}
-                title={approvalStatus === 'APPROVED' ? 'Xác nhận duyệt chấm công' : 'Xác nhận từ chối chấm công'}
+                title={
+                    approvalStatus === 'APPROVED' 
+                        ? 'Xác nhận duyệt chấm công' 
+                        : approvalStatus === 'REJECTED' 
+                            ? 'Xác nhận từ chối chấm công' 
+                            : 'Xác nhận đặt lại trạng thái chờ duyệt'
+                }
                 agree="Xác nhận"
                 cancel="Hủy bỏ"
                 onYesClick={() => {
                     formikRefPopup.current?.handleSubmit();
                 }}
                 disabled={submitting}
-                text={`Bạn đang ${approvalStatus === 'APPROVED' ? 'duyệt chấm công' : 'từ chối chấm công'} cho nhân viên ${selectedTimesheet?.staffName || ''} (${selectedTimesheet?.staffCode || ''}) ngày ${selectedTimesheet ? dayjs(selectedTimesheet.workingDate).format('DD/MM/YYYY') : ''}.`}
+                text={`Bạn đang ${
+                    approvalStatus === 'APPROVED' 
+                        ? 'duyệt chấm công' 
+                        : approvalStatus === 'REJECTED' 
+                            ? 'từ chối chấm công' 
+                            : 'đặt lại trạng thái chờ duyệt'
+                } cho nhân viên ${selectedTimesheet?.staffName || ''} (${selectedTimesheet?.staffCode || ''}) ngày ${selectedTimesheet ? dayjs(selectedTimesheet.workingDate).format('DD/MM/YYYY') : ''}.`}
             >
                 {approvalOpen && (
                     <Formik
@@ -592,7 +596,7 @@ const TimesheetApprovalList = () => {
                         : localStdHours;
 
                     const displayOvertimeHours = (detailTimesheet.overtimeHours !== undefined && detailTimesheet.overtimeHours !== null)
-                        ? detailTimesheet.overtimeHours
+                        ? ((detailTimesheet.overtimeHours || 0) + (detailTimesheet.weekendOvertimeHours || 0) + (detailTimesheet.holidayOvertimeHours || 0))
                         : localOtHours;
 
                     const displayTotalHours = displayStandardHours + displayOvertimeHours;
@@ -600,56 +604,44 @@ const TimesheetApprovalList = () => {
                     return (
                         <Box className="space-y-4 pt-1 pb-1">
                             {/* Stats */}
-                            <Grid container spacing={2}>
-                                <Grid item xs={6} sm={4}>
-                                    <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                        <Typography variant="caption" className="text-muted-foreground">Vào</Typography>
-                                        <Typography variant="body2" className="font-bold text-foreground">
-                                            {minCheckIn ? minCheckIn.format('HH:mm') : '--:--'}
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={6} sm={4}>
-                                    <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                        <Typography variant="caption" className="text-muted-foreground">Ra</Typography>
-                                        <Typography variant="body2" className="font-bold text-foreground">
-                                            {maxCheckOut ? maxCheckOut.format('HH:mm') : '--:--'}
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={12} sm={4}>
-                                    <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                        <Typography variant="caption" className="text-muted-foreground">Công quy đổi</Typography>
-                                        <Typography variant="body2" className="font-bold text-emerald-600 dark:text-emerald-500">
-                                            {detailTimesheet.totalWorkRatio || 0} công
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                        <Typography variant="caption" className="text-muted-foreground">Tổng số giờ làm</Typography>
-                                        <Typography variant="body2" className="font-bold text-primary dark:text-primary-foreground">
-                                            {displayTotalHours.toFixed(2)} giờ
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                        <Typography variant="caption" className="text-muted-foreground">Giờ làm thường</Typography>
-                                        <Typography variant="body2" className="font-bold text-indigo-600 dark:text-indigo-400">
-                                            {displayStandardHours.toFixed(2)} giờ
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                        <Typography variant="caption" className="text-muted-foreground">Giờ tăng ca (OT)</Typography>
-                                        <Typography variant="body2" className="font-bold text-amber-600 dark:text-amber-400">
-                                            {displayOvertimeHours.toFixed(2)} giờ
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                            </Grid>
+                            <Box className="grid grid-cols-3 gap-3">
+                                <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
+                                    <Typography variant="caption" className="text-muted-foreground">Vào</Typography>
+                                    <Typography variant="body2" className="font-bold text-foreground">
+                                        {minCheckIn ? minCheckIn.format('HH:mm') : '--:--'}
+                                    </Typography>
+                                </Box>
+                                <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
+                                    <Typography variant="caption" className="text-muted-foreground">Ra</Typography>
+                                    <Typography variant="body2" className="font-bold text-foreground">
+                                        {maxCheckOut ? maxCheckOut.format('HH:mm') : '--:--'}
+                                    </Typography>
+                                </Box>
+                                <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
+                                    <Typography variant="caption" className="text-muted-foreground">Công quy đổi</Typography>
+                                    <Typography variant="body2" className="font-bold text-emerald-600 dark:text-emerald-500">
+                                        {detailTimesheet.totalWorkRatio || 0} công
+                                    </Typography>
+                                </Box>
+                                <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
+                                    <Typography variant="caption" className="text-muted-foreground">Tổng số giờ làm</Typography>
+                                    <Typography variant="body2" className="font-bold text-primary dark:text-primary-foreground">
+                                        {displayTotalHours.toFixed(2)} giờ
+                                    </Typography>
+                                </Box>
+                                <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
+                                    <Typography variant="caption" className="text-muted-foreground">Giờ làm thường</Typography>
+                                    <Typography variant="body2" className="font-bold text-indigo-600 dark:text-indigo-400">
+                                        {displayStandardHours.toFixed(2)} giờ
+                                    </Typography>
+                                </Box>
+                                <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
+                                    <Typography variant="caption" className="text-muted-foreground">Giờ tăng ca (OT)</Typography>
+                                    <Typography variant="body2" className="font-bold text-amber-600 dark:text-amber-400">
+                                        {displayOvertimeHours.toFixed(2)} giờ
+                                    </Typography>
+                                </Box>
+                            </Box>
 
                             {/* Shift detail details */}
                             {details.map((d, index) => d.shift && (

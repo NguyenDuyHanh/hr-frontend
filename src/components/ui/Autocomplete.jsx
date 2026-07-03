@@ -1,4 +1,4 @@
-﻿import React, { memo, useEffect, useState, useMemo } from "react";
+import React, { memo, useEffect, useState, useMemo } from "react";
 import MuiAutocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { FastField, getIn } from "formik";
@@ -106,8 +106,19 @@ const MyAutocomplete = React.forwardRef(({
   // Rule 05: useMemo for SX and object props
   const sxMemo = useMemo(() => ({
     '& .MuiInputBase-root': {
-      backgroundColor: (theme) => readOnly ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') : 'inherit',
+      backgroundColor: (theme) => (readOnly || otherProps.disabled) 
+        ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') 
+        : 'inherit',
       transition: 'all 0.2s ease-in-out',
+      '&.Mui-disabled': {
+        backgroundColor: (theme) => theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important',
+        color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+        WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+        '& .MuiInputBase-input': {
+          color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+          WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+        }
+      },
       '&.Mui-error .MuiOutlinedInput-notchedOutline': {
         borderColor: '#d1d5db !important',
       },
@@ -127,7 +138,7 @@ const MyAutocomplete = React.forwardRef(({
         borderColor: (theme) => theme.palette.primary.main,
       },
       '&:hover': {
-        backgroundColor: (theme) => readOnly 
+        backgroundColor: (theme) => (readOnly || otherProps.disabled) 
           ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') 
           : (theme.palette.mode === 'light' ? '#ffffff' : 'inherit'),
       },
@@ -139,7 +150,7 @@ const MyAutocomplete = React.forwardRef(({
       }
     },
     ...otherProps.sx
-  }), [readOnly, otherProps.sx]);
+  }), [readOnly, otherProps.disabled, otherProps.sx]);
 
   const renderInput = useMemo(() => (params) => {
     // Manual sync fallback for input display if needed
@@ -189,7 +200,7 @@ const MyAutocomplete = React.forwardRef(({
           if (!option || !value) return false;
           return option.id === value.id;
         }}
-        disabled={readOnly}
+        disabled={readOnly || otherProps.disabled}
         renderInput={renderInput}
       />
     </div>

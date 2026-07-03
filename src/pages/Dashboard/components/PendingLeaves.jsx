@@ -7,6 +7,7 @@ import useDashboardStore from '../../../store/useDashboardStore';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import ConfirmationDialog from '../../../components/ui/ConfirmationDialog';
 
 const PendingLeaves = ({ pendingLeaves, loading }) => {
     const { t } = useTranslation();
@@ -65,9 +66,9 @@ const PendingLeaves = ({ pendingLeaves, loading }) => {
         }
         const success = await quickRejectLeave(rejectId, rejectReason);
         if (success) {
-            setOpenRejectDialog(false);
-            setRejectId(null);
             setRejectReason('');
+        } else {
+            throw new Error('Quick reject failed');
         }
     };
 
@@ -212,35 +213,31 @@ const PendingLeaves = ({ pendingLeaves, loading }) => {
                 </CardContent>
 
                 {/* Reject Confirmation Dialog */}
-                <Dialog open={openRejectDialog} onClose={() => setOpenRejectDialog(false)} maxWidth="xs" fullWidth>
-                    <DialogTitle>{t('dashboard.leaves.reject_title', 'Lý do từ chối')}</DialogTitle>
-                    <DialogContent>
+                <ConfirmationDialog
+                    open={openRejectDialog}
+                    onConfirmDialogClose={() => {
+                        setOpenRejectDialog(false);
+                        setRejectId(null);
+                        setRejectReason('');
+                    }}
+                    onYesClick={handleRejectSubmit}
+                    title={t('dashboard.leaves.reject_title', 'Lý do từ chối')}
+                    agree={t('common.reject', 'Từ chối')}
+                    cancel={t('common.cancel', 'Hủy')}
+                    disabled={!rejectReason.trim()}
+                >
+                    <div className="pt-2">
                         <TextField
                             autoFocus
-                            margin="dense"
                             label={t('dashboard.leaves.reject_reason_label', 'Lý do từ chối')}
                             fullWidth
                             variant="outlined"
                             value={rejectReason}
                             onChange={(e) => setRejectReason(e.target.value)}
                             required
-                            sx={{ mt: 1 }}
                         />
-                    </DialogContent>
-                    <DialogActions sx={{ px: 3, pb: 2.5 }}>
-                        <Button onClick={() => setOpenRejectDialog(false)} color="inherit">
-                            {t('common.cancel', 'Hủy')}
-                        </Button>
-                        <Button 
-                            onClick={handleRejectSubmit} 
-                            color="error" 
-                            variant="contained" 
-                            disabled={!rejectReason.trim()}
-                        >
-                            {t('common.reject', 'Từ chối')}
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                    </div>
+                </ConfirmationDialog>
             </Card>
         </Zoom>
     );

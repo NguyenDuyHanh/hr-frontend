@@ -350,7 +350,7 @@ const LayoutSidebar = () => {
           <div className="h-full text-sidebar-foreground border-r border-sidebar-border flex flex-col">
             {/* Mobile Header Logo inside Sidebar */}
             <div className="h-[48px] flex items-center justify-between px-4 bg-background border-b border-sidebar-border md:hidden">
-              <NavLink to="/dashboard" className='bg-gradient-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline'>
+              <NavLink to="/" className='bg-gradient-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline'>
                 H R M
               </NavLink>
 

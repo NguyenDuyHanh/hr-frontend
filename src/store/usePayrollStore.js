@@ -4,10 +4,12 @@ import {
     calculatePayroll,
     getPayrollDetails,
     confirmPayroll,
+    unconfirmPayroll,
     deletePayroll,
     updatePayslip,
     getMyPayslip,
-    createPayroll
+    createPayroll,
+    getPayrollsByPeriod
 } from '../services/payrollService';
 
 const usePayrollStore = create((set, get) => ({
@@ -35,10 +37,12 @@ const usePayrollStore = create((set, get) => ({
         }
     },
 
-    loadAllPayrolls: async () => {
+    loadAllPayrolls: async (periodId) => {
         set({ loading: true });
         try {
-            const response = await getAllPayrolls();
+            const response = periodId
+                ? await getPayrollsByPeriod(periodId)
+                : await getAllPayrolls();
             const dataList = Array.isArray(response?.data?.data)
                 ? response.data.data
                 : Array.isArray(response?.data) ? response.data : [];
@@ -87,6 +91,21 @@ const usePayrollStore = create((set, get) => ({
             await get().loadPayrollDetails(payrollId);
         } catch (error) {
             console.error('Error confirming payroll:', error);
+            throw error;
+        } finally {
+            set({ confirming: false });
+        }
+    },
+
+    unconfirmPayroll: async (payrollId) => {
+        if (!payrollId) return;
+        set({ confirming: true });
+        try {
+            await unconfirmPayroll(payrollId);
+            await get().loadAllPayrolls();
+            await get().loadPayrollDetails(payrollId);
+        } catch (error) {
+            console.error('Error unconfirming payroll:', error);
             throw error;
         } finally {
             set({ confirming: false });

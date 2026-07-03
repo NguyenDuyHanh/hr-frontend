@@ -175,7 +175,7 @@ const TimekeepingSummary = () => {
             staffTimesheets.forEach(ts => {
                 totalWorkRatio += ts.totalWorkRatio || 0;
                 standardHours += ts.standardHours || 0;
-                overtimeHours += ts.overtimeHours || 0;
+                overtimeHours += (ts.overtimeHours || 0) + (ts.weekendOvertimeHours || 0) + (ts.holidayOvertimeHours || 0);
 
                 const details = ts.details || [];
                 details.forEach(d => {
@@ -241,7 +241,7 @@ const TimekeepingSummary = () => {
             if (row.record) {
                 totalWorkRatio += row.record.totalWorkRatio || 0;
                 totalStandardHours += row.record.standardHours || 0;
-                totalOvertimeHours += row.record.overtimeHours || 0;
+                totalOvertimeHours += (row.record.overtimeHours || 0) + (row.record.weekendOvertimeHours || 0) + (row.record.holidayOvertimeHours || 0);
 
                 const details = row.record.details || [];
                 details.forEach(d => {
@@ -271,7 +271,7 @@ const TimekeepingSummary = () => {
         aggregatedData.forEach(row => {
             totalWorkRatio += row.totalWorkRatio || 0;
             totalStandardHours += row.standardHours || 0;
-            totalOvertimeHours += row.overtimeHours || 0;
+            totalOvertimeHours += (row.overtimeHours || 0) + (row.weekendOvertimeHours || 0) + (row.holidayOvertimeHours || 0);
             totalLateMinutes += row.lateMinutes || 0;
             totalEarlyMinutes += row.earlyMinutes || 0;
         });
@@ -402,7 +402,10 @@ const TimekeepingSummary = () => {
                     field: 'overtimeHours',
                     align: 'center',
                     width: 90,
-                    render: (row) => <span className="font-semibold text-amber-600">{row.record && row.record.overtimeHours > 0 ? row.record.overtimeHours.toFixed(2) : '0.00'}</span>
+                    render: (row) => {
+                        const ot = row.record ? (row.record.overtimeHours || 0) + (row.record.weekendOvertimeHours || 0) + (row.record.holidayOvertimeHours || 0) : 0;
+                        return <span className="font-semibold text-amber-600">{ot > 0 ? ot.toFixed(2) : '0.00'}</span>;
+                    }
                 },
                 {
                     title: 'Đi muộn',

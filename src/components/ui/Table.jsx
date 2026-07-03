@@ -187,7 +187,8 @@ function Table(props) {
       align: "center",
       width: "50px",
       render: (rowData) => {
-        const index = rowData.tableData?.id ?? 0;
+        const idx = data.indexOf(rowData);
+        const index = idx !== -1 ? idx : (typeof rowData.tableData?.id === 'number' ? rowData.tableData.id : 0);
         return (page - 1) * pageSize + index + 1;
       },
     };

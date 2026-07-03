@@ -133,8 +133,19 @@ const MyDateTimePicker = React.forwardRef(({
       InputLabelProps: { shrink: true },
       sx: {
         '& .MuiInputBase-root': {
-          backgroundColor: (theme) => readOnly ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') : 'inherit',
+          backgroundColor: (theme) => (readOnly || disabled) 
+            ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') 
+            : 'inherit',
           transition: 'all 0.2s ease-in-out',
+          '&.Mui-disabled': {
+            backgroundColor: (theme) => theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important',
+            color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+            WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+            '& .MuiInputBase-input': {
+              color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+              WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+            }
+          },
           '&.Mui-error .MuiOutlinedInput-notchedOutline': {
             borderColor: '#d1d5db !important',
           },
@@ -188,7 +199,7 @@ const MyDateTimePicker = React.forwardRef(({
     actionBar: {
       actions: ["cancel", "accept"],
     },
-  }), [name, isError, meta.error, readOnly, isTimePicker, otherProps.size, otherProps.variant, otherProps.placeholder, otherProps.helperText, otherProps.sx]);
+  }), [name, isError, meta.error, readOnly, disabled, isTimePicker, otherProps.size, otherProps.variant, otherProps.placeholder, otherProps.helperText, otherProps.sx]);
 
   const PickerComponent = isDateTimePicker || isDateTimeSecondsPicker 
     ? MuiDateTimePicker 

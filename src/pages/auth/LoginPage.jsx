@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
@@ -27,7 +27,7 @@ const LoginPage = () => {
   const location = useLocation();
 
   // Redirect path after successful login
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname || '/';
 
   // Retrieve remembered username from localStorage
   const rememberedUsername = localStorage.getItem('remembered_username') || '';
@@ -153,21 +153,6 @@ const LoginPage = () => {
                   </button>
                 )}
               />
-
-              {/* Checkbox and Forgot Password Link */}
-              <div className="flex items-center justify-between text-sm py-2">
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    alert('Vui lòng liên hệ quản trị viên (admin@hrm.com) để khôi phục mật khẩu.');
-                  }}
-                  className="font-bold text-primary hover:opacity-80 text-[13px] transition-colors"
-                >
-                  Forgot Password?
-                </a>
-              </div>
-
               {/* Submit Login Button */}
               <Button
                 type="submit"

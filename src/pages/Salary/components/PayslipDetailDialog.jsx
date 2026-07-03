@@ -271,8 +271,20 @@ const PayslipDetailDialog = ({
                                     const std = activePayroll?.period?.standardWorkDays || 26;
                                     const wd = Number((detail.totalWorkDays || 0).toFixed(2));
                                     const ot = Number((detail.totalOtHours || 0).toFixed(2));
-                                    if (item.salaryItem?.code === 'OT') {
-                                        return `Cách tính: (${formatMoney(base)} / ${std} ngày / 8 giờ) * 1.5 * ${ot} giờ OT`;
+                                    if (item.salaryItem?.code === 'OT' || item.salaryItem?.code === 'LUONG_OT' || item.salaryItem?.code === 'OVERTIME' || item.salaryItem?.code?.toUpperCase()?.includes('TANG_CA')) {
+                                        const parts = [];
+                                        const ot1 = detail.totalOtHours || 0;
+                                        const ot2 = detail.totalWeekendOtHours || 0;
+                                        const ot3 = detail.totalHolidayOtHours || 0;
+                                        
+                                        if (ot1 > 0) parts.push(`(${formatMoney(base)} / ${std} ngày / 8 giờ) * 1.5 * ${ot1.toFixed(2)} giờ OT thường`);
+                                        if (ot2 > 0) parts.push(`(${formatMoney(base)} / ${std} ngày / 8 giờ) * 2.0 * ${ot2.toFixed(2)} giờ OT cuối tuần`);
+                                        if (ot3 > 0) parts.push(`(${formatMoney(base)} / ${std} ngày / 8 giờ) * 3.0 * ${ot3.toFixed(2)} giờ OT ngày lễ`);
+                                        
+                                        if (parts.length === 0) {
+                                            return `Cách tính: Không có giờ OT (Thường: ${ot1.toFixed(2)}h, Cuối tuần: ${ot2.toFixed(2)}h, Lễ: ${ot3.toFixed(2)}h)`;
+                                        }
+                                        return `Cách tính: ${parts.join(' + ')}`;
                                     }
                                     switch (item.salaryItem?.calculationType) {
                                         case SalaryCalculationType.FIXED:
