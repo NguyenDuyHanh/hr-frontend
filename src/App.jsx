@@ -37,6 +37,7 @@ import DepartmentPage from "./pages/Department/DepartmentPage";
 import PositionPage from "./pages/Position/PositionPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import WelcomePage from "./pages/Home/WelcomePage";
+import HolidayPage from "./pages/Holiday/HolidayPage";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -99,6 +100,7 @@ function App() {
     "/time-sheet-detail": <TimekeepingCalendar />,
     "/check-inout-result": <TimesheetApprovalList />,
     "/time-sheet-summary": <TimekeepingSummary />,
+    "/holidays": <HolidayPage />,
     "/salary/salary-item": <SalaryItemPage />,
     "/salary/salary-period": <SalaryPeriodPage />,
     "/salary/payrolls": <PayrollListPage />,

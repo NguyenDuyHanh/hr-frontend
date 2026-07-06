@@ -32,6 +32,49 @@ import {
 } from '@mui/icons-material';
 import ConstantList from '../../appConfig';
 import useAuthStore from '../../store/useAuthStore';
+import * as AuthService from '../../services/AuthService';
+
+// Check if JWT token is expired (with 10-second buffer)
+const isTokenExpired = (token) => {
+  if (!token) return true;
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      window.atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    const { exp } = JSON.parse(jsonPayload);
+    return Date.now() >= (exp * 1000 - 10000); // 10-second buffer
+  } catch (error) {
+    return true;
+  }
+};
+
+// Proactively refresh access token if expired or near expiration
+const refreshTokenIfNeeded = async () => {
+  const { accessToken, refreshToken, setAuth, user, logout } = useAuthStore.getState();
+  if (!accessToken || isTokenExpired(accessToken)) {
+    if (refreshToken) {
+      try {
+        const response = await AuthService.refreshToken(refreshToken);
+        if (response.data && response.data.status === 200) {
+          const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.data;
+          setAuth(user, newAccessToken, newRefreshToken || refreshToken);
+          return newAccessToken;
+        }
+      } catch (err) {
+        console.error("Failed to refresh token inside AI Chatbot Widget:", err);
+      }
+    }
+    // If we cannot refresh, clear auth and force login redirect
+    logout();
+    return null;
+  }
+  return accessToken;
+};
 
 const AiChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,16 +88,26 @@ const AiChatbotWidget = () => {
 
   const messagesEndRef = useRef(null);
   
-  // Retrieve token from authentication store
-  const accessToken = useAuthStore((state) => state.accessToken);
+  // Custom fetch function that dynamically injects Authorization header and refreshes token if needed
+  const customFetch = async (url, options) => {
+    const token = await refreshTokenIfNeeded();
+    const headers = {
+      ...options.headers,
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return fetch(url, {
+      ...options,
+      headers
+    });
+  };
 
   // Configure useChat hook natively
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: ConstantList.API_ENPOINT + '/chat',
     body: { model },
-    headers: accessToken ? {
-      Authorization: `Bearer ${accessToken}`
-    } : {}
+    fetch: customFetch
   });
 
   // Auto scroll to bottom of messages
@@ -77,10 +130,7 @@ const AiChatbotWidget = () => {
     handleInputChange({ target: { value: text } });
     setTimeout(() => {
       handleSubmit(fakeEvent, { 
-        body: { model },
-        headers: accessToken ? {
-          Authorization: `Bearer ${accessToken}`
-        } : {}
+        body: { model }
       });
     }, 50);
   };
@@ -298,57 +348,29 @@ const AiChatbotWidget = () => {
           <div ref={messagesEndRef} />
         </Box>
 
-        {/* Prompt Suggestions */}
-        <Box sx={{ p: 1.5, bgcolor: 'hsl(var(--card))', borderTop: '1px solid hsl(var(--border))' }}>
-          <Typography variant="caption" sx={{ color: 'hsl(var(--muted-foreground))', display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-            <HelpOutline fontSize="inherit" /> Gợi ý tra cứu nhanh:
-          </Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {[
-              '🏢 Danh sách phòng ban',
-              '👥 Toàn bộ nhân viên',
-              '🔍 Nhân viên phòng IT',
-              '📊 Thống kê nhân sự'
-            ].map((text) => (
-              <Chip
-                key={text}
-                label={text}
-                size="small"
-                onClick={() => handlePromptSuggestion(text.replace(/^[^\s]+\s/, ''))}
-                sx={{ 
-                  bgcolor: 'hsl(var(--muted))', 
-                  color: 'hsl(var(--muted-foreground))', 
-                  '&:hover': { bgcolor: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }, 
-                  cursor: 'pointer' 
-                }}
-              />
-            ))}
-            {messages.length > 0 && (
-              <Chip
-                label="Xóa lịch sử"
-                size="small"
-                onClick={() => setMessages([])}
-                sx={{ 
-                  bgcolor: 'hsl(var(--destructive) / 0.15)', 
-                  color: 'hsl(var(--destructive))', 
-                  ml: 'auto', 
-                  '&:hover': { bgcolor: 'hsl(var(--destructive))', color: 'hsl(var(--destructive-foreground))' }, 
-                  cursor: 'pointer' 
-                }}
-              />
-            )}
+        {/* Clear History Button */}
+        {messages.length > 0 && (
+          <Box sx={{ p: 1, px: 2, display: 'flex', justifyContent: 'flex-end', bgcolor: 'hsl(var(--card))', borderTop: '1px solid hsl(var(--border))' }}>
+            <Chip
+              label="Xóa lịch sử"
+              size="small"
+              onClick={() => setMessages([])}
+              sx={{ 
+                bgcolor: 'hsl(var(--destructive) / 0.15)', 
+                color: 'hsl(var(--destructive))', 
+                '&:hover': { bgcolor: 'hsl(var(--destructive))', color: 'hsl(var(--destructive-foreground))' }, 
+                cursor: 'pointer' 
+              }}
+            />
           </Box>
-        </Box>
+        )}
 
         {/* Message Input Form */}
         <Divider />
         <Box
           component="form"
           onSubmit={(e) => handleSubmit(e, { 
-            body: { model },
-            headers: accessToken ? {
-              Authorization: `Bearer ${accessToken}`
-            } : {}
+            body: { model }
           })}
           sx={{ p: 1.5, bgcolor: 'hsl(var(--card))', display: 'flex', gap: 1, alignItems: 'center' }}
         >

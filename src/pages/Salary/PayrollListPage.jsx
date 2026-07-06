@@ -261,11 +261,11 @@ const PayrollListPage = () => {
                     columns={masterColumns}
                     data={filteredPayrolls}
                     totalElements={filteredPayrolls.length}
-                    page={0}
+                    page={1}
                     pageSize={100}
                     handleChangePage={() => {}}
                     setRowsPerPage={() => {}}
-                    hidePagination={true}
+                    nonePagination={true}
                     loading={loading || confirming || deleting}
                 />
             </Paper>

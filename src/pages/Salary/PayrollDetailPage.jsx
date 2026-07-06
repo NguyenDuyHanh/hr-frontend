@@ -14,8 +14,7 @@ import {
     ListItemText,
     Select,
     MenuItem,
-    TextField,
-    CircularProgress
+    TextField
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -481,11 +480,11 @@ const PayrollDetailPage = () => {
                                 columns={detailColumns}
                                 data={filteredStaffs}
                                 totalElements={filteredStaffs.length}
-                                page={0}
+                                page={1}
                                 pageSize={100}
                                 handleChangePage={() => {}}
                                 setRowsPerPage={() => {}}
-                                hidePagination={true}
+                                nonePagination={true}
                             />
                         </>
                     )}

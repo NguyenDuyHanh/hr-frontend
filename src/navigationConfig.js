@@ -54,6 +54,7 @@ export const navigations = [
     icon: "access_time",
     auth: [ADMIN, HR_MANAGER, HR_TIMEKEEPING_MANAGER, HR_EMPLOYEE],
     children: [
+      { name: "Ngày lễ / Sự kiện", path: "/holidays", auth: [ADMIN, HR_MANAGER] },
       { name: "Chi tiết chấm công", path: "/time-sheet-detail", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
       { name: "Phê duyệt chấm công", path: "/check-inout-result", auth: [ADMIN, HR_MANAGER] },
       { name: "Thống kê công", path: "/time-sheet-summary", auth: [ADMIN, HR_MANAGER, HR_TIMEKEEPING_MANAGER] },

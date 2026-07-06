@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
-import { Grid, Button, Stack, Link, CircularProgress, IconButton } from '@mui/material';
+import { Grid, Button, Stack, Link, IconButton } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -233,7 +233,7 @@ const CandidateFormDialog = ({
                                 variant="outlined"
                                 component="label"
                                 color="primary"
-                                startIcon={localUploadingCV ? <CircularProgress size={20} /> : <CloudUploadIcon />}
+                                startIcon={<CloudUploadIcon />}
                                 disabled={localUploadingCV}
                                 sx={{ textTransform: 'none' }}
                             >

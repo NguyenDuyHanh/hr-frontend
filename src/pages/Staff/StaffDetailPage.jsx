@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Box, Paper, Typography, Button, Grid, CircularProgress, Avatar } from '@mui/material';
+import { Box, Paper, Typography, Button, Grid, Avatar } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonIcon from '@mui/icons-material/Person';
 import AssignmentIcon from '@mui/icons-material/Assignment';
