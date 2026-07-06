@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
     Button, Grid, IconButton, Paper, Typography, 
     Select, MenuItem, FormControl, Chip, Card, 
-    Avatar, Tooltip, Link, CircularProgress, 
+    Avatar, Tooltip, Link, 
     Box, Stack
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -452,12 +452,7 @@ const RecruitmentDetail = () => {
     ];
 
     if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[400px]">
-                <CircularProgress size={30} />
-                <div className="text-gray-500 mt-2">Đang tải thông tin chi tiết tin tuyển dụng...</div>
-            </div>
-        );
+        return null;
     }
 
     if (!selectedRecruitment) {
@@ -657,21 +652,15 @@ const RecruitmentDetail = () => {
                     )}
                 </Formik>
 
-                {loadingCandidates ? (
-                    <Box display="flex" justifyContent="center" py={4}>
-                        <CircularProgress size={30} />
-                    </Box>
-                ) : (
-                    <Table
-                        columns={candidateColumns}
-                        data={candidates}
-                        totalElements={totalCandidates}
-                        page={candidatePage}
-                        pageSize={candidatePageSize}
-                        handleChangePage={(e, p) => setCandidatePage(p)}
-                        setRowsPerPage={(e) => setCandidatePageSize(parseInt(e.target.value, 10))}
-                    />
-                )}
+                <Table
+                    columns={candidateColumns}
+                    data={candidates}
+                    totalElements={totalCandidates}
+                    page={candidatePage}
+                    pageSize={candidatePageSize}
+                    handleChangePage={(e, p) => setCandidatePage(p)}
+                    setRowsPerPage={(e) => setCandidatePageSize(parseInt(e.target.value, 10))}
+                />
             </TabAccordion>
 
             {/* Dialog: Candidate Add/Edit Form */}

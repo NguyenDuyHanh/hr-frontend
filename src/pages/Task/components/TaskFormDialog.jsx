@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
-import { Grid, Button, Paper, Box, Typography, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, CircularProgress } from '@mui/material';
+import { Grid, Button, Paper, Box, Typography, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -281,7 +281,7 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
                                     <Button
                                         variant="outlined"
                                         component="label"
-                                        startIcon={isUploading ? <CircularProgress size={16} /> : <CloudUploadIcon />}
+                                        startIcon={<CloudUploadIcon />}
                                         size="small"
                                         sx={{ textTransform: 'none' }}
                                         disabled={!formik.values.id || isUploading || isViewMode}

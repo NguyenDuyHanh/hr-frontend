@@ -3,27 +3,26 @@ import {
     Box,
     Typography,
     Button,
-    IconButton,
-    Tooltip,
     Grid,
     Divider,
+    Tooltip,
     CircularProgress
 } from '@mui/material';
 import Popup from '../../../components/ui/Popup';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import SaveIcon from '@mui/icons-material/Save';
-import UndoIcon from '@mui/icons-material/Undo';
-import InfoIcon from '@mui/icons-material/Info';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import InfoIcon from '@mui/icons-material/Info';
 import { toast } from 'sonner';
 import { Formik, FormikProvider } from 'formik';
 import CustomTextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
-import BankTransferQrCard from './BankTransferQrCard';
-import { generateBankTransferQr } from '../../../services/payrollService';
 import { SalaryCalculationType } from '../../../constants';
 import usePayrollStore from '../../../store/usePayrollStore';
+import BankTransferQrCard from './BankTransferQrCard';
+import { generateBankTransferQr } from '../../../services/payrollService';
+import useAuthStore from '../../../store/useAuthStore';
+import { ROLES } from '../../../constants/roles';
 
 const PayslipDetailDialog = ({
     open,
@@ -35,6 +34,15 @@ const PayslipDetailDialog = ({
 }) => {
     // Store states and actions
     const { updatePayslipStatus, updating } = usePayrollStore();
+    const hasRole = useAuthStore((state) => state.hasRole);
+
+    // Dynamic role check for editing and QR
+    const hasEditPermission = hasRole([
+        ROLES.ADMIN,
+        ROLES.HR_MANAGER,
+        ROLES.HR_COMPENSATION_BENEFIT
+    ]);
+    const canEdit = isAdmin || hasEditPermission;
 
     // Local states
     const [localPaidStatus, setLocalPaidStatus] = useState('UNPAID');
@@ -98,14 +106,6 @@ const PayslipDetailDialog = ({
         }
     };
 
-    const handleUndoChanges = () => {
-        if (detail) {
-            setLocalPaidStatus(detail.paidStatus || 'UNPAID');
-            setLocalNote(detail.note || '');
-            toast.info('Đã hoàn tác thay đổi');
-        }
-    };
-
     const handleOpenQrModal = async (payslipDetail) => {
         if (!payslipDetail) return;
         
@@ -166,7 +166,7 @@ const PayslipDetailDialog = ({
                         >
                             Đóng
                         </Button>
-                        {isAdmin && (
+                        {canEdit && (
                             <>
                                 <Button
                                     onClick={handleUpdatePayslip}
@@ -176,7 +176,7 @@ const PayslipDetailDialog = ({
                                     disabled={updating}
                                     sx={{ textTransform: 'none' }}
                                 >
-                                    {updating ? <CircularProgress size={20} color="inherit" /> : 'Lưu'}
+                                    Lưu
                                 </Button>
                             </>
                         )}
@@ -351,150 +351,73 @@ const PayslipDetailDialog = ({
                         </Box>
                     </Grid>
 
-                    {/* Right Panel: Metadata & VietQR Action */}
+                    {/* Right Panel: Metadata Information Form */}
                     <Grid item xs={12} md={4}>
                         <Typography variant="subtitle2" sx={{ color: 'primary.main', fontWeight: 'bold', mb: 2 }}>
                             THÔNG TIN PHIẾU
                         </Typography>
                         
-                        {isAdmin ? (
-                            <Formik
-                                initialValues={{
-                                    displayName: `${detail.staff?.displayName || ''} - ${detail.staff?.staffCode || ''}`,
-                                    payrollPeriodName: activePayroll?.period?.name || '',
-                                    payrollName: activePayroll?.name || '',
-                                    paidStatus: localPaidStatus,
-                                    note: localNote
-                                }}
-                                enableReinitialize
-                                onSubmit={() => {}}
-                            >
-                                {(formikProps) => (
-                                    <FormikProvider value={formikProps}>
-                                        <CustomTextField
-                                            label="Nhân viên"
-                                            name="displayName"
-                                            readOnly
-                                        />
+                        <Formik
+                            initialValues={{
+                                displayName: `${detail.staff?.displayName || ''} - ${detail.staff?.staffCode || ''}`,
+                                payrollPeriodName: activePayroll?.period?.name || '',
+                                payrollName: activePayroll?.name || '',
+                                paidStatus: localPaidStatus,
+                                note: localNote
+                            }}
+                            enableReinitialize
+                            onSubmit={() => {}}
+                        >
+                            {(formikProps) => (
+                                <FormikProvider value={formikProps}>
+                                    <CustomTextField
+                                        label="Nhân viên"
+                                        name="displayName"
+                                        readOnly
+                                    />
 
-                                        <CustomTextField
-                                            label="Kỳ lương"
-                                            name="payrollPeriodName"
-                                            readOnly
-                                        />
+                                    <CustomTextField
+                                        label="Kỳ lương"
+                                        name="payrollPeriodName"
+                                        readOnly
+                                    />
 
-                                        <CustomTextField
-                                            label="Thuộc bảng lương"
-                                            name="payrollName"
-                                            readOnly
-                                        />
+                                    <CustomTextField
+                                        label="Thuộc bảng lương"
+                                        name="payrollName"
+                                        readOnly
+                                    />
 
-                                        <SelectInput
-                                            label="Trạng thái chi trả"
-                                            name="paidStatus"
-                                            options={[
-                                                { value: 'UNPAID', name: 'Chưa chi trả' },
-                                                { value: 'PAID', name: 'Đã chi trả' }
-                                            ]}
-                                            keyValue="value"
-                                            displayvalue="name"
-                                            hideNullOption={true}
-                                            handleChange={(e) => setLocalPaidStatus(e.target.value)}
-                                        />
+                                    <SelectInput
+                                        label="Trạng thái chi trả"
+                                        name="paidStatus"
+                                        options={[
+                                            { value: 'UNPAID', name: 'Chưa chi trả' },
+                                            { value: 'PAID', name: 'Đã chi trả' }
+                                        ]}
+                                        keyValue="value"
+                                        displayvalue="name"
+                                        hideNullOption={true}
+                                        disabled={!canEdit}
+                                        handleChange={(e) => setLocalPaidStatus(e.target.value)}
+                                    />
 
-                                        <CustomTextField
-                                            label="Ghi chú"
-                                            name="note"
-                                            multiline
-                                            rows={3}
-                                            placeholder="Nhập ghi chú (nếu có)..."
-                                            notDelay={true}
-                                            onChange={(e) => setLocalNote(e.target.value)}
-                                        />
-                                    </FormikProvider>
-                                )}
-                            </Formik>
-                        ) : (
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                <Box>
-                                    <Typography variant="caption" color="text.secondary">Nhân viên</Typography>
-                                    <Typography variant="body2" fontWeight="bold">
-                                        {detail.staff?.displayName || ''} - {detail.staff?.staffCode || ''}
-                                    </Typography>
-                                </Box>
+                                    <CustomTextField
+                                        label="Ghi chú"
+                                        name="note"
+                                        multiline
+                                        rows={3}
+                                        placeholder="Nhập ghi chú (nếu có)..."
+                                        notDelay={true}
+                                        readOnly={!canEdit}
+                                        onChange={(e) => setLocalNote(e.target.value)}
+                                    />
+                                </FormikProvider>
+                            )}
+                        </Formik>
 
-                                <Box>
-                                    <Typography variant="caption" color="text.secondary">Kỳ lương</Typography>
-                                    <Typography variant="body2" fontWeight="medium">
-                                        {activePayroll?.period?.name || ''}
-                                    </Typography>
-                                </Box>
-
-                                <Box>
-                                    <Typography variant="caption" color="text.secondary">Trạng thái chi trả</Typography>
-                                    <Box sx={{ mt: 0.5 }}>
-                                        {localPaidStatus === 'PAID' ? (
-                                            <Box 
-                                                display="inline-flex" 
-                                                alignItems="center" 
-                                                gap={0.5} 
-                                                sx={{ 
-                                                    backgroundColor: (theme) => theme.palette.mode === 'light' ? '#e8f5e9' : 'rgba(46, 125, 50, 0.2)',
-                                                    color: (theme) => theme.palette.mode === 'light' ? '#2e7d32' : '#81c784',
-                                                    px: 1.5, 
-                                                    py: 0.5, 
-                                                    borderRadius: '16px',
-                                                    fontSize: '13px',
-                                                    fontWeight: 'bold'
-                                                }}
-                                            >
-                                                <CheckCircleIcon sx={{ fontSize: '16px' }} />
-                                                Đã chi trả
-                                            </Box>
-                                        ) : (
-                                            <Box 
-                                                display="inline-flex" 
-                                                alignItems="center" 
-                                                gap={0.5} 
-                                                sx={{ 
-                                                    backgroundColor: (theme) => theme.palette.mode === 'light' ? '#ffeec2' : 'rgba(245, 124, 0, 0.2)',
-                                                    color: (theme) => theme.palette.mode === 'light' ? '#b56d00' : '#ffb74d',
-                                                    px: 1.5, 
-                                                    py: 0.5, 
-                                                    borderRadius: '16px',
-                                                    fontSize: '13px',
-                                                    fontWeight: 'bold'
-                                                }}
-                                            >
-                                                <InfoIcon sx={{ fontSize: '16px' }} />
-                                                Chưa chi trả
-                                            </Box>
-                                        )}
-                                    </Box>
-                                </Box>
-
-                                <Box>
-                                    <Typography variant="caption" color="text.secondary">Ghi chú</Typography>
-                                    <Typography 
-                                        variant="body2" 
-                                        sx={{ 
-                                            p: 1.5, 
-                                            border: '1px solid',
-                                            borderColor: (theme) => theme.palette.mode === 'light' ? '#e0e0e0' : 'rgba(255, 255, 255, 0.1)',
-                                            borderRadius: '4px', 
-                                            backgroundColor: (theme) => theme.palette.mode === 'light' ? '#fafafa' : 'rgba(255, 255, 255, 0.02)',
-                                            minHeight: '60px', 
-                                            fontStyle: localNote ? 'normal' : 'italic', 
-                                            color: localNote ? 'text.primary' : 'text.secondary' 
-                                        }}
-                                    >
-                                        {localNote || '(Không có ghi chú)'}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        )}
-
-                        {isAdmin && (
+                        {/* Admin QR Features */}
+                        {canEdit && (
                             <>
                                 <Box mb={2} mt={3}>
                                     <BankTransferQrCard

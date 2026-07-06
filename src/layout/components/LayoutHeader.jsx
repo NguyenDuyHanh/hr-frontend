@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { 
   IconButton, Button, Menu, MenuItem, Divider, Typography, Box, 
-  CircularProgress, Chip 
+  Chip 
 } from '@mui/material'
 import { useFormik, FormikProvider } from 'formik'
 import TextField from '@/components/ui/TextField'
@@ -512,7 +512,7 @@ const LayoutHeader = () => {
                   startIcon={<AccessTimeIcon />}
                   className="font-bold px-5 py-1.5 rounded-lg shadow-sm"
                 >
-                  {submitting ? <CircularProgress size={20} color="inherit" /> : 'Chấm công'}
+                  Chấm công
                 </Button>
               </>
             }

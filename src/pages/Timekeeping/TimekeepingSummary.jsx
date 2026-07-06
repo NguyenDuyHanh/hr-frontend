@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { 
-    Button, Grid, Paper, Typography, Box, CircularProgress
+    Button, Grid, Paper, Typography, Box
 } from '@mui/material';
 import { 
     Refresh
@@ -620,22 +620,15 @@ const TimekeepingSummary = () => {
                 </Formik>
 
                 {/* Table View */}
-                {loading ? (
-                    <Box className="h-[400px] flex flex-col items-center justify-center gap-2">
-                        <CircularProgress />
-                        <Typography variant="body2" className="text-gray-400 italic">Đang tổng hợp dữ liệu ngày công...</Typography>
-                    </Box>
-                ) : (
-                        <Table 
-                            columns={columns}
-                            data={paginatedData}
-                            totalElements={totalElements}
-                            page={page}
-                            pageSize={pageSize}
-                            handleChangePage={(e, p) => setPage(p)}
-                            setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
-                        />
-                )}
+                <Table 
+                    columns={columns}
+                    data={paginatedData}
+                    totalElements={totalElements}
+                    page={page}
+                    pageSize={pageSize}
+                    handleChangePage={(e, p) => setPage(p)}
+                    setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
+                />
             </Paper>
         </Box>
     );

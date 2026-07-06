@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
     Button, Grid, IconButton, Paper, Chip, 
-    CircularProgress, Box, Stack
+    Box, Stack
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -302,21 +302,15 @@ const RecruitmentList = () => {
                     )}
                 </Formik>
 
-                {loadingRecruitments ? (
-                    <Box display="flex" justifyContent="center" py={4}>
-                        <CircularProgress size={30} />
-                    </Box>
-                ) : (
-                    <Table
-                        columns={recruitmentColumns}
-                        data={recruitments}
-                        totalElements={totalRecruitments}
-                        page={recruitmentPage}
-                        pageSize={recruitmentPageSize}
-                        handleChangePage={(e, p) => setRecruitmentPage(p)}
-                        setRowsPerPage={(e) => setRecruitmentPageSize(parseInt(e.target.value, 10))}
-                    />
-                )}
+                <Table
+                    columns={recruitmentColumns}
+                    data={recruitments}
+                    totalElements={totalRecruitments}
+                    page={recruitmentPage}
+                    pageSize={recruitmentPageSize}
+                    handleChangePage={(e, p) => setRecruitmentPage(p)}
+                    setRowsPerPage={(e) => setRecruitmentPageSize(parseInt(e.target.value, 10))}
+                />
             </Paper>
 
             {/* Dialog: Recruitment Add Form */}

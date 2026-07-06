@@ -16,7 +16,6 @@ import { Formik, FormikProvider } from 'formik';
 import usePayrollStore from '../../store/usePayrollStore';
 import usePeriodStore from '../../store/usePeriodStore';
 import SelectInput from '../../components/ui/SelectInput';
-import Loading from '../../components/ui/Loading';
 import Table from '../../components/ui/Table';
 import PayslipDetailDialog from './components/PayslipDetailDialog';
 
@@ -190,9 +189,7 @@ const StaffPayslipPage = () => {
 
             <Divider />
 
-            {loading ? (
-                <Loading size={50} overlay={false} />
-            ) : payslip ? (
+            {payslip ? (
                 <>
                     <Table
                         columns={columns}

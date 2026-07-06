@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { CircularProgress, Alert } from '@mui/material';
+import { Alert } from '@mui/material';
 import KpiCards from './components/KpiCards';
 import StaffTrendChart from './components/StaffTrendChart';
 import DepartmentChart from './components/DepartmentChart';
