@@ -224,7 +224,7 @@ const UserList = () => {
                 </div>
             ),
         },
-        { title: 'Tên tài khoản', field: 'username' },
+        { title: 'Tên tài khoản', field: 'username', align: 'center' },
         { 
             title: 'Vai trò', 
             render: (rowData) => {
@@ -234,7 +234,7 @@ const UserList = () => {
                 return '';
             }
         },
-        { title: 'Nhân viên sử dụng', render: (rowData) => rowData.staffName || '' },
+        { title: 'Nhân viên sử dụng', align: 'center', render: (rowData) => rowData.staffName || '' },
         { 
             title: 'Trạng thái', 
             align: 'center',
@@ -284,7 +284,6 @@ const UserList = () => {
                                 onReset={handleReset}
                                 onAdd={handleAdd}
                                 addLabel="Thêm tài khoản"
-                                searchPlaceholder="Tìm kiếm tài khoản theo username, email, tên nhân viên hoặc mã nhân viên..."
                                 filter={{
                                     open: filterOpen,
                                     onToggle: setFilterOpen,
@@ -311,7 +310,7 @@ const UserList = () => {
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
                                         <SelectInput
-                                            label="Vai trò (Quyền)"
+                                            label="Vai trò"
                                             name="roleId"
                                             options={roleOptions}
                                             keyValue="id"

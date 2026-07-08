@@ -32,6 +32,11 @@ const TableWrapper = styled(Box)(({ theme }) => ({
     boxShadow: "none",
     border: "none",
   },
+  // Align headers and body by keeping native collapse separate structure
+  "& .MuiTable-root": {
+    borderCollapse: "separate !important",
+    borderSpacing: "0 !important",
+  },
 }));
 
 const MobileCard = memo(({
@@ -152,7 +157,7 @@ function Table(props) {
     maxHeight,
     colParent = false,
     defaultExpanded = false,
-    showIndex = false,
+    showIndex = true,
     onRowClick,
     detailPanel,
     icons,
@@ -167,34 +172,76 @@ function Table(props) {
   }, [propTotalPages, totalElements, pageSize]);
 
   const displayColumns = useMemo(() => {
-    const processedColumns = (columns || [])
+    const actionCols = [];
+    const regularCols = [];
+
+    (columns || [])
       .filter(col => col && typeof col === 'object')
-      .map(col => {
-        if (col.title === 'Thao tác') {
-          return {
-            ...col,
-            width: '1%',
+      .forEach(col => {
+        const titleStr = typeof col.title === 'string' ? col.title : (col.title ? col.title.toString() : '');
+        const isAction = titleStr.toLowerCase().includes('thao tác') || titleStr.toLowerCase().includes('action');
+        
+        if (isAction) {
+          // Dynamic styles to make the action column sticky on the right using pure CSS
+          const stickyCellStyle = (value, rowData) => {
+            const originalStyle = typeof col.cellStyle === 'function' 
+              ? col.cellStyle(value, rowData) 
+              : col.cellStyle;
+            return {
+              position: "sticky",
+              right: 0,
+              backgroundColor: theme.palette.background.paper,
+              zIndex: 2,
+              borderLeft: "1px solid hsl(var(--border))",
+              borderRight: "1px solid hsl(var(--border))",
+              ...originalStyle,
+            };
           };
+
+          const stickyHeaderStyle = {
+            position: "sticky",
+            right: 0,
+            backgroundColor: "hsl(var(--muted))",
+            zIndex: 3,
+            borderLeft: "1px solid hsl(var(--border))",
+            borderRight: "1px solid hsl(var(--border))",
+            ...col.headerStyle,
+          };
+
+          actionCols.push({
+            ...col,
+            width: col.width || '120px',
+            cellStyle: stickyCellStyle,
+            headerStyle: stickyHeaderStyle,
+          });
+        } else {
+          regularCols.push(col);
         }
-        return col;
       });
+
+    const processedColumns = [...regularCols, ...actionCols];
 
     if (!showIndex) return processedColumns;
 
     const indexColumn = {
       title: "STT",
-      field: "tableData.id",
       align: "center",
       width: "50px",
       render: (rowData) => {
-        const idx = data.indexOf(rowData);
-        const index = idx !== -1 ? idx : (typeof rowData.tableData?.id === 'number' ? rowData.tableData.id : 0);
-        return (page - 1) * pageSize + index + 1;
+        const idx = data.findIndex(item => {
+          if (!item || !rowData) return false;
+          if (item === rowData) return true;
+          return Object.keys(item).every(key => {
+            if (key === 'tableData') return true;
+            return item[key] === rowData[key];
+          });
+        });
+        return (page - 1) * pageSize + (idx !== -1 ? idx : 0) + 1;
       },
     };
 
     return [indexColumn, ...processedColumns];
-  }, [columns, showIndex, page, pageSize]);
+  }, [columns, showIndex, page, pageSize, data, theme]);
 
   const defaultIcons = useMemo(() => {
     return {

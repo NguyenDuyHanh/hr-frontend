@@ -19,7 +19,7 @@ import * as Yup from 'yup';
 import Table from '../../components/ui/Table';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import { getRecruitmentById, saveRecruitment } from '../../services/recruitmentService';
-import { generateCandidateCode } from '../../services/candidateService';
+import { generateCandidateCode, exportCandidatesExcel } from '../../services/candidateService';
 import { getStaffs, getDepartments, getPositions, pagingStaffs } from '../../services/StaffService';
 
 import CandidateFormDialog from './components/CandidateFormDialog';
@@ -273,6 +273,18 @@ const RecruitmentDetail = () => {
         candidateFormikRef.current?.resetForm();
         setCandidateKeyword('');
         setCandidateFilters({});
+    };
+
+    const handleExportCandidate = async () => {
+        if (!selectedRecruitment?.id) return;
+        const searchDto = {
+            pageIndex: 1,
+            pageSize: 100000,
+            keyword: candidateKeyword || null,
+            recruitmentId: selectedRecruitment.id,
+            ...candidateFilters,
+        };
+        return await exportCandidatesExcel(searchDto);
     };
 
     // Status Transition Handlers
@@ -624,6 +636,8 @@ const RecruitmentDetail = () => {
                                     onToggle: setCandidateFilterOpen,
                                     activeCount: Object.keys(candidateFilters).length
                                 }}
+                                onExport={handleExportCandidate}
+                                exportFileName={`Danh_sach_ung_vien_${selectedRecruitment?.code || 'export'}.xlsx`}
                             />
 
                             <FilterPanel

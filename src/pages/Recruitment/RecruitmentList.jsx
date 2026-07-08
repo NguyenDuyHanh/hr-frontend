@@ -182,7 +182,7 @@ const RecruitmentList = () => {
         { title: 'Mã tin', field: 'code', align: 'center', width: 130 },
         { title: 'Tiêu đề tuyển dụng', field: 'name', align: 'center', width: 220 },
         { 
-            title: 'Người duyệt CV', 
+            title: 'Người duyệt hồ sơ', 
             field: 'personApproveCVName', 
             align: 'center',
             width: 180,
@@ -255,22 +255,6 @@ const RecruitmentList = () => {
                                 onReset={handleResetRecruitmentFilters}
                             >
                                 <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            name="code"
-                                            label="Mã tin tuyển dụng"
-                                            placeholder="Nhập mã tin..."
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            name="name"
-                                            label="Tiêu đề tuyển dụng"
-                                            placeholder="Nhập tiêu đề..."
-                                            fullWidth
-                                        />
-                                    </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <AsyncAutocomplete
                                             name="personApproveCV"

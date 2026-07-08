@@ -229,7 +229,7 @@ const TimesheetApprovalList = () => {
             width: 150,
             align: 'center',
             render: (rowData) => (
-                <Typography className="font-semibold text-sm">{rowData.staffName || '---'}</Typography>
+                <span>{rowData.staffName || '---'}</span>
             )
         },
         {
@@ -301,40 +301,6 @@ const TimesheetApprovalList = () => {
             }
         },
         {
-            title: 'Công',
-            field: 'totalWorkRatio',
-            align: 'center',
-            width: 80,
-            render: (rowData) => <span className="font-bold text-emerald-600">{rowData.totalWorkRatio || 0}</span>
-        },
-        {
-            title: 'Số giờ làm',
-            width: 130,
-            align: 'center',
-            render: (rowData) => {
-                let totalHours = 0;
-                const details = rowData.details || [];
-                details.forEach(d => {
-                    if (d.checkInTime && d.checkOutTime) {
-                        const diffHours = dayjs(d.checkOutTime).diff(dayjs(d.checkInTime), 'hour', true);
-                        if (diffHours > 0) {
-                            totalHours += diffHours;
-                        }
-                    }
-                });
-
-                const displayHours = (rowData.standardHours !== undefined && rowData.standardHours !== null)
-                    ? (rowData.standardHours + (rowData.overtimeHours || 0) + (rowData.weekendOvertimeHours || 0) + (rowData.holidayOvertimeHours || 0))
-                    : totalHours;
-
-                return (
-                    <span className="font-bold text-gray-700 dark:text-gray-300 text-sm">
-                        {displayHours > 0 ? `${displayHours.toFixed(2)}` : '0'}
-                    </span>
-                );
-            }
-        },
-        {
             title: 'Trạng thái',
             field: 'status',
             width: 120,
@@ -351,13 +317,6 @@ const TimesheetApprovalList = () => {
                 }
             }
         },
-        {
-            title: 'Ghi chú duyệt',
-            field: 'note',
-            align: 'center',
-            width: 180,
-            render: (rowData) => <span className="text-xs text-gray-500">{rowData.note || '---'}</span>
-        }
     ];
 
     return (

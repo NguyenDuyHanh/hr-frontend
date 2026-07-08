@@ -38,6 +38,7 @@ const shouldComponentUpdate = (nextProps, currentProps) => {
     nextProps.required !== currentProps.required ||
     nextProps.disabled !== currentProps.disabled ||
     nextProps.readOnly !== currentProps.readOnly ||
+    nextProps.noMargin !== currentProps.noMargin ||
     nextProps.formik.isSubmitting !== currentProps.formik.isSubmitting ||
     Object.keys(nextProps).length !== Object.keys(currentProps).length ||
     getIn(nextProps.formik.values, currentProps.name) !==
@@ -64,6 +65,7 @@ const MyAutocomplete = React.forwardRef(({
   required = false,
   oldStyle = false,
   readOnly = false,
+  noMargin = false,
   field,
   meta,
   setFieldValue,
@@ -175,7 +177,7 @@ const MyAutocomplete = React.forwardRef(({
   }, [variant, isError, helperText, placeholder, sxMemo, field?.value, getOptionLabel]);
 
   return (
-    <div className="w-full mb-4">
+    <div className={`w-full ${noMargin ? '' : 'mb-4'}`}>
       {label && (
         <label 
           htmlFor={name} 

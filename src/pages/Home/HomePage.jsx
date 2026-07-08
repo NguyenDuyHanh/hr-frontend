@@ -29,7 +29,7 @@ const IconMap = {
   event: EventIcon,
 };
 
-const WelcomePage = () => {
+const HomePage = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const userRoles = user?.role || [];
@@ -72,7 +72,7 @@ const WelcomePage = () => {
     });
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto animate-fade-in px-4 md:px-6 py-6 pb-12">
+    <div className="space-y-8 max-w-7xl animate-fade-in pb-12">
       {/* Banner Chào mừng Premium */}
       <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 md:p-6 shadow-sm">
         <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-primary/5 blur-2xl"></div>
@@ -175,4 +175,4 @@ const WelcomePage = () => {
   );
 };
 
-export default WelcomePage;
+export default HomePage;

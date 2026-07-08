@@ -76,6 +76,7 @@ export const navigations = [
     auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT, HR_EMPLOYEE],
     children: [
       { name: "Khoản lương", path: "/salary/salary-item", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
+      { name: "Cấu hình lương nhân viên", path: "/salary/staff-salary-config", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
       { name: "Kỳ lương", path: "/salary/salary-period", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
       { name: "Bảng lương", path: "/salary/payrolls", auth: [ADMIN, HR_COMPENSATION_BENEFIT] },
       { name: "Phiếu lương cá nhân", path: "/salary/salary-staff-payslip", auth: [HR_EMPLOYEE] },

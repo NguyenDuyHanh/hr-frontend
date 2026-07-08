@@ -97,10 +97,31 @@ const AiChatbotWidget = () => {
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    return fetch(url, {
+    const response = await fetch(url, {
       ...options,
       headers
     });
+
+    // Log the streaming chunks to console in real-time
+    const cloneResponse = response.clone();
+    const reader = cloneResponse.body.getReader();
+    const decoder = new TextDecoder();
+    
+    (async () => {
+      try {
+        console.log("=== BẮT ĐẦU NHẬN STREAM DỮ LIỆU THÔ ===");
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          console.log("Chunk nhận được:", decoder.decode(value));
+        }
+        console.log("=== KẾT THÚC STREAM ===");
+      } catch (error) {
+        console.warn("Stream bị gián đoạn hoặc kết thúc đột ngột:", error.message);
+      }
+    })();
+
+    return response;
   };
 
   // Configure useChat hook natively
@@ -377,7 +398,6 @@ const AiChatbotWidget = () => {
           <TextField
             fullWidth
             size="small"
-            placeholder="Hỏi AI về thông tin nhân sự..."
             value={input}
             onChange={handleInputChange}
             disabled={isLoading}
