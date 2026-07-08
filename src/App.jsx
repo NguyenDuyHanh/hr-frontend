@@ -26,6 +26,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import { setNavigate } from "./navigation";
 import { ROLES } from "./constants/roles";
 import SalaryItemPage from "./pages/Salary/SalaryItemPage";
+import StaffSalaryConfigList from "./pages/Salary/StaffSalaryConfigList";
 import SalaryPeriodPage from "./pages/Salary/SalaryPeriodPage";
 import PayrollListPage from "./pages/Salary/PayrollListPage";
 import PayrollDetailPage from "./pages/Salary/PayrollDetailPage";
@@ -36,7 +37,7 @@ import LeaveBalance from "./pages/Leave/LeaveBalance";
 import DepartmentPage from "./pages/Department/DepartmentPage";
 import PositionPage from "./pages/Position/PositionPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
-import WelcomePage from "./pages/Home/WelcomePage";
+import HomePage from "./pages/Home/HomePage";
 import HolidayPage from "./pages/Holiday/HolidayPage";
 
 // Placeholder component for pages
@@ -89,7 +90,7 @@ function App() {
 
   // Map các component đặc biệt
   const componentMap = {
-    "/home": <WelcomePage />,
+    "/home": <HomePage />,
     "/dashboard": <DashboardPage />,
     "/staff/all": <StaffList />,
 
@@ -102,6 +103,7 @@ function App() {
     "/time-sheet-summary": <TimekeepingSummary />,
     "/holidays": <HolidayPage />,
     "/salary/salary-item": <SalaryItemPage />,
+    "/salary/staff-salary-config": <StaffSalaryConfigList />,
     "/salary/salary-period": <SalaryPeriodPage />,
     "/salary/payrolls": <PayrollListPage />,
     "/salary/salary-staff-payslip": <StaffPayslipPage />,
@@ -165,7 +167,6 @@ function App() {
               </AuthGuard>
             } 
           />
-
 
           {/* Route chi tiết dự án - chế độ xem */}
           <Route 

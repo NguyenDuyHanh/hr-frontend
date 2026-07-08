@@ -118,7 +118,7 @@ const KpiCards = ({ kpiSummary, loading }) => {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {cards.map((card, index) => (
-                <Zoom in={true} style={{ transitionDelay: `${index * 100}ms` }} key={index}>
+                <Zoom in={true} key={index}>
                     <div
                         onClick={() => navigate(card.path)}
                         style={{

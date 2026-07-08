@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { 
-    Button, Grid, Paper, Typography, Box
+    Button, Grid, Paper, Typography, Box, Chip
 } from '@mui/material';
 import { 
     Refresh
@@ -358,9 +358,9 @@ const TimekeepingSummary = () => {
                         });
 
                         return (
-                            <Box className="text-xs space-y-0.5">
-                                <div>Vào: <span className="font-semibold text-emerald-600">{minCi ? minCi.format('HH:mm') : '--:--'}</span></div>
-                                <div>Ra: <span className="font-semibold text-indigo-600">{maxCo ? maxCo.format('HH:mm') : '--:--'}</span></div>
+                            <Box className="text-xs space-y-0.5 text-gray-600 dark:text-gray-400">
+                                <div>Vào: <span className="font-semibold text-gray-800 dark:text-gray-200">{minCi ? minCi.format('HH:mm') : '--:--'}</span></div>
+                                <div>Ra: <span className="font-semibold text-gray-800 dark:text-gray-200">{maxCo ? maxCo.format('HH:mm') : '--:--'}</span></div>
                             </Box>
                         );
                     }
@@ -440,13 +440,13 @@ const TimekeepingSummary = () => {
                         if (!row.record) return <span className="text-gray-300 dark:text-gray-600">-</span>;
                         switch (row.record.status) {
                             case 'APPROVED':
-                                return <span className="text-xs px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 border border-emerald-200 dark:border-emerald-900 rounded font-medium">Đã duyệt</span>;
+                                return <Chip label="Đã duyệt" size="small" color="success" variant="outlined" />;
                             case 'SUBMITTED':
-                                return <span className="text-xs px-2 py-0.5 bg-amber-50 dark:bg-amber-950/20 text-amber-600 border border-amber-200 dark:border-amber-900 rounded font-medium">Chờ duyệt</span>;
+                                return <Chip label="Chờ duyệt" size="small" color="warning" variant="outlined" />;
                             case 'REJECTED':
-                                return <span className="text-xs px-2 py-0.5 bg-rose-50 dark:bg-rose-950/20 text-rose-600 border border-rose-200 dark:border-rose-900 rounded font-medium">Từ chối</span>;
+                                return <Chip label="Từ chối" size="small" color="error" variant="outlined" />;
                             default:
-                                return <span className="text-xs px-2 py-0.5 bg-gray-50 dark:bg-zinc-800/30 text-gray-500 border border-gray-200 rounded font-medium">Nháp</span>;
+                                return <Chip label="Nháp" size="small" color="default" variant="outlined" />;
                         }
                     }
                 }
@@ -459,14 +459,14 @@ const TimekeepingSummary = () => {
                     field: 'staffCode',
                     width: 100,
                     align: 'center',
-                    render: (row) => <span className="font-semibold text-gray-700 dark:text-gray-300">{row.staffCode}</span>
+                    render: (row) => <span>{row.staffCode}</span>
                 },
                 {
                     title: 'Nhân viên',
                     field: 'displayName',
                     align: 'center',    
                     minWidth: 150,
-                    render: (row) => <span className="font-bold text-gray-800 dark:text-gray-200">{row.displayName}</span>
+                    render: (row) => <span>{row.displayName}</span>
                 },
                 {
                     title: 'Phòng ban',

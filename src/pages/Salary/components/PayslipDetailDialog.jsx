@@ -86,7 +86,7 @@ const PayslipDetailDialog = ({
         
         return isIntern
             ? `CHUYEN TRO CAP THUC TAP THANG ${month}/${year} CHO THUC TAP SINH ${displayName}`
-            : `THANH TOAN LUONG THANG ${month}/${year} CHO ${displayName}`;
+            : `THANH TOAN LUONG THANG ${month}/${year} CHO NHAN VIEN ${displayName}`;
     };
 
     // Actions
@@ -485,24 +485,24 @@ const PayslipDetailDialog = ({
 
                                 <Box sx={{ fontSize: '14px', '& > div': { display: 'flex', mb: 2 } }}>
                                     <Box>
-                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', shrink: 0 }}>Ngân hàng:</Typography>
-                                        <Typography variant="body2" fontWeight="bold" color="text.primary">{detail.staff?.bankName || '---'}</Typography>
+                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>Ngân hàng:</Typography>
+                                        <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ flex: 1 }}>{detail.staff?.bankName || '---'}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', shrink: 0 }}>Số TK:</Typography>
-                                        <Typography variant="body2" fontWeight="medium" color="text.primary">{detail.staff?.bankAccountNumber || '---'}</Typography>
+                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>Số TK:</Typography>
+                                        <Typography variant="body2" fontWeight="medium" color="text.primary" sx={{ flex: 1 }}>{detail.staff?.bankAccountNumber || '---'}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', shrink: 0 }}>Chủ TK:</Typography>
-                                        <Typography variant="body2" fontWeight="bold" color="text.primary">{removeAccents(detail.staff?.bankAccountName || detail.staff?.displayName || '---')}</Typography>
+                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>Chủ TK:</Typography>
+                                        <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ flex: 1 }}>{removeAccents(detail.staff?.bankAccountName || detail.staff?.displayName || '---')}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', shrink: 0 }}>Số tiền:</Typography>
-                                        <Typography variant="body2" fontWeight="bold" sx={{ color: 'primary.main' }}>{formatMoney(detail.netSalary)}</Typography>
+                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>Số tiền:</Typography>
+                                        <Typography variant="body2" fontWeight="bold" sx={{ color: 'primary.main', flex: 1 }}>{formatMoney(detail.netSalary)}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', shrink: 0 }}>Nội dung:</Typography>
-                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>Nội dung:</Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1, wordBreak: 'break-word' }}>
                                             {getTransferContent(detail)}
                                         </Typography>
                                     </Box>
@@ -516,7 +516,6 @@ const PayslipDetailDialog = ({
                                         border: '1px solid',
                                         borderColor: (theme) => theme.palette.mode === 'light' ? '#e0e0e0' : 'rgba(255, 255, 255, 0.1)',
                                         borderRadius: '8px',
-                                        p: 2,
                                         mb: 2,
                                         mt: 2,
                                         backgroundColor: '#fff',

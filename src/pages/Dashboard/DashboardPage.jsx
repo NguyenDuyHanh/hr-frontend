@@ -13,13 +13,6 @@ const DashboardPage = () => {
 
     useEffect(() => {
         fetchSummary();
-        
-        // Auto refresh dashboard data every 2 minutes
-        const interval = setInterval(() => {
-            fetchSummary();
-        }, 120000);
-
-        return () => clearInterval(interval);
     }, [fetchSummary]);
 
     const isFirstLoad = loading && !summary;

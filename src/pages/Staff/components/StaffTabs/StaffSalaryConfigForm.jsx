@@ -21,6 +21,64 @@ import VNDCurrencyInput from '../../../../components/ui/VNDCurrencyInput';
 
 import { getAllSalaryItems, getStaffSalaryItems, saveStaffSalaryItems } from '../../../../services/salaryItemService';
 import { SalaryItemType, SalaryCalculationType } from '../../../../constants';
+import { NumericFormat } from 'react-number-format';
+
+const NumericFormatCustom = React.forwardRef((props, ref) => {
+    const { onChange, ...other } = props;
+    return (
+        <NumericFormat
+            {...other}
+            getInputRef={ref}
+            onValueChange={(values) => {
+                onChange({
+                    target: {
+                        name: props.name,
+                        value: values.value,
+                    },
+                });
+            }}
+            thousandSeparator
+            valueIsNumericString
+        />
+    );
+});
+
+const InlineAmountInput = ({ value, onChange, disabled }) => {
+    const [localValue, setLocalValue] = useState(value);
+
+    useEffect(() => {
+        setLocalValue(value);
+    }, [value]);
+
+    return (
+        <TextField
+            value={localValue}
+            onChange={(e) => setLocalValue(e.target.value)}
+            onBlur={() => {
+                const numVal = parseFloat(localValue) || 0;
+                onChange(numVal);
+            }}
+            size="small"
+            fullWidth
+            disabled={disabled}
+            InputProps={{
+                inputComponent: NumericFormatCustom,
+                endAdornment: (
+                    <span style={{ marginRight: '8px', color: '#757575', whiteSpace: 'nowrap' }}>₫</span>
+                )
+            }}
+            sx={{
+                "& .MuiOutlinedInput-input": {
+                    textAlign: "right",
+                    fontSize: "14px",
+                },
+                "& .MuiOutlinedInput-root": {
+                    backgroundColor: disabled ? "rgba(0, 0, 0, 0.05)" : "inherit",
+                }
+            }}
+        />
+    );
+};
 
 const StaffSalaryConfigForm = ({ staffId, isView }) => {
     const [allSalaryItems, setAllSalaryItems] = useState([]);
@@ -138,12 +196,13 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
         { 
             title: 'Khoản lương', 
             field: 'salaryItem.name',
+            cellStyle: { verticalAlign: 'middle' },
             render: (row) => {
                 const index = getRowIndex(row);
                 const isNewRow = row.isNew === true;
                 
                 if (isView || !isNewRow) {
-                    return <span className="font-semibold">{row.salaryItem?.name}</span>;
+                    return <span>{row.salaryItem?.name}</span>;
                 }
                 
                 const cellAvailableItems = allSalaryItems.filter(item => 
@@ -158,10 +217,11 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
                         options={cellAvailableItems}
                         displayData="name"
                         placeholder="Chọn khoản lương..."
+                        noMargin={true}
                         onChange={(_, newValue) => {
                             const idx = getRowIndex(row);
                             if (idx !== -1) {
-                                formik.setFieldValue(`configuredItems[idx].salaryItem`, newValue);
+                                formik.setFieldValue(`configuredItems[${idx}].salaryItem`, newValue);
                                 
                                 const updated = [...configuredItems];
                                 if (updated[idx]) {
@@ -176,29 +236,35 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
         },
         { 
             title: 'Mã', 
+            align: 'center',
             field: 'salaryItem.code',
+            cellStyle: { verticalAlign: 'middle' },
             render: (row) => {
                 if (row.salaryItem?.code) {
-                    return <span className="font-mono text-accent font-bold">{row.salaryItem.code}</span>;
+                    return <span>{row.salaryItem.code}</span>;
                 }
                 return <span className="text-gray-400 italic">--</span>;
             }
         },
         { 
             title: 'Loại', 
+            align: 'center',
             field: 'salaryItem.type', 
+            cellStyle: { verticalAlign: 'middle' },
             render: (row) => {
                 if (!row.salaryItem?.type) return <span className="text-gray-400 italic">--</span>;
                 return row.salaryItem.type === SalaryItemType.INCOME ? (
-                    <span className="text-emerald-700 font-bold">Thu nhập</span>
+                    <span>Thu nhập</span>
                 ) : (
-                    <span className="text-rose-700 font-bold">Giảm trừ</span>
+                    <span>Giảm trừ</span>
                 );
             }
         },
         { 
             title: 'Cách tính', 
+            align: 'center',
             field: 'salaryItem.calculationType',
+            cellStyle: { verticalAlign: 'middle' },
             render: (row) => {
                 if (!row.salaryItem?.calculationType) return <span className="text-gray-400 italic">--</span>;
                 return row.salaryItem.calculationType === SalaryCalculationType.FIXED ? 'Cố định' : 
@@ -206,34 +272,24 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
             }
         },
         { 
-            title: 'Số tiền gán', 
+            title: 'Số tiền', 
             field: 'amount', 
             align: 'right', 
-            width: 220,
+            width: 200,
+            cellStyle: { verticalAlign: 'middle' },
             render: (row) => {
                 const index = formik.values.configuredItems.findIndex(item => item.salaryItem?.id === row.salaryItem?.id);
                 const disabled = !row.salaryItem?.id;
                 return isView ? (
-                    <Typography variant="body2" fontWeight="bold">
+                    <Typography variant="body2">
                         {formatMoney(row.amount)}
                     </Typography>
                 ) : (
-                    <VNDCurrencyInput
-                        name={`configuredItems[${index}].amount`}
-                        placeholder="Số tiền..."
-                        textAlignRight={true}
-                        notDelay={true}
-                        size="small"
-                        noMargin={true}
+                    <InlineAmountInput
+                        value={row.amount}
                         disabled={disabled}
-                        onChange={(e) => {
-                            const val = parseFloat(e.target.value) || 0;
+                        onChange={(val) => {
                             formik.setFieldValue(`configuredItems[${index}].amount`, val);
-                            const updated = [...configuredItems];
-                            if (updated[index]) {
-                                updated[index].amount = val;
-                                setConfiguredItems(updated);
-                            }
                         }}
                     />
                 );
@@ -243,6 +299,7 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
             title: 'Thao tác',
             align: 'center',
             width: 80,
+            cellStyle: { verticalAlign: 'middle' },
             render: (row) => {
                 return (
                     <Tooltip title="Gỡ bỏ khoản lương này" arrow>
@@ -276,12 +333,9 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
 
     return (
         <FormikProvider value={formik}>
-            <Box className="space-y-6">
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Box>
-                        <Typography variant="h6" fontWeight="bold">Cấu hình Lương & Phụ cấp</Typography>
-                    </Box>
-                    {!isView && (
+            <Box className="space-y-4" pb={4}>
+                {!isView && (
+                    <Box display="flex" justifyContent="end" alignItems="center">
                         <Box className="flex gap-2">
                             <Button 
                                 variant="outlined" 
@@ -300,10 +354,8 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
                                 Lưu cấu hình
                             </Button>
                         </Box>
-                    )}
-                </Box>
-
-                <Divider />
+                    </Box>
+                )}
 
                 {/* Configuration list table */}
                 <Table 

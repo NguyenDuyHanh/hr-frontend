@@ -38,9 +38,7 @@ const StaffBankInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
         },
     });
 
-    const action = isView ? (
-        <Button onClick={onClose} variant="contained" color="primary" sx={{ textTransform: 'none', px: 4 }}>Đóng</Button>
-    ) : (
+    const action = isView ? null : (
         <>
             <Button onClick={onClose} variant="outlined" color="inherit" sx={{ color: 'text.secondary', textTransform: 'none' }}>Hủy bỏ</Button>
             <Button onClick={formik.handleSubmit} color="primary" variant="contained" sx={{ textTransform: 'none', px: 4, ml: 1 }}>Lưu lại</Button>
@@ -49,7 +47,7 @@ const StaffBankInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
 
     return (
         <FormikProvider value={formik}>
-            <div className="space-y-6">
+            <div className="space-y-6 pb-4">
                 <TabAccordion title="Thông tin tài khoản ngân hàng" open={true}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
@@ -88,9 +86,11 @@ const StaffBankInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
                 </TabAccordion>
 
                 {/* Form actions */}
-                <Box display="flex" justifyContent="flex-end" mt={4} className="pt-4 border-t border-border">
-                    {action}
-                </Box>
+                {action && (
+                    <Box display="flex" justifyContent="flex-end" mt={4} className="pt-4 border-t border-border">
+                        {action}
+                    </Box>
+                )}
             </div>
         </FormikProvider>
     );

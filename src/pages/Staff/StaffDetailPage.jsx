@@ -96,52 +96,6 @@ const StaffDetailPage = () => {
                 </Box>
             )
         },
-        /*
-        {
-            label: 'Hợp đồng lao động',
-            icon: <AssignmentIcon />,
-            content: (
-                <Box p={4} mt={2} component={Paper} variant="outlined" className="text-center text-text-secondary">
-                    <Typography variant="body1" className="italic">
-                        Thông tin hợp đồng lao động đang được phát triển...
-                    </Typography>
-                </Box>
-            )
-        },
-        {
-            label: 'Quá trình làm việc',
-            icon: <HistoryIcon />,
-            content: (
-                <Box p={4} mt={2} component={Paper} variant="outlined" className="text-center text-text-secondary">
-                    <Typography variant="body1" className="italic">
-                        Lịch sử quá trình làm việc đang được phát triển...
-                    </Typography>
-                </Box>
-            )
-        },
-        {
-            label: 'Khen thưởng / Kỷ luật',
-            icon: <EmojiEventsIcon />,
-            content: (
-                <Box p={4} mt={2} component={Paper} variant="outlined" className="text-center text-text-secondary">
-                    <Typography variant="body1" className="italic">
-                        Lịch sử khen thưởng và kỷ luật đang được phát triển...
-                    </Typography>
-                </Box>
-            )
-        },
-        {
-            label: 'Bảo hiểm',
-            icon: <SecurityIcon />,
-            content: (
-                <Box p={4} mt={2} component={Paper} variant="outlined" className="text-center text-text-secondary">
-                    <Typography variant="body1" className="italic">
-                        Thông tin bảo hiểm xã hội đang được phát triển...
-                    </Typography>
-                </Box>
-            )
-        },
-        */
         {
             label: 'Lương & Phụ cấp',
             icon: <AttachMoneyIcon />,
@@ -149,7 +103,7 @@ const StaffDetailPage = () => {
                 <Box mt={2}>
                     <StaffSalaryConfigForm 
                         staffId={id} 
-                        isView={isView}
+                        isView={true}
                     />
                 </Box>
             )
@@ -194,7 +148,7 @@ const StaffDetailPage = () => {
                 </Box>
             ) : (
                 <Typography variant="h5" fontWeight="bold" className="text-text-primary px-1">
-                    Trang cá nhân
+                    Hồ sơ cá nhân
                 </Typography>
             )}
 

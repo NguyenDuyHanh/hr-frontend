@@ -15,6 +15,7 @@ import {
 } from '../../../../constants';
 import { getDepartments, getPositions } from '../../../../services/StaffService';
 import { format } from 'date-fns';
+import { getLeaveBalance } from '../../../../services/leaveService';
 
 const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
     const { addStaff, modifyStaff } = useStaffStore();
@@ -70,6 +71,8 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
         idNumberIssueBy: staffData?.idNumberIssueBy || '',
         companyEmail: staffData?.companyEmail || '',
         annualLeave: staffData?.annualLeave !== undefined && staffData?.annualLeave !== null ? staffData.annualLeave : 12.0,
+        usedDays: 0,
+        remainingDays: staffData?.annualLeave !== undefined && staffData?.annualLeave !== null ? staffData.annualLeave : 12.0,
 
         // 7. Tax & Insurance
         taxCode: staffData?.taxCode || '',
@@ -90,7 +93,9 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 departmentId: values.department?.id || null,
                 positionId: values.position?.id || null,
                 department: undefined,
-                position: undefined
+                position: undefined,
+                usedDays: undefined,
+                remainingDays: undefined
             };
 
             // Format dates
@@ -119,14 +124,31 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
 
     const { values, setFieldValue } = formik;
 
+    useEffect(() => {
+        const fetchBalance = async () => {
+            if (staffData?.id) {
+                try {
+                    const currentYear = new Date().getFullYear();
+                    const balanceRes = await getLeaveBalance(staffData.id, currentYear);
+                    const balance = balanceRes?.data || balanceRes;
+                    if (balance) {
+                        setFieldValue('usedDays', balance.usedDays ?? 0);
+                        setFieldValue('remainingDays', balance.remainingDays ?? 12);
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch leave balance", err);
+                }
+            }
+        };
+        fetchBalance();
+    }, [staffData, setFieldValue]);
+
     const filteredPositions = useMemo(() => {
         if (!values.department?.id) return positions;
         return positions.filter(pos => pos.department?.id === values.department.id);
     }, [positions, values.department?.id]);
 
-    const action = isView ? (
-        <Button onClick={onClose} variant="contained" color="primary" sx={{ textTransform: 'none', px: 4 }}>Đóng</Button>
-    ) : (
+    const action = isView ? null : (
         <>
             <Button onClick={onClose} variant="outlined" color="inherit" sx={{ color: 'text.secondary', textTransform: 'none' }}>Hủy bỏ</Button>
             <Button onClick={formik.handleSubmit} color="primary" variant="contained" sx={{ textTransform: 'none', px: 4, ml: 1 }}>Lưu lại</Button>
@@ -135,7 +157,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
 
     return (
         <FormikProvider value={formik}>
-            <div className="space-y-4">
+            <div className="space-y-4 pb-4">
                 {/* 1. Thông tin cá nhân */}
                 <TabAccordion title="Thông tin cá nhân" open={true}>
                     <Grid container spacing={3}>
@@ -232,8 +254,28 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                             <TextField label="Email công ty" name="companyEmail" fullWidth disabled={isView} />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={3}>
-                            <TextField type="number" label="Số ngày nghỉ phép" name="annualLeave" fullWidth disabled={isView} />
+                            <TextField type="number" label="Định mức phép năm" name="annualLeave" fullWidth disabled={isView} />
                         </Grid>
+                        {staffData?.id && (
+                            <>
+                                <Grid item xs={12} sm={6} lg={3}>
+                                    <TextField 
+                                        label="Số ngày đã nghỉ" 
+                                        name="usedDays"
+                                        fullWidth 
+                                        disabled 
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} lg={3}>
+                                    <TextField 
+                                        label="Số ngày phép còn lại" 
+                                        name="remainingDays"
+                                        fullWidth 
+                                        disabled 
+                                    />
+                                </Grid>
+                            </>
+                        )}
                     </Grid>
                 </TabAccordion>
 
@@ -302,9 +344,11 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 </TabAccordion>
 
                 {/* Form actions */}
-                <Box display="flex" justifyContent="flex-end" mt={4} className="pt-4 border-t border-border">
-                    {action}
-                </Box>
+                {action && (
+                    <Box display="flex" justifyContent="flex-end" mt={4} className="pt-4 border-t border-border">
+                        {action}
+                    </Box>
+                )}
             </div>
         </FormikProvider>
     );

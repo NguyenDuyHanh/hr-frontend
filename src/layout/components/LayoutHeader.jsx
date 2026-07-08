@@ -407,13 +407,15 @@ const LayoutHeader = () => {
             />
             <div className="flex flex-col min-w-0">
               {user?.staffName && (
-                <span className="font-semibold text-[15px] text-foreground truncate block leading-tight">
+              <span className="font-semibold text-[15px] text-foreground truncate block leading-tight">
                   {user.staffName}
+              </span>
+              )}
+              {user?.email && (
+                <span className="text-muted-foreground text-[12px] truncate mt-0.5 block">
+                  {user.email}
                 </span>
               )}
-              <span className="text-muted-foreground text-[12px] truncate mt-0.5 block">
-                {user?.email || (user?.username ? `${user.username}@gmail.com` : 'user@domain.com')}
-              </span>
               {user?.staffCode && (
                 <span className="text-secondary text-[12px] font-semibold mt-0.5 block tracking-wide">
                   {user.staffCode}
@@ -431,7 +433,7 @@ const LayoutHeader = () => {
             className="mx-1 my-0.5 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground flex items-center gap-3 group transition-colors cursor-pointer"
           >
             <PersonOutlineIcon className="text-foreground group-hover:text-sidebar-accent-foreground w-[18px] h-[18px] min-w-[18px]" />
-            Trang cá nhân
+            Hồ sơ cá nhân
           </MenuItem>
           
           <MenuItem 

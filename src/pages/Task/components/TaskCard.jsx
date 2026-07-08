@@ -96,7 +96,7 @@ const TaskCard = ({ task, index }) => {
                                     style={{ color: isOverdue ? '#f44336' : '#757575' }}
                                     className={isOverdue ? 'font-semibold' : ''}
                                 >
-                                    {task.startTime ? formatDate(task.startTime, "DD/MM") : '—'}
+                                    {task.startTime ? formatDate(task.startTime, "dd/MM") : '—'}
                                 </Typography>
                             </Box>
 

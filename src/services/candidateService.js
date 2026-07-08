@@ -44,3 +44,10 @@ export const updateCandidateStatus = async (id, status, refusalReason) => {
     });
     return response.data;
 };
+
+export const exportCandidatesExcel = async (searchDto) => {
+    const response = await axios.post(`${API_PATH}/export-excel`, searchDto || {}, {
+        responseType: 'blob',
+    });
+    return response.data;
+};

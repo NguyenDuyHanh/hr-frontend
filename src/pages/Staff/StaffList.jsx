@@ -24,6 +24,7 @@ import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import { Formik } from 'formik';
 import Autocomplete from '../../components/ui/Autocomplete';
+import SelectInput from '../../components/ui/SelectInput';
 
 const FAKE_DEPARTMENTS = [
   { id: '1', name: "Phòng Hành chính" },
@@ -261,12 +262,6 @@ const StaffList = () => {
             align: 'center',
             render: (rowData) => <span className="whitespace-nowrap">{rowData.positionName || '---'}</span> 
         },
-        { 
-            title: 'Số ngày phép', 
-            width: 130,
-            align: 'center',
-            render: (rowData) => <span>{rowData.annualLeave !== undefined && rowData.annualLeave !== null ? rowData.annualLeave : '---'}</span> 
-        },
     ];
 
     return (
@@ -276,13 +271,15 @@ const StaffList = () => {
                     innerRef={formikRef}
                     initialValues={{
                         department: initialDepartment,
-                        position: initialPosition
+                        position: initialPosition,
+                        workingStatus: filters.workingStatus || ''
                     }}
                     enableReinitialize={true}
                     onSubmit={(values) => {
                         setFilters({
                             departmentId: values.department?.id || null,
-                            positionId: values.position?.id || null
+                            positionId: values.position?.id || null,
+                            workingStatus: values.workingStatus || null
                         });
                     }}
                 >
@@ -301,8 +298,8 @@ const StaffList = () => {
                                     onToggle: setFilterOpen,
                                     activeCount: activeFilterCount
                                 }}
-                                downloadTemplateOptions={canManage ? templateOpts : undefined}
-                                importOptions={canManage ? importOpts : undefined}
+                                // downloadTemplateOptions={canManage ? templateOpts : undefined}
+                                // importOptions={canManage ? importOpts : undefined}
                                 onExport={canManage ? handleExport : undefined}
                                 exportFileName="Danh_sach_nhan_vien.xlsx"
                             />
@@ -314,7 +311,7 @@ const StaffList = () => {
                                 onReset={handleReset}
                             >
                                 <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
+                                    <Grid item xs={12} sm={4}>
                                         <Autocomplete
                                             name="department"
                                             label="Phòng ban"
@@ -333,7 +330,7 @@ const StaffList = () => {
                                             }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={6}>
+                                    <Grid item xs={12} sm={4}>
                                         <Autocomplete
                                             name="position"
                                             label="Vị trí"
@@ -343,6 +340,19 @@ const StaffList = () => {
                                                     : positions
                                             }
                                             getOptionLabel={(option) => option?.name || ''}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <SelectInput
+                                            name="workingStatus"
+                                            label="Trạng thái nhân viên"
+                                            options={[
+                                                { value: '', name: 'Tất cả' },
+                                                ...WorkingStatusOptions.map(opt => ({ value: opt.value, name: opt.name }))
+                                            ]}
+                                            keyValue="value"
+                                            displayvalue="name"
+                                            hideNullOption={true}
                                         />
                                     </Grid>
                                 </Grid>
