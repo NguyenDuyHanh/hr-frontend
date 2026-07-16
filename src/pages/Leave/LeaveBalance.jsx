@@ -85,13 +85,13 @@ const LeaveBalance = () => {
             field: 'staffCode',
             align: 'center',
             width: 140,
-            render: (rowData) => <span className="font-semibold">{rowData.staffCode}</span>
+            render: (rowData) => <span>{rowData.staffCode}</span>
         },
         {
             title: t('leave.field.staffName', 'Tên nhân viên'),
             field: 'staffName',
             width: 200,
-            render: (rowData) => <span className="font-semibold">{rowData.staffName}</span>
+            render: (rowData) => <span>{rowData.staffName}</span>
         },
         {
             title: t('leave.field.department', 'Phòng ban'),

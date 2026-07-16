@@ -358,7 +358,7 @@ const TimekeepingSummary = () => {
                         });
 
                         return (
-                            <Box className="text-xs space-y-0.5 text-gray-600 dark:text-gray-400">
+                            <Box className="space-y-0.5 text-gray-600 dark:text-gray-400">
                                 <div>Vào: <span className="font-semibold text-gray-800 dark:text-gray-200">{minCi ? minCi.format('HH:mm') : '--:--'}</span></div>
                                 <div>Ra: <span className="font-semibold text-gray-800 dark:text-gray-200">{maxCo ? maxCo.format('HH:mm') : '--:--'}</span></div>
                             </Box>
@@ -370,12 +370,12 @@ const TimekeepingSummary = () => {
                     width: 180,
                     render: (row) => {
                         if (!row.record || !row.record.details || row.record.details.length === 0) {
-                            return <span className="text-gray-400 italic text-xs">Vắng / Nghỉ</span>;
+                            return <span className="text-gray-400">Vắng / Nghỉ</span>;
                         }
                         return (
-                            <div className="space-y-0.5 text-xs">
+                            <div className="space-y-0.5">
                                 {row.record.details.map((d, idx) => d.shift && (
-                                    <div key={idx} className="font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                                    <div key={idx} className="whitespace-nowrap">
                                         {d.shift.name} ({formatShiftTime(d.shift.startTime)} - {formatShiftTime(d.shift.endTime)})
                                     </div>
                                 ))}
@@ -416,7 +416,7 @@ const TimekeepingSummary = () => {
                         if (row.record && row.record.details) {
                             row.record.details.forEach(d => late += d.lateMinutes || 0);
                         }
-                        return late > 0 ? <span className="font-bold text-rose-600">{late}p</span> : <span className="text-gray-300">-</span>;
+                        return late > 0 ? <span className="font-bold text-rose-600">{late}p</span> : <span>0</span>;
                     }
                 },
                 {
@@ -428,7 +428,7 @@ const TimekeepingSummary = () => {
                         if (row.record && row.record.details) {
                             row.record.details.forEach(d => early += d.earlyMinutes || 0);
                         }
-                        return early > 0 ? <span className="font-bold text-rose-600">{early}p</span> : <span className="text-gray-300">-</span>;
+                        return early > 0 ? <span className="font-bold text-rose-600">{early}p</span> : <span>0</span>;
                     }
                 },
                 {
@@ -472,13 +472,11 @@ const TimekeepingSummary = () => {
                     title: 'Phòng ban',
                     field: 'departmentName',
                     width: 180,
-                    align: 'center'
                 },
                 {
                     title: 'Vị trí',
                     field: 'positionName',
                     width: 150,
-                    align: 'center'
                 },
                 {
                     title: 'Tổng công',
@@ -506,14 +504,14 @@ const TimekeepingSummary = () => {
                     field: 'lateMinutes',
                     align: 'center',
                     width: 120,
-                    render: (row) => row.lateMinutes > 0 ? <span className="font-bold text-rose-600">{row.lateMinutes}p</span> : <span className="text-gray-300">-</span>
+                    render: (row) => row.lateMinutes > 0 ? <span className="font-bold text-rose-600">{row.lateMinutes}p</span> : <span>0</span>
                 },
                 {
                     title: 'Về sớm (phút)',
                     field: 'earlyMinutes',
                     align: 'center',
                     width: 120,
-                    render: (row) => row.earlyMinutes > 0 ? <span className="font-bold text-rose-600">{row.earlyMinutes}p</span> : <span className="text-gray-300">-</span>
+                    render: (row) => row.earlyMinutes > 0 ? <span className="font-bold text-rose-600">{row.earlyMinutes}p</span> : <span>0</span>
                 }
             ];
         }

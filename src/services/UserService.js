@@ -42,3 +42,8 @@ export const unlockUser = async (id) => {
     const response = await axios.put(`${API_PATH}/${id}/unlock`);
     return response.data;
 };
+
+export const changePassword = async (data) => {
+    const response = await axios.put(`${API_PATH}/change-password`, data);
+    return response.data;
+};

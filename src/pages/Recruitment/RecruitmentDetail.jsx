@@ -34,6 +34,7 @@ import SelectInput from '../../components/ui/SelectInput';
 import TextField from '../../components/ui/TextField';
 import AsyncAutocomplete from '../../components/ui/AsyncAutocomplete';
 import TabAccordion from '../../components/ui/Tab/TabAccordion';
+import { formatDate } from '../../LocalFunction';
 
 const RecruitmentDetail = () => {
     const { id } = useParams();
@@ -310,7 +311,6 @@ const RecruitmentDetail = () => {
         }
     };
 
-
     // Candidate Columns
     const candidateColumns = [
         {
@@ -319,7 +319,7 @@ const RecruitmentDetail = () => {
             align: 'center',
             width: 120,
             render: (row) => (
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center justify-center space-x-1">
                     <IconButton 
                         size="small" 
                         sx={{ color: '#ed6c02' }} 
@@ -341,20 +341,16 @@ const RecruitmentDetail = () => {
                 </div>
             )
         },
-        { title: 'Mã ứng viên', field: 'candidateCode',  width: 130 },
+        { title: 'Mã ứng viên', field: 'candidateCode', align: 'center', width: 130 },
         { 
             title: 'Thông tin ứng viên', 
             field: 'displayName', 
             width: 250,
             render: (row) => (
-                <Box display="flex" alignItems="center" gap={1.5} py={1}>
-                    <Box>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{row.displayName}</Typography>
-                        <Typography variant="caption" color="text.secondary">Ngày sinh: {row.birthDate || '---'}</Typography>
-                        <Box>
-                            <Typography variant="caption" color="text.secondary">Giới tính: {row.gender === 'MALE' ? 'Nam' : row.gender === 'FEMALE' ? 'Nữ' : row.gender === 'OTHER' ? 'Khác' : (row.gender || '---')}</Typography>
-                        </Box>
-                    </Box>
+                <Box display="flex" flexDirection="column" gap={0.5} py={1}>
+                    <span>{row.displayName}</span>
+                    <span>Ngày sinh: {formatDate(row.birthDate) || '---'}</span>
+                    <span>Giới tính: {row.gender === 'MALE' ? 'Nam' : row.gender === 'FEMALE' ? 'Nữ' : row.gender === 'OTHER' ? 'Khác' : (row.gender || '---')}</span>
                 </Box>
             )
         },
@@ -362,20 +358,20 @@ const RecruitmentDetail = () => {
             title: 'Liên hệ',
             width: 200,
             render: (row) => (
-                <Box py={0.5}>
-                    <Typography variant="body2" sx={{ fontSize: '12px' }}>SĐT: {row.phoneNumber || '---'}</Typography>
-                    <Typography variant="body2" sx={{ fontSize: '12px', color: 'text.secondary' }}>Email: {row.email || '---'}</Typography>
-                </Box>
+                <div className="py-1">
+                    <div>SĐT: {row.phoneNumber || '---'}</div>
+                    <div>Email: {row.email || '---'}</div>
+                </div>
             )
         },
         {
             title: 'Phòng ban & Vị trí tiếp nhận',
             width: 220,
             render: (row) => (
-                <Box py={0.5}>
-                    <Typography variant="body2" sx={{ fontSize: '12px', fontWeight: 'bold' }}>PB: {row.departmentName || '---'}</Typography>
-                    <Typography variant="body2" sx={{ fontSize: '12px', color: 'text.secondary' }}>VT: {row.positionName || '---'}</Typography>
-                </Box>
+                <div className="py-1">
+                    <div>PB: {row.departmentName || '---'}</div>
+                    <div>VT: {row.positionName || '---'}</div>
+                </div>
             )
         },
         {
@@ -388,7 +384,7 @@ const RecruitmentDetail = () => {
                     <Tooltip title="Xem CV ứng viên">
                         <Link href={row.cvFileUrl} target="_blank" rel="noopener" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, color: '#d32f2f', textDecoration: 'none' }}>
                             <PictureAsPdfIcon fontSize="small" />
-                            <span style={{ fontSize: '12px', fontWeight: '500' }}>Xem</span>
+                            <span style={{ fontWeight: '500' }}>Xem</span>
                         </Link>
                     </Tooltip>
                     <Tooltip title="Tải CV về máy">
@@ -407,37 +403,32 @@ const RecruitmentDetail = () => {
                         </IconButton>
                     </Tooltip>
                 </Box>
-            ) : <Typography variant="caption" color="text.disabled">Chưa nộp</Typography>
+            ) : <span>Chưa nộp</span>
         },
         {
             title: 'Trạng thái',
             field: 'status',
+            align: 'center',
             width: 180,
             render: (row) => {
                 const st = CANDIDATE_STATUSES.find(s => s.value === row.status) || CANDIDATE_STATUSES[0];
                 return (
-                    <Box display="flex" flexDirection="column" gap={0.5}>
-                        <Box display="flex" alignItems="center" gap={1}>
-                            {row.status !== 'ONBOARDED' && row.status !== 'REJECTED' ? (
-                                <FormControl size="small" sx={{ minWidth: 130 }}>
-                                    <Select
-                                        value={row.status}
-                                        onChange={(e) => handleStatusChangeClick(row, e.target.value)}
-                                        sx={{ fontSize: '12px', height: '30px' }}
-                                        disabled={isViewMode}
-                                    >
-                                        {CANDIDATE_STATUSES.map(opt => (
-                                            <MenuItem key={opt.value} value={opt.value} sx={{ fontSize: '12px' }}>
-                                                {opt.label}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            ) : (
-                                <Chip label={st.label} color={st.color} size="small" variant="outlined" />
-                            )}
-                            
-
+                    <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
+                        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                            <FormControl size="small" sx={{ minWidth: 130 }}>
+                                <Select
+                                    value={row.status}
+                                    onChange={(e) => handleStatusChangeClick(row, e.target.value)}
+                                    sx={{ height: '30px' }}
+                                    disabled={isViewMode || row.status === 'ONBOARDED' || row.status === 'REJECTED'}
+                                >
+                                    {CANDIDATE_STATUSES.map(opt => (
+                                        <MenuItem key={opt.value} value={opt.value}>
+                                            {opt.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </Box>
                         {row.note && (
                             <Tooltip title={row.note}>
@@ -450,7 +441,8 @@ const RecruitmentDetail = () => {
                                         maxWidth: 160,
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
-                                        textOverflow: 'ellipsis'
+                                        textOverflow: 'ellipsis',
+                                        textAlign: 'center'
                                     }}
                                 >
                                     Ghi chú: {row.note}
@@ -488,46 +480,19 @@ const RecruitmentDetail = () => {
     return (
         <Stack spacing={2}>
             {/* Top section: back button and mode action */}
-            <Paper elevation={0} className="p-4 border border-border">
-                <div className="flex justify-between items-center mb-4">
-                    <Button 
-                        startIcon={<ArrowBackIcon />} 
-                        onClick={() => navigate('/recruitments')}
-                        sx={{ textTransform: 'none', color: 'text.secondary' }}
-                        size="small"
-                    >
-                        Quay lại danh sách
-                    </Button>
-                    {isViewMode && (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<EditIcon />}
-                            onClick={() => navigate(`/recruitments/${id}/edit`)}
-                            sx={{ textTransform: 'none' }}
-                            size="small"
-                        >
-                            Chỉnh sửa tin
-                        </Button>
-                    )}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                    <Typography variant="h5" className="font-bold text-foreground">
-                        {selectedRecruitment.name}
-                    </Typography>
-                    <Chip 
-                        label={selectedRecruitment.code} 
-                        size="small" 
-                        className="font-mono font-bold"
-                        color="primary" 
-                        variant="outlined"
-                    />
-                </div>
-            </Paper>
+            <div>
+                <Button 
+                    startIcon={<ArrowBackIcon />} 
+                    onClick={() => navigate('/recruitments')}
+                    sx={{ textTransform: 'none', color: 'text.secondary' }}
+                    size="small"
+                >
+                    Quay lại danh sách
+                </Button>
+            </div>
 
             {/* Accordion 1: Thông tin tin tuyển dụng */}
-            <TabAccordion title="Thông tin tin tuyển dụng" open={true}>
+            <TabAccordion title="Thông tin tin tuyển dụng" open={true} className='mb-0'>
                 <FormikProvider value={formik}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
@@ -628,7 +593,7 @@ const RecruitmentDetail = () => {
                                 onSearchDraftChange={setCandidateSearchDraft}
                                 onSearch={handleCandidateSearch}
                                 onReset={handleResetCandidateFilters}
-                                onAdd={handleAddCandidate}
+                                onAdd={isViewMode ? undefined : handleAddCandidate}
                                 addDisabled={isViewMode}
                                 addLabel="Thêm ứng viên"
                                 filter={{
@@ -636,7 +601,7 @@ const RecruitmentDetail = () => {
                                     onToggle: setCandidateFilterOpen,
                                     activeCount: Object.keys(candidateFilters).length
                                 }}
-                                onExport={handleExportCandidate}
+                                onExport={isViewMode ? undefined : handleExportCandidate}
                                 exportFileName={`Danh_sach_ung_vien_${selectedRecruitment?.code || 'export'}.xlsx`}
                             />
 
@@ -696,7 +661,7 @@ const RecruitmentDetail = () => {
                     onClose={() => setOpenStatusDialog(false)}
                     refusalReason={refusalReason}
                     setRefusalReason={setRefusalReason}
-                    onConfirm={() => submitStatusChange(selectedCandidate.id, targetCandidateStatus, refusalReason)}
+                    onConfirm={(reason) => submitStatusChange(selectedCandidate.id, targetCandidateStatus, reason)}
                 />
             )}
 

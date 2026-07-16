@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
-import { Grid, Button } from '@mui/material';
+import { Grid, Button, Box } from '@mui/material';
 import useProjectStore from '../../../store/useProjectStore';
 import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
@@ -64,44 +64,46 @@ const ProjectForm = ({ open, onClose, projectData, onSaveSuccess }) => {
             action={action}
         >
             <FormikProvider value={formik}>
-                <Grid container spacing={2} className='pb-0'>
-                    <Grid item xs={12}>
-                        <TextField 
-                            label="Tên dự án" 
-                            name="name" 
-                            required
-                        />
+                <Box sx={{ pt: 1.5 }}>
+                    <Grid container spacing={2} className='pb-0'>
+                        <Grid item xs={12}>
+                            <TextField 
+                                label="Tên dự án" 
+                                name="name" 
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField 
+                                label="Mã dự án" 
+                                name="code" 
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField 
+                                label="Mô tả" 
+                                name="description" 
+                                multiline
+                                rows={3}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <DateTimePicker 
+                                label="Ngày bắt đầu" 
+                                name="startDate" 
+                                notValueMillisecond={true}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <DateTimePicker 
+                                label="Ngày kết thúc" 
+                                name="endDate" 
+                                notValueMillisecond={true}
+                            />
+                        </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                        <TextField 
-                            label="Mã dự án" 
-                            name="code" 
-                            required
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField 
-                            label="Mô tả" 
-                            name="description" 
-                            multiline
-                            rows={3}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <DateTimePicker 
-                            label="Ngày bắt đầu" 
-                            name="startDate" 
-                            notValueMillisecond={true}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <DateTimePicker 
-                            label="Ngày kết thúc" 
-                            name="endDate" 
-                            notValueMillisecond={true}
-                        />
-                    </Grid>
-                </Grid>
+                </Box>
             </FormikProvider>
         </Popup>
     );

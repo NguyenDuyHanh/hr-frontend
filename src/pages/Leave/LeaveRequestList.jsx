@@ -209,13 +209,13 @@ const LeaveRequestList = () => {
             title: t('leave.field.staffCode', 'Mã nhân viên'),
             field: 'requestStaffCode',
             width: 130,
-            render: (rowData) => <span className="font-semibold">{rowData.requestStaffCode}</span>
+            render: (rowData) => <span>{rowData.requestStaffCode}</span>
         },
         {
             title: t('leave.field.staffName', 'Tên nhân viên'),
             field: 'requestStaffName',
             width: 180,
-            render: (rowData) => <span className="font-semibold">{rowData.requestStaffName}</span>
+            render: (rowData) => <span>{rowData.requestStaffName}</span>
         },
         {
             title: t('leave.field.department', 'Phòng ban'),

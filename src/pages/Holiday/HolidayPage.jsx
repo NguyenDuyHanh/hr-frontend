@@ -262,7 +262,7 @@ const HolidayPage = () => {
                 </div>
             ),
         },
-        { title: 'Mã', field: 'code', align: 'center' },
+        { title: 'Mã', field: 'code' },
         { title: 'Tên ngày lễ', field: 'name', align: 'left' },
         {
             title: 'Từ ngày',
@@ -277,14 +277,7 @@ const HolidayPage = () => {
         {
             title: 'Số ngày',
             align: 'center',
-            render: (row) => (
-                <Chip
-                    label={`${row.totalDays} ngày`}
-                    size="small"
-                    color={row.totalDays > 1 ? 'primary' : 'default'}
-                    variant="outlined"
-                />
-            )
+            render: (row) => <span>{`${row.totalDays}`}</span>
         },
         { title: 'Năm', field: 'year', align: 'center' },
         { title: 'Mô tả', field: 'description', align: 'left' },

@@ -24,7 +24,6 @@ import DateTimePicker from '../../components/ui/DateTimePicker';
 import Popup from '../../components/ui/Popup';
 
 const TIMESHEET_STATUS_OPTIONS = [
-    { id: 'DRAFT', name: 'Nháp' },
     { id: 'SUBMITTED', name: 'Chờ duyệt' },
     { id: 'APPROVED', name: 'Đã duyệt' },
     { id: 'REJECTED', name: 'Từ chối' }
@@ -236,13 +235,11 @@ const TimesheetApprovalList = () => {
             title: 'Phòng ban',
             field: 'departmentName',
             width: 150,
-            align: 'center',
             render: (rowData) => <span>{rowData.departmentName || '---'}</span>
         },
         {
             title: 'Vị trí',
             field: 'positionName',
-            align: 'center',
             width: 130,
             render: (rowData) => <span>{rowData.positionName || '---'}</span>
         },
@@ -260,7 +257,7 @@ const TimesheetApprovalList = () => {
                 const details = rowData.details || [];
                 if (details.length === 0) return '---';
                 return (
-                    <div className="space-y-0.5 text-xs">
+                    <div className="space-y-0.5">
                         {details.map((d, idx) => d.shift && (
                             <div key={idx} className="whitespace-nowrap">
                                 {d.shift.name} ({formatShiftTime(d.shift.startTime)} - {formatShiftTime(d.shift.endTime)})
@@ -293,7 +290,7 @@ const TimesheetApprovalList = () => {
                     }
                 });
                 return (
-                    <div className="text-xs">
+                    <div>
                         <div>Vào: <span className="font-bold text-gray-700">{minCheckIn ? minCheckIn.format('HH:mm') : '--:--'}</span></div>
                         <div>Ra: <span className="font-bold text-gray-700">{maxCheckOut ? maxCheckOut.format('HH:mm') : '--:--'}</span></div>
                     </div>
@@ -620,7 +617,7 @@ const TimesheetApprovalList = () => {
                             {/* Raw Logs with Snapshot Photos */}
                             <Box className="space-y-2 mt-4">
                                 <Typography variant="subtitle2" className="font-bold text-foreground">
-                                    Lịch sử quét vân tay/nhận diện (Webcam & IP logs)
+                                    Lịch sử chấm công
                                 </Typography>
 
                                 {rawLogs.length === 0 ? (
@@ -654,6 +651,9 @@ const TimesheetApprovalList = () => {
                                                         </Typography>
                                                         <Typography variant="caption" className="text-muted-foreground block">
                                                             IP: <span className="font-mono text-foreground font-semibold">{log.ipAddress || 'Unknown'}</span> | {log.deviceType || 'Web Browser'}
+                                                            {log.latitude && log.longitude && (
+                                                                <> | GPS: <span className="font-mono text-foreground font-semibold">{log.latitude.toFixed(6)}, {log.longitude.toFixed(6)}</span></>
+                                                            )}
                                                         </Typography>
                                                     </Box>
                                                 </Box>

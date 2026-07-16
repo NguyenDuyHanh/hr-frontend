@@ -66,6 +66,7 @@ const MyAsyncAutocomplete = React.forwardRef(({
   getOptionDisabled = (option) => false,
   oldStyle = false,
   readOnly = false,
+  disabled = false,
   field,
   meta,
   setFieldValue,
@@ -149,8 +150,17 @@ const MyAsyncAutocomplete = React.forwardRef(({
   // Rule 05: useMemo for style and input params
   const sxMemo = useMemo(() => ({
     '& .MuiInputBase-root': {
-      backgroundColor: (theme) => readOnly ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') : 'inherit',
+      backgroundColor: (theme) => (readOnly || disabled) ? (theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important') : 'inherit',
       transition: 'all 0.2s ease-in-out',
+      '&.Mui-disabled': {
+        backgroundColor: (theme) => theme.palette.mode === 'light' ? '#f5f5f5 !important' : 'rgba(255, 255, 255, 0.05) !important',
+        color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+        WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+        '& .MuiInputBase-input': {
+          color: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+          WebkitTextFillColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.6) !important' : 'rgba(255, 255, 255, 0.5) !important',
+        }
+      },
       '&.Mui-error .MuiOutlinedInput-notchedOutline': {
         borderColor: '#d1d5db !important',
       },
@@ -182,7 +192,7 @@ const MyAsyncAutocomplete = React.forwardRef(({
       }
     },
     ...otherProps.sx
-  }), [readOnly, otherProps.sx]);
+  }), [readOnly, disabled, otherProps.sx]);
 
   const renderInput = useMemo(() => (params) => (
     <TextField
@@ -199,7 +209,7 @@ const MyAsyncAutocomplete = React.forwardRef(({
         ...params.InputProps,
         endAdornment: (
           <Fragment>
-            {loading && !readOnly ? (
+            {loading && !readOnly && !disabled ? (
               <CircularProgress color="inherit" size={20} />
             ) : null}
             {params.InputProps.endAdornment}
@@ -208,7 +218,7 @@ const MyAsyncAutocomplete = React.forwardRef(({
       }}
       sx={sxMemo}
     />
-  ), [variant, placeholder, isError, helperText, loading, readOnly, sxMemo]);
+  ), [variant, placeholder, isError, helperText, loading, readOnly, disabled, sxMemo]);
 
   return (
     <div className="w-full mb-4">
@@ -223,11 +233,12 @@ const MyAsyncAutocomplete = React.forwardRef(({
       <Autocomplete
         {...field}
         {...otherProps}
+        disabled={disabled}
         id={name}
         ref={ref}
-        open={readOnly ? false : open}
+        open={readOnly || disabled ? false : open}
         size={size}
-        onOpen={() => !readOnly && setOpen(true)}
+        onOpen={() => !readOnly && !disabled && setOpen(true)}
         onClose={() => setOpen(false)}
         onChange={handleChange}
         isOptionEqualToValue={(option, value) => {

@@ -1,8 +1,13 @@
 import React from 'react';
 import { Button } from '@mui/material';
 import { Formik } from 'formik';
+import * as Yup from 'yup';
 import Popup from '../../../components/ui/Popup';
 import TextField from '../../../components/ui/TextField';
+
+const validationSchema = Yup.object({
+    refusalReason: Yup.string().trim().required('Vui lòng nhập lý do từ chối / loại hồ sơ')
+});
 
 const RejectionDialog = ({
     open,
@@ -14,9 +19,11 @@ const RejectionDialog = ({
     return (
         <Formik
             initialValues={{ refusalReason: refusalReason || '' }}
+            validationSchema={validationSchema}
             enableReinitialize={true}
-            onSubmit={() => {
-                onConfirm();
+            onSubmit={(values) => {
+                setRefusalReason(values.refusalReason);
+                onConfirm(values.refusalReason);
             }}
         >
             {(formik) => {
@@ -31,15 +38,12 @@ const RejectionDialog = ({
                             Hủy
                         </Button>
                         <Button 
-                            onClick={() => {
-                                setRefusalReason(formik.values.refusalReason);
-                                onConfirm();
-                            }} 
+                            onClick={formik.handleSubmit} 
                             variant="contained" 
                             color="error"
                             sx={{ textTransform: 'none', ml: 1 }}
                         >
-                            Xác nhận loại
+                            Xác nhận
                         </Button>
                     </>
                 );
@@ -55,14 +59,11 @@ const RejectionDialog = ({
                         <TextField
                             name="refusalReason"
                             label="Lý do từ chối / loại hồ sơ"
+                            required
                             fullWidth
                             multiline
                             rows={3}
                             notDelay={true}
-                            onChange={(e) => {
-                                formik.setFieldValue('refusalReason', e.target.value);
-                                setRefusalReason(e.target.value);
-                            }}
                             placeholder="Nhập lý do loại (như không đạt chuyên môn, không thỏa thuận được lương, ứng viên từ chối...)"
                             sx={{ mt: 1, minWidth: 350 }}
                         />

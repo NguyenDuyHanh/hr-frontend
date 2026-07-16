@@ -13,12 +13,13 @@ import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 import Table from '../../components/ui/Table';
 import useUserStore from '../../store/userStore';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import UserForm from './UserForm';
+import ChangePasswordDialog from './ChangePasswordDialog';
 import SelectInput from '../../components/ui/SelectInput';
 import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
@@ -62,7 +63,8 @@ const UserList = () => {
     const [filterOpen, setFilterOpen] = useState(false);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [openLockConfirm, setOpenLockConfirm] = useState(false);
-    const [isView, setIsView] = useState(false);
+    const [openChangePassword, setOpenChangePassword] = useState(false);
+    const [changePasswordUser, setChangePasswordUser] = useState(null);
     
     const formikRef = useRef();
     const [searchDraft, setSearchDraft] = useState(keyword || '');
@@ -142,20 +144,17 @@ const UserList = () => {
 
     const handleAdd = () => {
         setSelectedUser(null);
-        setIsView(false);
         setOpenForm(true);
     };
 
     const handleEdit = (user) => {
         setSelectedUser(user);
-        setIsView(false);
         setOpenForm(true);
     };
 
-    const handleView = (user) => {
-        setSelectedUser(user);
-        setIsView(true);
-        setOpenForm(true);
+    const handleChangePassword = (user) => {
+        setChangePasswordUser(user);
+        setOpenChangePassword(true);
     };
 
     const handleDelete = (user) => {
@@ -194,9 +193,9 @@ const UserList = () => {
             align: 'center',
             render: (rowData) => (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '4px' }}>
-                    <Tooltip title="Xem chi tiết" arrow>
-                        <IconButton size="small" color="info" onClick={() => handleView(rowData)}>
-                            <VisibilityIcon fontSize="small" />
+                    <Tooltip title="Đổi mật khẩu" arrow>
+                        <IconButton size="small" color="info" onClick={() => handleChangePassword(rowData)}>
+                            <VpnKeyIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
 
@@ -360,10 +359,20 @@ const UserList = () => {
                     open={openForm} 
                     onClose={() => setOpenForm(false)} 
                     userData={selectedUser}
-                    isView={isView}
                     onSaveSuccess={() => {
                         setOpenForm(false);
                     }}
+                />
+            )}
+
+            {openChangePassword && changePasswordUser && (
+                <ChangePasswordDialog
+                    open={openChangePassword}
+                    onClose={() => {
+                        setOpenChangePassword(false);
+                        setChangePasswordUser(null);
+                    }}
+                    user={changePasswordUser}
                 />
             )}
 
