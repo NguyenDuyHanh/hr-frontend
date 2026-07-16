@@ -251,7 +251,7 @@ const ProjectGeneralInfo = ({ isViewMode = false, onSaved }) => {
                     </Grid>
 
                     {/* Row 3: Description */}
-                    <Grid item xs={12}>
+                    <Grid item xs={12} className="mt-4">
                         <TextField 
                             label="Mô tả" 
                             name="description" 

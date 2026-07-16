@@ -39,6 +39,7 @@ import PositionPage from "./pages/Position/PositionPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import HomePage from "./pages/Home/HomePage";
 import HolidayPage from "./pages/Holiday/HolidayPage";
+import RolePage from "./pages/Role/RolePage";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -112,6 +113,7 @@ function App() {
     "/leave-balance": <LeaveBalance />,
     "/department": <DepartmentPage />,
     "/category/staff/position": <PositionPage />,
+    "/administration/roles": <RolePage />,
   };
 
   return (

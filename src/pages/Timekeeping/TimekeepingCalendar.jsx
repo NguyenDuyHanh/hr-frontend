@@ -252,7 +252,7 @@ const TimekeepingCalendar = () => {
                                     <Typography 
                                         key={index} 
                                         variant="subtitle2" 
-                                        className={`font-semibold py-2 text-gray-500 dark:text-gray-400 ${day === 'CN' ? 'text-red-500 dark:text-red-400' : ''}`}
+                                        className={`font-semibold py-2 text-gray-500 dark:text-gray-400 ${day === 'CN' || day === 'T7' ? 'text-red-500 dark:text-red-400' : ''}`}
                                     >
                                         {day}
                                     </Typography>
@@ -726,6 +726,9 @@ const TimekeepingCalendar = () => {
                                                         </Typography>
                                                         <Typography variant="caption" className="text-muted-foreground block mt-0.5">
                                                             IP: {log.ipAddress} | Thiết bị: {log.deviceType || 'Web Browser'}
+                                                            {log.latitude && log.longitude && (
+                                                                <> | GPS: <span className="font-mono text-foreground font-semibold">{log.latitude.toFixed(6)}, {log.longitude.toFixed(6)}</span></>
+                                                            )}
                                                         </Typography>
                                                     </Box>
                                                 </Box>

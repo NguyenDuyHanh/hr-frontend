@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getUsers, deleteUser, saveUser, pagingUsers, lockUser, unlockUser } from '../services/UserService';
+import { getUsers, deleteUser, saveUser, pagingUsers, lockUser, unlockUser, changePassword } from '../services/UserService';
 import { getRoles } from '../services/RoleService';
 import { toast } from 'sonner';
 
@@ -138,6 +138,18 @@ const useUserStore = create((set, get) => ({
         } catch (error) {
             console.error('Error unlocking user:', error);
             const msg = error.response?.data?.message || 'Lỗi khi mở khóa tài khoản';
+            toast.error(msg);
+            throw error;
+        }
+    },
+
+    changeUserPassword: async (data) => {
+        try {
+            await changePassword(data);
+            toast.success('Đổi mật khẩu thành công');
+        } catch (error) {
+            console.error('Error changing password:', error);
+            const msg = error.response?.data?.message || 'Lỗi khi đổi mật khẩu';
             toast.error(msg);
             throw error;
         }

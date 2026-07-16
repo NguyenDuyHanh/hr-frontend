@@ -183,7 +183,7 @@ const LayoutHeader = () => {
         };
 
         await checkInOut(checkInOutDto);
-        toast.success(`Điểm danh ${values.recordType === 'CHECK_IN' ? 'Vào ca' : 'Ra ca'} thành công!`);
+        toast.success(`Chấm công ${values.recordType === 'CHECK_IN' ? 'Vào ca' : 'Ra ca'} thành công!`);
         
         // Reload current month timesheets to immediately update the calendar view if open
         if (selectedStaffId) {
@@ -272,14 +272,10 @@ const LayoutHeader = () => {
   };
 
   const selectedShiftApprovedOrRejected = useMemo(() => {
-    if (!todayTimesheet || !values.shiftId) return false;
+    if (!todayTimesheet) return false;
     const status = todayTimesheet.status;
-    if (status !== 'APPROVED' && status !== 'REJECTED') return false;
-    
-    // Check if there is already a detail for this shift
-    const details = todayTimesheet.details || [];
-    return details.some(d => d.shift && d.shift.id === values.shiftId);
-  }, [todayTimesheet, values.shiftId]);
+    return status === 'APPROVED' || status === 'REJECTED';
+  }, [todayTimesheet]);
 
   const confirmationText = useMemo(() => {
     const actionText = values.recordType === 'CHECK_IN' ? 'Vào ca' : 'Ra ca';
@@ -499,7 +495,7 @@ const LayoutHeader = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  disabled={submitting}
+                  disabled={submitting || selectedShiftApprovedOrRejected}
                   onClick={() => {
                     if (!location.lat || !location.lng) {
                       toast.error("Không thể chấm công khi chưa bật hoặc cấp quyền định vị GPS!");
@@ -522,12 +518,10 @@ const LayoutHeader = () => {
             <FormikProvider value={formik}>
               <Box className="space-y-4 pt-[-6px] pb-2">
                 {selectedShiftApprovedOrRejected && (
-                  <Box className="bg-amber-50 dark:bg-amber-950/20 p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/50 text-xs text-amber-700 dark:text-amber-400 flex items-start gap-2.5">
-                    <InfoIcon sx={{ fontSize: 16, color: 'warning.main', mt: 0.5 }} />
+                  <Box className="bg-red-50 dark:bg-red-950/20 p-3.5 rounded-xl border border-red-200 dark:border-red-900/50 text-xs text-red-700 dark:text-red-400 flex items-start gap-2.5">
+                    <InfoIcon sx={{ fontSize: 16, color: 'error.main', mt: 0.5 }} />
                     <Box className="font-semibold leading-relaxed">
-                      Ca làm việc này trong ngày đã được phê duyệt hoặc từ chối.
-                      <br />
-                      <span className="font-bold text-amber-800 dark:text-amber-300">(Đang bật chế độ test: Vẫn cho phép chấm công)</span>
+                      Ngày công này đã được phê duyệt hoặc từ chối, không thể tiếp tục chấm công.
                     </Box>
                   </Box>
                 )}
