@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     IconButton,
     Paper,
@@ -28,6 +29,7 @@ import useHolidayStore from '../../store/useHolidayStore';
 import { format, differenceInCalendarDays } from 'date-fns';
 
 const HolidayPage = () => {
+    const { t } = useTranslation();
     const {
         holidays,
         loading,
@@ -63,20 +65,20 @@ const HolidayPage = () => {
     // Filter Options
     const yearOptions = useMemo(() => {
         return [
-            { value: '', name: 'Tất cả' },
+            { value: '', name: t('common.all', 'Tất cả') },
             ...Array.from({ length: 5 }, (_, i) => ({
                 value: currentYear - 2 + i,
-                name: `Năm ${currentYear - 2 + i}`
+                name: `${t('holiday.year', 'Năm')} ${currentYear - 2 + i}`
             }))
         ];
-    }, [currentYear]);
+    }, [currentYear, t]);
 
     const yearFormOptions = useMemo(() => {
         return Array.from({ length: 5 }, (_, i) => ({
             value: currentYear - 2 + i,
-            name: `Năm ${currentYear - 2 + i}`
+            name: `${t('holiday.year', 'Năm')} ${currentYear - 2 + i}`
         }));
-    }, [currentYear]);
+    }, [currentYear, t]);
 
     const activeFilterCount = useMemo(() => {
         return getActiveFilterCount({ 
@@ -126,14 +128,14 @@ const HolidayPage = () => {
 
     // Holiday validation schema
     const validationSchema = Yup.object({
-        code: Yup.string().trim().required('Mã ngày lễ là bắt buộc'),
-        name: Yup.string().trim().required('Tên ngày lễ là bắt buộc'),
-        year: Yup.number().required('Năm là bắt buộc'),
-        startDate: Yup.date().nullable().required('Ngày bắt đầu là bắt buộc'),
+        code: Yup.string().trim().required(t('holiday.validation.code_required', 'Mã ngày lễ là bắt buộc')),
+        name: Yup.string().trim().required(t('holiday.validation.name_required', 'Tên ngày lễ là bắt buộc')),
+        year: Yup.number().required(t('holiday.validation.year_required', 'Năm là bắt buộc')),
+        startDate: Yup.date().nullable().required(t('holiday.validation.start_date_required', 'Ngày bắt đầu là bắt buộc')),
         endDate: Yup.date()
             .nullable()
-            .required('Ngày kết thúc là bắt buộc')
-            .min(Yup.ref('startDate'), 'Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu'),
+            .required(t('holiday.validation.end_date_required', 'Ngày kết thúc là bắt buộc'))
+            .min(Yup.ref('startDate'), t('holiday.validation.end_date_min', 'Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu')),
     });
 
     // Holiday form
@@ -165,15 +167,15 @@ const HolidayPage = () => {
 
                 if (isEdit) {
                     await modifyHoliday(selectedHoliday.id, payload);
-                    toast.success('Cập nhật ngày lễ thành công');
+                    toast.success(t('holiday.update_success', 'Cập nhật ngày lễ thành công'));
                 } else {
                     await addHoliday(payload);
-                    toast.success('Tạo ngày lễ mới thành công');
+                    toast.success(t('holiday.create_success', 'Tạo ngày lễ mới thành công'));
                 }
                 setOpenDialog(false);
             } catch (error) {
                 console.error(isEdit ? 'Failed to update holiday:' : 'Failed to create holiday:', error);
-                const msg = error?.response?.data?.message || (isEdit ? 'Lỗi khi cập nhật ngày lễ' : 'Lỗi khi tạo ngày lễ mới');
+                const msg = error?.response?.data?.message || (isEdit ? t('holiday.update_error', 'Lỗi khi cập nhật ngày lễ') : t('holiday.create_error', 'Lỗi khi tạo ngày lễ mới'));
                 toast.error(msg);
             } finally {
                 setSaving(false);
@@ -232,11 +234,11 @@ const HolidayPage = () => {
         if (selectedHoliday && selectedHoliday.id) {
             try {
                 await removeHoliday(selectedHoliday.id);
-                toast.success('Xóa ngày lễ thành công');
+                toast.success(t('holiday.delete_success', 'Xóa ngày lễ thành công'));
                 setOpenConfirmDelete(false);
             } catch (error) {
                 console.error('Failed to delete holiday:', error);
-                const msg = error?.response?.data?.message || 'Lỗi khi xóa ngày lễ';
+                const msg = error?.response?.data?.message || t('holiday.delete_error', 'Lỗi khi xóa ngày lễ');
                 toast.error(msg);
             }
         }
@@ -244,17 +246,17 @@ const HolidayPage = () => {
 
     const columns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             align: 'center',
             width: '1%',
             render: (rowData) => (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                    <Tooltip title="Chỉnh sửa ngày lễ" arrow>
+                    <Tooltip title={t('holiday.edit_tooltip', 'Chỉnh sửa ngày lễ')} arrow>
                         <IconButton size="small" color="primary" onClick={() => handleOpenEdit(rowData)}>
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Xóa ngày lễ" arrow>
+                    <Tooltip title={t('holiday.delete_tooltip', 'Xóa ngày lễ')} arrow>
                         <IconButton size="small" color="error" onClick={() => handleOpenDelete(rowData)}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -262,25 +264,25 @@ const HolidayPage = () => {
                 </div>
             ),
         },
-        { title: 'Mã', field: 'code' },
-        { title: 'Tên ngày lễ', field: 'name', align: 'left' },
+        { title: t('holiday.code', 'Mã'), field: 'code' },
+        { title: t('holiday.name', 'Tên ngày lễ'), field: 'name', align: 'left' },
         {
-            title: 'Từ ngày',
+            title: t('holiday.start_date', 'Từ ngày'),
             align: 'center',
             render: (row) => row.startDate ? format(new Date(row.startDate), 'dd/MM/yyyy') : '-'
         },
         {
-            title: 'Đến ngày',
+            title: t('holiday.end_date', 'Đến ngày'),
             align: 'center',
             render: (row) => row.endDate ? format(new Date(row.endDate), 'dd/MM/yyyy') : '-'
         },
         {
-            title: 'Số ngày',
+            title: t('holiday.total_days', 'Số ngày'),
             align: 'center',
             render: (row) => <span>{`${row.totalDays}`}</span>
         },
-        { title: 'Năm', field: 'year', align: 'center' },
-        { title: 'Mô tả', field: 'description', align: 'left' },
+        { title: t('holiday.year', 'Năm'), field: 'year', align: 'center' },
+        { title: t('holiday.description', 'Mô tả'), field: 'description', align: 'left' },
     ];
 
     return (
@@ -293,8 +295,8 @@ const HolidayPage = () => {
                         onSearch={handleSearch}
                         onReset={handleReset}
                         onAdd={handleOpenAdd}
-                        addLabel="Thêm ngày lễ"
-                        searchPlaceholder="Tìm kiếm theo tên hoặc mã ngày lễ..."
+                        addLabel={t('holiday.add', 'Thêm ngày lễ')}
+                        searchPlaceholder={t('holiday.search_placeholder', 'Tìm kiếm theo tên hoặc mã ngày lễ...')}
                         filter={{
                             open: filterOpen,
                             onToggle: setFilterOpen,
@@ -311,7 +313,7 @@ const HolidayPage = () => {
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={4}>
                                 <SelectInput
-                                    label="Năm"
+                                    label={t('holiday.year', 'Năm')}
                                     name="year"
                                     options={yearOptions}
                                     keyValue="value"
@@ -321,14 +323,14 @@ const HolidayPage = () => {
                             </Grid>
                             <Grid item xs={12} sm={4}>
                                 <DateTimePicker
-                                    label="Từ ngày"
+                                    label={t('holiday.start_date', 'Từ ngày')}
                                     name="fromDate"
                                     notValueMillisecond={true}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={4}>
                                 <DateTimePicker
-                                    label="Đến ngày"
+                                    label={t('holiday.end_date', 'Đến ngày')}
                                     name="toDate"
                                     notValueMillisecond={true}
                                 />
@@ -352,12 +354,12 @@ const HolidayPage = () => {
             <Popup
                 open={openDialog}
                 onClosePopup={() => setOpenDialog(false)}
-                title={isEdit ? 'Chỉnh sửa ngày lễ' : 'Thêm ngày lễ mới'}
+                title={isEdit ? t('holiday.edit_title', 'Chỉnh sửa ngày lễ') : t('holiday.create_title', 'Thêm ngày lễ mới')}
                 size="sm"
                 action={
                     <>
                         <Button onClick={() => setOpenDialog(false)} color="inherit" disabled={saving}>
-                            Hủy
+                            {t('common.cancel', 'Hủy')}
                         </Button>
                         <Button
                             onClick={holidayFormik.handleSubmit}
@@ -365,7 +367,7 @@ const HolidayPage = () => {
                             variant="contained"
                             disabled={saving}
                         >
-                            {saving ? 'Đang lưu...' : (isEdit ? 'Lưu thay đổi' : 'Thêm ngày lễ')}
+                            {saving ? t('common.saving', 'Đang lưu...') : (isEdit ? t('common.save_changes', 'Lưu thay đổi') : t('holiday.add_btn', 'Thêm ngày lễ'))}
                         </Button>
                     </>
                 }
@@ -376,7 +378,7 @@ const HolidayPage = () => {
                         <Box className="flex gap-4">
                             <Box className="flex-1">
                                 <TextField
-                                    label="Mã ngày lễ"
+                                    label={t('holiday.code_label', 'Mã ngày lễ')}
                                     name="code"
                                     required
                                     placeholder="VD: TET_DUONG_LICH_2026"
@@ -384,7 +386,7 @@ const HolidayPage = () => {
                             </Box>
                             <Box className="flex-1">
                                 <SelectInput
-                                    label="Năm"
+                                    label={t('holiday.year', 'Năm')}
                                     name="year"
                                     options={yearFormOptions}
                                     keyValue="value"
@@ -397,7 +399,7 @@ const HolidayPage = () => {
 
                         {/* Hàng 2: Tên ngày lễ */}
                         <TextField
-                            label="Tên ngày lễ"
+                            label={t('holiday.name_label', 'Tên ngày lễ')}
                             name="name"
                             required
                             placeholder="VD: Tết Dương Lịch"
@@ -407,7 +409,7 @@ const HolidayPage = () => {
                         <Box className="flex gap-4">
                             <Box className="flex-1">
                                 <DateTimePicker
-                                    label="Từ ngày"
+                                    label={t('holiday.start_date', 'Từ ngày')}
                                     name="startDate"
                                     notValueMillisecond={true}
                                     required={true}
@@ -415,7 +417,7 @@ const HolidayPage = () => {
                             </Box>
                             <Box className="flex-1">
                                 <DateTimePicker
-                                    label="Đến ngày"
+                                    label={t('holiday.end_date', 'Đến ngày')}
                                     name="endDate"
                                     notValueMillisecond={true}
                                     required={true}
@@ -427,14 +429,14 @@ const HolidayPage = () => {
                         {calculatedTotalDays > 0 && (
                             <Box className="my-2 p-2 rounded-lg" sx={{ bgcolor: 'primary.50', border: '1px solid', borderColor: 'primary.200' }}>
                                 <Typography variant="body2" color="primary.main" fontWeight="600">
-                                    Tổng số ngày nghỉ: {calculatedTotalDays} ngày
+                                    {t('holiday.total_days_text', 'Tổng số ngày nghỉ: {{days}} ngày', { days: calculatedTotalDays })}
                                 </Typography>
                             </Box>
                         )}
 
                         {/* Hàng 4: Mô tả */}
                         <TextField
-                            label="Mô tả"
+                            label={t('holiday.description', 'Mô tả')}
                             name="description"
                             multiline
                             rows={3}
@@ -449,10 +451,10 @@ const HolidayPage = () => {
                 open={openConfirmDelete}
                 onConfirmDialogClose={() => setOpenConfirmDelete(false)}
                 onYesClick={handleConfirmDelete}
-                title="Xác nhận xóa ngày lễ"
-                text={`Bạn có chắc chắn muốn xóa ngày lễ "${selectedHoliday?.name}"?`}
-                agree="Xác nhận xóa"
-                cancel="Hủy bỏ"
+                title={t('holiday.delete_confirm_title', 'Xác nhận xóa ngày lễ')}
+                text={t('holiday.delete_confirm_text', 'Bạn có chắc chắn muốn xóa ngày lễ "{{name}}"?', { name: selectedHoliday?.name })}
+                agree={t('common.confirm', 'Xác nhận xóa')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
         </div>
     );

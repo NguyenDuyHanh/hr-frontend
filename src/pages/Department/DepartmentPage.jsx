@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
     IconButton, 
     Paper, 
@@ -21,6 +22,7 @@ import useDepartmentStore from '../../store/departmentStore';
 import { pagingPositions } from '../../services/positionService';
 
 const DepartmentPage = () => {
+    const { t } = useTranslation();
     const {
         departments,
         loading,
@@ -95,12 +97,12 @@ const DepartmentPage = () => {
         if (selectedDepartment && selectedDepartment.id) {
             try {
                 await removeDepartment(selectedDepartment.id);
-                toast.success('Xóa phòng ban thành công');
+                toast.success(t('department.delete_success', 'Xóa phòng ban thành công'));
                 setOpenConfirm(false);
                 setSelectedDepartment(null);
             } catch (error) {
                 console.error('Failed to delete department:', error);
-                const errorMsg = error.response?.data?.message || 'Không thể xóa phòng ban này. Vui lòng thử lại sau.';
+                const errorMsg = error.response?.data?.message || t('common.error_occurred', 'Không thể xóa phòng ban này. Vui lòng thử lại sau.');
                 toast.error(errorMsg);
             }
         }
@@ -122,7 +124,7 @@ const DepartmentPage = () => {
             }
         } catch (error) {
             console.error('Failed to load positions for department:', error);
-            toast.error('Không thể tải danh sách vị trí thuộc phòng ban');
+            toast.error(t('department.load_positions_error', 'Không thể tải danh sách vị trí thuộc phòng ban'));
         } finally {
             setPositionsLoading(false);
         }
@@ -144,22 +146,22 @@ const DepartmentPage = () => {
 
     const columns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             align: 'center',
             width: '100px',
             render: (rowData) => (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '4px' }}>
-                    <Tooltip title="Danh sách vị trí" arrow>
+                    <Tooltip title={t('department.list_positions_title', 'Danh sách vị trí')} arrow>
                         <IconButton size="small" color="info" onClick={() => handleOpenPositionsList(rowData)}>
                             <FormatListBulletedIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Chỉnh sửa" arrow>
+                    <Tooltip title={t('common.edit', 'Chỉnh sửa')} arrow>
                         <IconButton size="small" color="primary" onClick={() => handleOpenEdit(rowData)}>
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Xóa" arrow>
+                    <Tooltip title={t('common.delete', 'Xóa')} arrow>
                         <IconButton size="small" color="error" onClick={() => handleOpenDelete(rowData)}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -167,15 +169,15 @@ const DepartmentPage = () => {
                 </div>
             ),
         },
-        { title: 'Mã phòng ban', field: 'code', align: 'center', width: '150px' },
-        { title: 'Tên phòng ban', field: 'name', align: 'left' },
-        { title: 'Mô tả', field: 'description', align: 'left' }
+        { title: t('department.code', 'Mã phòng ban'), field: 'code', align: 'center', width: '150px' },
+        { title: t('department.name', 'Tên phòng ban'), field: 'name', align: 'left' },
+        { title: t('department.description', 'Mô tả'), field: 'description', align: 'left' }
     ];
 
     const positionColumns = [
-        { title: 'Mã vị trí', field: 'code', align: 'center', width: '120px' },
-        { title: 'Tên vị trí/Chức danh', field: 'name', align: 'left' },
-        { title: 'Mô tả', field: 'description', align: 'left' }
+        { title: t('department.position_code', 'Mã vị trí'), field: 'code', align: 'center', width: '120px' },
+        { title: t('department.position_name', 'Tên vị trí/Chức danh'), field: 'name', align: 'left' },
+        { title: t('department.position_description', 'Mô tả'), field: 'description', align: 'left' }
     ];
 
     return (
@@ -187,8 +189,8 @@ const DepartmentPage = () => {
                     onSearch={handleSearch}
                     onReset={handleReset}
                     onAdd={handleOpenAdd}
-                    addLabel="Thêm phòng ban"
-                    searchPlaceholder="Tìm kiếm phòng ban theo tên hoặc mã..."
+                    addLabel={t('department.add', 'Thêm phòng ban')}
+                    searchPlaceholder={t('department.search_placeholder', 'Tìm kiếm phòng ban theo tên hoặc mã...')}
                 />
 
                 <Table 
@@ -214,28 +216,28 @@ const DepartmentPage = () => {
                     setSelectedDepartment(null);
                 }}
                 onYesClick={handleConfirmDelete}
-                title="Xác nhận xóa phòng ban"
-                text={`Bạn có chắc chắn muốn xóa phòng ban "${selectedDepartment?.name}" (${selectedDepartment?.code}) này không?`}
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                title={t('department.delete_confirm_title', 'Xác nhận xóa phòng ban')}
+                text={t('department.delete_confirm_text', { name: selectedDepartment?.name, code: selectedDepartment?.code }, `Bạn có chắc chắn muốn xóa phòng ban "${selectedDepartment?.name}" (${selectedDepartment?.code}) này không?`)}
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
 
             {/* List Positions of Department Dialog */}
             <Popup
                 open={openPositionsDialog}
                 onClosePopup={() => setOpenPositionsDialog(false)}
-                title={`Danh sách vị trí - ${selectedDepartment?.name} (${selectedDepartment?.code})`}
+                title={t('department.positions_detail_title', { name: selectedDepartment?.name, code: selectedDepartment?.code }, `Danh sách vị trí - ${selectedDepartment?.name} (${selectedDepartment?.code})`)}
                 size="md"
                 action={
                     <Button onClick={() => setOpenPositionsDialog(false)} color="primary" variant="contained">
-                        Đóng
+                        {t('common.close', 'Đóng')}
                     </Button>
                 }
             >
                 {positionsList.length === 0 && !positionsLoading ? (
                     <Box py={4} textAlign="center">
                         <Typography color="textSecondary" italic>
-                            Không có vị trí/chức danh nào thuộc phòng ban này.
+                            {t('department.empty_positions', 'Không có vị trí/chức danh nào thuộc phòng ban này.')}
                         </Typography>
                     </Box>
                 ) : (

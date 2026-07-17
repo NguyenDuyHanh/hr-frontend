@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, memo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -57,6 +58,7 @@ const IconMapper = memo(({ iconName, ...props }) => {
 });
 
 const SubSidebarItem = memo(({ child }) => {
+  const { t } = useTranslation();
   const location = useLocation();
   const hasActiveSubChild = child.children?.some(c => 
     c.path && location.pathname.startsWith(c.path)
@@ -80,7 +82,7 @@ const SubSidebarItem = memo(({ child }) => {
             : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
         }`}
       >
-        <span>{child.name}</span>
+        <span>{t('menu.' + child.name, child.name)}</span>
         <ExpandMoreIcon 
           sx={{ 
             fontSize: "18px", 
@@ -103,7 +105,7 @@ const SubSidebarItem = memo(({ child }) => {
                     : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/30 hover:text-sidebar-accent-foreground"}`
                 }
               >
-                {subChild.name}
+                {t('menu.' + subChild.name, subChild.name)}
               </NavLink>
             </li>
           ))}
@@ -114,6 +116,7 @@ const SubSidebarItem = memo(({ child }) => {
 });
 
 const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSidebar }) => {
+  const { t } = useTranslation();
   const location = useLocation();
   const isExpanded = expanded === item.name;
   
@@ -170,7 +173,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
     );
 
     return (
-      <Tooltip title={item.name} placement="right" arrow enterDelay={100} leaveDelay={100}>
+      <Tooltip title={t('menu.' + item.name, item.name)} placement="right" arrow enterDelay={100} leaveDelay={100}>
         {itemContent}
       </Tooltip>
     );
@@ -210,7 +213,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
         >
           <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ fontSize: "18px", color: "currentColor" }} />}>
             <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
-            <span className="flex-1 font-normal text-[14px]">{item.name}</span>
+            <span className="flex-1 font-normal text-[14px]">{t('menu.' + item.name, item.name)}</span>
           </AccordionSummary>
           <AccordionDetails>
             <ul className="list-none p-0 m-0">
@@ -228,7 +231,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
                           : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
                       }
                     >
-                      {child.name}
+                      {t('menu.' + child.name, child.name)}
                     </NavLink>
                   </li>
                 )
@@ -246,7 +249,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
               className="flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline bg-sidebar text-sidebar-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
             >
               <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
-              <span className="flex-1 font-normal text-[14px]">{item.name}</span>
+              <span className="flex-1 font-normal text-[14px]">{t('menu.' + item.name, item.name)}</span>
             </a>
           ) : (
             <NavLink
@@ -259,7 +262,7 @@ const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSideb
               }
             >
               <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
-              <span className="flex-1 font-normal text-[14px]">{item.name}</span>
+              <span className="flex-1 font-normal text-[14px]">{t('menu.' + item.name, item.name)}</span>
             </NavLink>
           )}
         </div>

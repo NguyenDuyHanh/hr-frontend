@@ -1,9 +1,10 @@
-﻿import React, { useState, memo } from 'react';
+import React, { useState, memo } from 'react';
 import { Collapse, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import RotateLeftIcon from '@mui/icons-material/RotateLeft';
 import CloseIcon from '@mui/icons-material/Close';
 import TuneIcon from '@mui/icons-material/Tune';
+import { useTranslation } from 'react-i18next';
 
 /**
  * FilterPanel — Bộ lọc nâng cao.
@@ -30,12 +31,14 @@ function FilterPanel({
   onOpenChange,
   defaultOpen = false,
   disabled = false,
-  title = 'Bộ lọc tìm kiếm nâng cao',
+  title,
   className = '',
 }) {
+  const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
+  const resolvedTitle = title !== undefined ? title : t('common.advanced_filter', 'Bộ lọc tìm kiếm nâng cao');
 
   const setOpen = (val) => {
     if (!isControlled) setInternalOpen(val);
@@ -54,11 +57,11 @@ function FilterPanel({
     <Collapse in={open} timeout={250} unmountOnExit className={className}>
       <div className="mb-4 mt-4 bg-background backdrop-blur-sm shadow-sm">
         {/* Header */}
-        {title && (
+        {resolvedTitle && (
           <div className="flex items-center gap-2 mb-6 pb-3 border-b border-border">
             <TuneIcon className="text-muted-foreground" sx={{ fontSize: 16 }} />
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-              {title}
+              {resolvedTitle}
             </span>
           </div>
         )}
@@ -81,7 +84,7 @@ function FilterPanel({
             className="w-full sm:w-auto normal-case"
             sx={{ boxShadow: 'none' }}
           >
-            Tìm kiếm
+            {t('common.search', 'Tìm kiếm')}
           </Button>
 
           {/* Đặt lại */}
@@ -94,7 +97,7 @@ function FilterPanel({
             startIcon={<RotateLeftIcon fontSize="small" />}
             className="w-full sm:w-auto normal-case border-border text-foreground hover:bg-muted"
           >
-            Đặt lại
+            {t('common.reset', 'Đặt lại')}
           </Button>
 
           {/* Đóng bộ lọc */}
@@ -106,7 +109,7 @@ function FilterPanel({
             startIcon={<CloseIcon fontSize="small" />}
             className="w-full sm:w-auto normal-case text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
-            Đóng bộ lọc
+            {t('common.close_filter', 'Đóng bộ lọc')}
           </Button>
         </div>
       </div>

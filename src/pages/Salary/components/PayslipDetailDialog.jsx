@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Box,
     Typography,
@@ -32,6 +33,7 @@ const PayslipDetailDialog = ({
     isAdmin = false,
     onUpdateSuccess
 }) => {
+    const { t } = useTranslation();
     // Store states and actions
     const { updatePayslipStatus, updating } = usePayrollStore();
     const hasRole = useAuthStore((state) => state.hasRole);
@@ -95,14 +97,14 @@ const PayslipDetailDialog = ({
         try {
             const response = await updatePayslipStatus(detail.id, localPaidStatus, localNote);
             if (response?.data) {
-                toast.success('Cập nhật phiếu lương thành công!');
+                toast.success(t('salary.payslip.update_success', 'Cập nhật phiếu lương thành công!'));
                 if (onUpdateSuccess) {
                     onUpdateSuccess(detail.id, localPaidStatus, localNote);
                 }
             }
         } catch (err) {
             console.error('Failed to update payslip:', err);
-            toast.error('Không thể cập nhật phiếu lương');
+            toast.error(t('salary.payslip.update_error', 'Không thể cập nhật phiếu lương'));
         }
     };
 
@@ -114,7 +116,7 @@ const PayslipDetailDialog = ({
         const bankAccountName = payslipDetail.staff?.bankAccountName || payslipDetail.staff?.displayName;
         
         if (!bankBin || !bankAccountNumber) {
-            toast.error('Nhân viên chưa cấu hình thông tin tài khoản ngân hàng hoặc mã BIN!');
+            toast.error(t('salary.payslip.bank_account_missing_error', 'Nhân viên chưa cấu hình thông tin tài khoản ngân hàng hoặc mã BIN!'));
             return;
         }
 
@@ -141,7 +143,7 @@ const PayslipDetailDialog = ({
             }
         } catch (err) {
             console.error('Failed to generate big QR:', err);
-            toast.error('Không thể tạo mã QR chi tiết');
+            toast.error(t('salary.payslip.qr_generate_error', 'Không thể tạo mã QR chi tiết'));
         } finally {
             setQrModalLoading(false);
         }
@@ -154,7 +156,7 @@ const PayslipDetailDialog = ({
             <Popup
                 open={open}
                 onClosePopup={onClose}
-                title="Phiếu lương nhân viên"
+                title={t('salary.payslip.popup_title', 'Phiếu lương nhân viên')}
                 size="lg"
                 action={
                     <Box display="flex" width="100%" justifyContent="end" gap={1}>
@@ -164,7 +166,7 @@ const PayslipDetailDialog = ({
                             variant="outlined" 
                             sx={{ textTransform: 'none' }}
                         >
-                            Đóng
+                            {t('common.close', 'Đóng')}
                         </Button>
                         {canEdit && (
                             <>
@@ -176,7 +178,7 @@ const PayslipDetailDialog = ({
                                     disabled={updating}
                                     sx={{ textTransform: 'none' }}
                                 >
-                                    Lưu
+                                    {t('common.save', 'Lưu')}
                                 </Button>
                             </>
                         )}
@@ -188,11 +190,11 @@ const PayslipDetailDialog = ({
                     <Grid item xs={12} md={8}>
                         <Box sx={{ borderRight: { md: '1px solid #e0e0e0' }, pr: { md: 3 }, pb: 2 }}>
                             <Typography variant="subtitle2" sx={{ color: 'primary.main', fontWeight: 'bold', mb: 2 }}>
-                                CHI TIẾT CÁC THÀNH PHẦN LƯƠNG
+                                {t('salary.payslip.salary_components_detail', 'CHI TIẾT CÁC THÀNH PHẦN LƯƠNG')}
                             </Typography>
 
                             {/* Standard Fields */}
-                            <Tooltip title="Số ngày công chuẩn * 8 giờ" arrow placement="top">
+                            <Tooltip title={t('salary.payslip.std_hours_tooltip', 'Số ngày công chuẩn * 8 giờ')} arrow placement="top">
                                 <Box 
                                     sx={{
                                         display: 'flex',
@@ -208,7 +210,7 @@ const PayslipDetailDialog = ({
                                     }}
                                 >
                                     <Typography variant="body2" color="text.secondary" fontWeight="medium">
-                                        Số giờ công tiêu chuẩn
+                                        {t('salary.payslip.standard_work_hours', 'Số giờ công tiêu chuẩn')}
                                     </Typography>
                                     <Typography variant="body2" fontWeight="bold" color="text.primary">
                                         {(activePayroll?.period?.standardWorkDays || 30) * 8}
@@ -216,7 +218,7 @@ const PayslipDetailDialog = ({
                                 </Box>
                             </Tooltip>
 
-                            <Tooltip title="Số ngày thực tế đi làm * 8 giờ" arrow placement="top">
+                            <Tooltip title={t('salary.payslip.actual_hours_tooltip', 'Số ngày thực tế đi làm * 8 giờ')} arrow placement="top">
                                 <Box 
                                     sx={{
                                         display: 'flex',
@@ -232,7 +234,7 @@ const PayslipDetailDialog = ({
                                     }}
                                 >
                                     <Typography variant="body2" color="text.secondary" fontWeight="medium">
-                                        Số giờ công thực tế
+                                        {t('salary.payslip.actual_work_hours', 'Số giờ công thực tế')}
                                     </Typography>
                                     <Typography variant="body2" fontWeight="bold" color="text.primary">
                                         {detail.totalWorkDays ? (detail.totalWorkDays * 8) : 0}
@@ -240,7 +242,7 @@ const PayslipDetailDialog = ({
                                 </Box>
                             </Tooltip>
 
-                            <Tooltip title="Lấy từ bảng chấm công được duyệt" arrow placement="top">
+                            <Tooltip title={t('salary.payslip.timesheet_source_tooltip', 'Lấy từ bảng chấm công được duyệt')} arrow placement="top">
                                 <Box 
                                     sx={{
                                         display: 'flex',
@@ -256,7 +258,7 @@ const PayslipDetailDialog = ({
                                     }}
                                 >
                                     <Typography variant="body2" color="text.secondary" fontWeight="medium">
-                                        Ngày công thực tế đi làm
+                                        {t('salary.payslip.actual_work_days', 'Ngày công thực tế đi làm')}
                                     </Typography>
                                     <Typography variant="body2" fontWeight="bold" color="text.primary">
                                         {detail.totalWorkDays || 0}
@@ -277,24 +279,24 @@ const PayslipDetailDialog = ({
                                         const ot2 = detail.totalWeekendOtHours || 0;
                                         const ot3 = detail.totalHolidayOtHours || 0;
                                         
-                                        if (ot1 > 0) parts.push(`(${formatMoney(base)} / ${std} ngày / 8 giờ) * 1.5 * ${ot1.toFixed(2)} giờ OT thường`);
-                                        if (ot2 > 0) parts.push(`(${formatMoney(base)} / ${std} ngày / 8 giờ) * 2.0 * ${ot2.toFixed(2)} giờ OT cuối tuần`);
-                                        if (ot3 > 0) parts.push(`(${formatMoney(base)} / ${std} ngày / 8 giờ) * 3.0 * ${ot3.toFixed(2)} giờ OT ngày lễ`);
+                                        if (ot1 > 0) parts.push(`(${formatMoney(base)} / ${std} ${t('salary.payslip.standard_days_unit', 'ngày')} / 8 ${t('salary.payslip.ot_hours_unit', 'giờ')}) * 1.5 * ${ot1.toFixed(2)} ${t('salary.payslip.ot_regular_hours', 'giờ OT thường')}`);
+                                        if (ot2 > 0) parts.push(`(${formatMoney(base)} / ${std} ${t('salary.payslip.standard_days_unit', 'ngày')} / 8 ${t('salary.payslip.ot_hours_unit', 'giờ')}) * 2.0 * ${ot2.toFixed(2)} ${t('salary.payslip.ot_weekend_hours', 'giờ OT cuối tuần')}`);
+                                        if (ot3 > 0) parts.push(`(${formatMoney(base)} / ${std} ${t('salary.payslip.standard_days_unit', 'ngày')} / 8 ${t('salary.payslip.ot_hours_unit', 'giờ')}) * 3.0 * ${ot3.toFixed(2)} ${t('salary.payslip.ot_holiday_hours', 'giờ OT ngày lễ')}`);
                                         
                                         if (parts.length === 0) {
-                                            return `Cách tính: Không có giờ OT (Thường: ${ot1.toFixed(2)}h, Cuối tuần: ${ot2.toFixed(2)}h, Lễ: ${ot3.toFixed(2)}h)`;
+                                            return `${t('salary.payslip.calculation_method', 'Cách tính:')} ${t('salary.payslip.no_ot_hours', 'Không có giờ OT')} (${t('salary.payslip.ot_regular', 'Thường:')} ${ot1.toFixed(2)}h, ${t('salary.payslip.ot_weekend', 'Cuối tuần:')} ${ot2.toFixed(2)}h, ${t('salary.payslip.ot_holiday', 'Lễ:')} ${ot3.toFixed(2)}h)`;
                                         }
-                                        return `Cách tính: ${parts.join(' + ')}`;
+                                        return `${t('salary.payslip.calculation_method', 'Cách tính:')} ${parts.join(' + ')}`;
                                     }
                                     switch (item.salaryItem?.calculationType) {
                                         case SalaryCalculationType.FIXED:
-                                            return `Cách tính: Cố định (${formatMoney(base)})`;
+                                            return `${t('salary.payslip.calculation_method', 'Cách tính:')} ${t('salary.payslip.fixed', 'Cố định')} (${formatMoney(base)})`;
                                         case SalaryCalculationType.BY_STANDARD_DAYS:
-                                            return `Cách tính: (${formatMoney(base)} / ${std} ngày công chuẩn) * ${wd} ngày thực tế`;
+                                            return `${t('salary.payslip.calculation_method', 'Cách tính:')} (${formatMoney(base)} / ${std} ${t('salary.payslip.standard_days_unit', 'ngày công chuẩn')}) * ${wd} ${t('salary.payslip.actual_days_unit', 'ngày thực tế')}`;
                                         case SalaryCalculationType.DAILY_MULTIPLIED:
-                                            return `Cách tính: ${formatMoney(base)} * ${wd} ngày thực tế`;
+                                            return `${t('salary.payslip.calculation_method', 'Cách tính:')} ${formatMoney(base)} * ${wd} ${t('salary.payslip.actual_days_unit', 'ngày thực tế')}`;
                                         default:
-                                            return `Cách tính: ${item.salaryItem?.calculationType === SalaryCalculationType.BY_STANDARD_DAYS ? 'Tính theo công' : 'Theo ngày thực tế'}`;
+                                            return `${t('salary.payslip.calculation_method', 'Cách tính:')} ${item.salaryItem?.calculationType === SalaryCalculationType.BY_STANDARD_DAYS ? t('salary.payslip.by_standard_workdays', 'Tính theo công') : t('salary.payslip.by_actual_workdays', 'Theo ngày thực tế')}`;
                                     }
                                 })();
 
@@ -342,7 +344,7 @@ const PayslipDetailDialog = ({
                                 }}
                             >
                                 <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
-                                    Lương thực lĩnh
+                                    {t('salary.payslip.net_salary', 'Lương thực lĩnh')}
                                 </Typography>
                                 <Typography variant="body1" fontWeight="bold" sx={{ color: 'primary.main' }}>
                                     {formatMoney(detail.netSalary)}
@@ -354,7 +356,7 @@ const PayslipDetailDialog = ({
                     {/* Right Panel: Metadata Information Form */}
                     <Grid item xs={12} md={4}>
                         <Typography variant="subtitle2" sx={{ color: 'primary.main', fontWeight: 'bold', mb: 2 }}>
-                            THÔNG TIN PHIẾU
+                            {t('salary.payslip.payslip_info', 'THÔNG TIN PHIẾU')}
                         </Typography>
                         
                         <Formik
@@ -371,29 +373,29 @@ const PayslipDetailDialog = ({
                             {(formikProps) => (
                                 <FormikProvider value={formikProps}>
                                     <CustomTextField
-                                        label="Nhân viên"
+                                        label={t('staff.name', 'Nhân viên')}
                                         name="displayName"
                                         readOnly
                                     />
 
                                     <CustomTextField
-                                        label="Kỳ lương"
+                                        label={t('salary.period.name', 'Kỳ lương')}
                                         name="payrollPeriodName"
                                         readOnly
                                     />
 
                                     <CustomTextField
-                                        label="Thuộc bảng lương"
+                                        label={t('salary.payroll.name', 'Thuộc bảng lương')}
                                         name="payrollName"
                                         readOnly
                                     />
 
                                     <SelectInput
-                                        label="Trạng thái chi trả"
+                                        label={t('salary.payroll.paid_status_label', 'Trạng thái chi trả')}
                                         name="paidStatus"
                                         options={[
-                                            { value: 'UNPAID', name: 'Chưa chi trả' },
-                                            { value: 'PAID', name: 'Đã chi trả' }
+                                            { value: 'UNPAID', name: t('salary.payroll.paid_status.unpaid', 'Chưa chi trả') },
+                                            { value: 'PAID', name: t('salary.payroll.paid_status.paid', 'Đã chi trả') }
                                         ]}
                                         keyValue="value"
                                         displayvalue="name"
@@ -403,11 +405,11 @@ const PayslipDetailDialog = ({
                                     />
 
                                     <CustomTextField
-                                        label="Ghi chú"
+                                        label={t('common.notes', 'Ghi chú')}
                                         name="note"
                                         multiline
                                         rows={3}
-                                        placeholder="Nhập ghi chú (nếu có)..."
+                                        placeholder={t('common.notes_placeholder', 'Nhập ghi chú (nếu có)...')}
                                         notDelay={true}
                                         readOnly={!canEdit}
                                         onChange={(e) => setLocalNote(e.target.value)}
@@ -446,7 +448,7 @@ const PayslipDetailDialog = ({
                                         }
                                     }}
                                 >
-                                    QR Chuyển khoản
+                                    {t('salary.payslip.qr_btn', 'QR Chuyển khoản')}
                                 </Button>
                             </>
                         )}
@@ -458,7 +460,7 @@ const PayslipDetailDialog = ({
             <Popup
                 open={openQrModal}
                 onClosePopup={() => setOpenQrModal(false)}
-                title="QR Chuyển Khoản Lương"
+                title={t('salary.payslip.qr_modal_title', 'QR Chuyển Khoản Lương')}
                 size="md"
                 action={
                     <Button 
@@ -467,7 +469,7 @@ const PayslipDetailDialog = ({
                         color="inherit" 
                         sx={{ textTransform: 'none' }}
                     >
-                        Đóng
+                        {t('common.close', 'Đóng')}
                     </Button>
                 }
             >
@@ -479,29 +481,29 @@ const PayslipDetailDialog = ({
                                 <Box display="flex" alignItems="center" gap={1} mb={3} mt={2}>
                                     <AccountBalanceWalletIcon sx={{ color: 'primary.main', fontSize: '20px' }} />
                                     <Typography variant="subtitle2" fontWeight="bold" color="text.primary">
-                                        Thông tin chuyển khoản
+                                        {t('salary.payslip.transfer_info', 'Thông tin chuyển khoản')}
                                     </Typography>
                                 </Box>
 
                                 <Box sx={{ fontSize: '14px', '& > div': { display: 'flex', mb: 2 } }}>
                                     <Box>
-                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>Ngân hàng:</Typography>
+                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>{t('salary.payslip.bank_name', 'Ngân hàng:')}</Typography>
                                         <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ flex: 1 }}>{detail.staff?.bankName || '---'}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>Số TK:</Typography>
+                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>{t('salary.payslip.account_number', 'Số TK:')}</Typography>
                                         <Typography variant="body2" fontWeight="medium" color="text.primary" sx={{ flex: 1 }}>{detail.staff?.bankAccountNumber || '---'}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>Chủ TK:</Typography>
+                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>{t('salary.payslip.account_name', 'Chủ TK:')}</Typography>
                                         <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ flex: 1 }}>{removeAccents(detail.staff?.bankAccountName || detail.staff?.displayName || '---')}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>Số tiền:</Typography>
+                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>{t('salary.payslip.amount', 'Số tiền:')}</Typography>
                                         <Typography variant="body2" fontWeight="bold" sx={{ color: 'primary.main', flex: 1 }}>{formatMoney(detail.netSalary)}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>Nội dung:</Typography>
+                                        <Typography variant="body2" sx={{ width: '120px', color: 'text.secondary', flexShrink: 0 }}>{t('salary.payslip.transfer_content', 'Nội dung:')}</Typography>
                                         <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1, wordBreak: 'break-word' }}>
                                             {getTransferContent(detail)}
                                         </Typography>
@@ -534,7 +536,7 @@ const PayslipDetailDialog = ({
                                     ) : qrModalImage ? (
                                         <img src={qrModalImage} alt="QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                     ) : (
-                                        <Typography variant="body2" color="text.secondary">Lỗi tải QR</Typography>
+                                        <Typography variant="body2" color="text.secondary">{t('salary.payslip.qr_load_error', 'Lỗi tải QR')}</Typography>
                                     )}
                                 </Box>
                                 {!qrModalLoading && qrModalImage && (
@@ -552,7 +554,7 @@ const PayslipDetailDialog = ({
                                         }}
                                     >
                                         <Box sx={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#2e7d32' }} />
-                                        Sẵn sàng quét
+                                        {t('salary.payslip.qr_ready', 'Sẵn sàng quét')}
                                     </Box>
                                 )}
                             </Grid>
@@ -567,13 +569,13 @@ const PayslipDetailDialog = ({
                                 border: '1px solid #ffe0b2',
                                 backgroundColor: '#fff8e1',
                                 display: 'flex',
-                                alignItems: 'center',
+                                  alignItems: 'center',
                                 gap: 1
                             }}
                         >
                             <InfoIcon sx={{ color: '#f57c00', fontSize: '18px' }} />
                             <Typography variant="caption" sx={{ color: '#e65100', fontWeight: 'bold' }}>
-                                Vui lòng kiểm tra kỹ thông tin chuyển khoản trước khi giao dịch.
+                                {t('salary.payslip.transfer_warning', 'Vui lòng kiểm tra kỹ thông tin chuyển khoản trước khi giao dịch.')}
                             </Typography>
                         </Box>
                     </Box>

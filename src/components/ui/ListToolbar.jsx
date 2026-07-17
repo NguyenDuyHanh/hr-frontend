@@ -33,6 +33,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import RotateLeftIcon from '@mui/icons-material/RotateLeft';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 /* ────────────────────────────────────────────── constants ── */
 const TOOLBAR_ACTION_GAP = 8;
@@ -88,7 +89,7 @@ function ListToolbar({
   // ─── search ───
   keyword = '',
   onKeywordChange,
-  searchPlaceholder = 'Tìm kiếm…',
+  searchPlaceholder,
 
   // ─── search controlled draft ───
   searchDraft,
@@ -100,7 +101,7 @@ function ListToolbar({
 
   // ─── add ───
   onAdd,
-  addLabel = 'Thêm mới',
+  addLabel,
   addDisabled = false,
 
   // ─── download template ───
@@ -129,6 +130,10 @@ function ListToolbar({
   searchExtraControls,
   filterExtraControls,
 }) {
+  const { t } = useTranslation();
+  const resolvedSearchPlaceholder = searchPlaceholder !== undefined ? searchPlaceholder : t('common.search_placeholder', 'Tìm kiếm…');
+  const resolvedAddLabel = addLabel !== undefined ? addLabel : t('common.add', 'Thêm mới');
+
   const fileInputRef = useRef(null);
   const [importing, setImporting] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -145,11 +150,11 @@ function ListToolbar({
   // ─── Resolved option arrays ───
   const templateOpts = downloadTemplateOptions ??
     (onDownloadTemplate
-      ? [{ label: 'Tải mẫu', fileName: templateFileName, onDownload: onDownloadTemplate }]
+      ? [{ label: t('common.download_template', 'Tải mẫu'), fileName: templateFileName, onDownload: onDownloadTemplate }]
       : []);
 
   const importOpts = importOptions ??
-    (onImport ? [{ label: 'Nhập Excel', onImport }] : []);
+    (onImport ? [{ label: t('common.import_excel', 'Nhập Excel'), onImport }] : []);
 
   // ─── Draft (controlled vs uncontrolled) ───
   const isControlled = searchDraft !== undefined;
@@ -191,9 +196,9 @@ function ListToolbar({
       setDownloadingTemplate(true);
       const blob = await option.onDownload();
       downloadBlob(blob, option.fileName);
-      toast.success('Tải mẫu thành công');
+      toast.success(t('common.download_template_success', 'Tải mẫu thành công'));
     } catch {
-      toast.error('Tải mẫu thất bại');
+      toast.error(t('common.download_template_failed', 'Tải mẫu thất bại'));
     } finally {
       setDownloadingTemplate(false);
     }
@@ -213,9 +218,9 @@ function ListToolbar({
     try {
       setImporting(true);
       await opt.onImport(file);
-      toast.success('Nhập Excel thành công');
+      toast.success(t('common.import_success', 'Nhập Excel thành công'));
     } catch (err) {
-      let msg = 'Nhập Excel thất bại';
+      let msg = t('common.import_failed', 'Nhập Excel thất bại');
       if (err?.response?.data) {
         if (typeof err.response.data === 'string') msg = err.response.data;
         else if (err.response.data.message) msg = err.response.data.message;
@@ -237,10 +242,10 @@ function ListToolbar({
       const blob = await onExport();
       if (!blob) return;
       downloadBlob(blob, exportFileName);
-      toast.success('Xuất Excel thành công');
+      toast.success(t('common.export_success', 'Xuất Excel thành công'));
     } catch (err) {
       if (err?.name === 'ExportCancelled') return;
-      toast.error('Xuất Excel thất bại');
+      toast.error(t('common.export_failed', 'Xuất Excel thất bại'));
     } finally {
       setExporting(false);
     }
@@ -260,7 +265,7 @@ function ListToolbar({
       actions.push({
         key: 'bulk-delete',
         icon: bulkDeleting ? <CircularProgress size={14} /> : <DeleteIcon fontSize="small" />,
-        label: `Xoá${selectedCount > 0 ? ` (${selectedCount})` : ''}`,
+        label: `${t('common.delete', 'Xoá')}${selectedCount > 0 ? ` (${selectedCount})` : ''}`,
         onClick: onBulkDelete,
         disabled: bulkDeleting || selectedCount === 0,
         color: selectedCount > 0 ? 'error' : 'inherit',
@@ -273,7 +278,7 @@ function ListToolbar({
       actions.push({
         key: 'template',
         icon: downloadingTemplate ? <CircularProgress size={14} /> : <DescriptionIcon fontSize="small" />,
-        label: 'Tải mẫu',
+        label: t('common.download_template', 'Tải mẫu'),
         onClick: () => handleDownloadTemplate(templateOpts[0]),
         disabled: downloadingTemplate,
         variant: 'outlined',
@@ -282,7 +287,7 @@ function ListToolbar({
       actions.push({
         key: 'template',
         icon: downloadingTemplate ? <CircularProgress size={14} /> : <DescriptionIcon fontSize="small" />,
-        label: 'Tải mẫu',
+        label: t('common.download_template', 'Tải mẫu'),
         onClick: (e) => setTemplateAnchor(e.currentTarget),
         disabled: downloadingTemplate,
         variant: 'outlined',
@@ -295,7 +300,7 @@ function ListToolbar({
       actions.push({
         key: 'import',
         icon: importing ? <CircularProgress size={14} /> : <FileUploadIcon fontSize="small" />,
-        label: 'Nhập Excel',
+        label: t('common.import_excel', 'Nhập Excel'),
         onClick: () => handleImportClick(0),
         disabled: importing,
         variant: 'outlined',
@@ -304,7 +309,7 @@ function ListToolbar({
       actions.push({
         key: 'import',
         icon: importing ? <CircularProgress size={14} /> : <FileUploadIcon fontSize="small" />,
-        label: 'Nhập Excel',
+        label: t('common.import_excel', 'Nhập Excel'),
         onClick: (e) => setImportAnchor(e.currentTarget),
         disabled: importing,
         variant: 'outlined',
@@ -317,7 +322,7 @@ function ListToolbar({
       actions.push({
         key: 'export',
         icon: exporting ? <CircularProgress size={14} /> : <FileDownloadIcon fontSize="small" />,
-        label: 'Xuất Excel',
+        label: t('common.export_excel', 'Xuất Excel'),
         onClick: handleExport,
         disabled: exporting,
         variant: 'outlined',
@@ -336,6 +341,7 @@ function ListToolbar({
     importOpts, importing,
     onExport, exporting,
     extraActionNodes,
+    t,
   ]);
 
   // ─── Responsive overflow logic ───
@@ -489,7 +495,7 @@ function ListToolbar({
           value={currentDraft}
           onChange={(e) => updateDraft(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          placeholder={searchPlaceholder}
+          placeholder={resolvedSearchPlaceholder}
           size="small"
           variant="outlined"
           className="w-full sm:min-w-0 sm:flex-1 xl:flex-initial xl:w-[300px]"
@@ -505,7 +511,7 @@ function ListToolbar({
             startIcon={<SearchIcon fontSize="small" />}
             className="normal-case whitespace-nowrap font-medium border-border text-foreground hover:bg-muted"
           >
-            <span>Tìm kiếm</span>
+            <span>{t('common.search', 'Tìm kiếm')}</span>
           </Button>
 
           {/* Extra search controls */}
@@ -515,7 +521,7 @@ function ListToolbar({
 
           {/* Filter toggle */}
           {filter && (
-            <Tooltip title="Bộ lọc nâng cao" arrow>
+            <Tooltip title={t('common.filter_tooltip', 'Bộ lọc nâng cao')} arrow>
               <Button
                 variant={filter.open ? 'contained' : 'outlined'}
                 size="small"
@@ -532,7 +538,7 @@ function ListToolbar({
                   ${filter.activeCount > 0 && !filter.open ? 'border-primary ring-1 ring-primary' : ''}
                 `}
               >
-                <span>Bộ lọc</span>
+                <span>{t('common.filter', 'Bộ lọc')}</span>
                 {filter.activeCount > 0 && (
                   <span className={`
                     ml-1 px-1.5 py-0.5 text-xs font-bold rounded-full transition-colors duration-200

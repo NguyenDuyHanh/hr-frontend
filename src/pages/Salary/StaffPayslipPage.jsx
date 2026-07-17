@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
     Paper, 
     Box, 
@@ -20,6 +21,7 @@ import Table from '../../components/ui/Table';
 import PayslipDetailDialog from './components/PayslipDetailDialog';
 
 const StaffPayslipPage = () => {
+    const { t } = useTranslation();
     const {
         allPeriods,
         loading: fetchingPeriods,
@@ -61,7 +63,7 @@ const StaffPayslipPage = () => {
                 await loadMyPayslip(selectedPeriodId);
             } catch (error) {
                 console.error('Failed to load payslip:', error);
-                toast.info('Chưa có dữ liệu phiếu lương cho kỳ này');
+                toast.info(t('salary.payslip.no_payslip_data_warning', 'Chưa có dữ liệu phiếu lương cho kỳ này'));
             }
         };
         loadPayslip();
@@ -81,12 +83,12 @@ const StaffPayslipPage = () => {
 
     const columns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             align: 'center',
             width: '1%',
             render: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                    <Tooltip title="Xem chi tiết phiếu lương" arrow>
+                    <Tooltip title={t('salary.payroll.view_details_tooltip', 'Xem chi tiết phiếu lương')} arrow>
                         <IconButton size="small" color="primary" onClick={() => handleOpenDetail(row)}>
                             <VisibilityIcon fontSize="small" />
                         </IconButton>
@@ -95,64 +97,64 @@ const StaffPayslipPage = () => {
             ),
         },
         {
-            title: 'Kỳ lương',
+            title: t('salary.period.name', 'Kỳ lương'),
             align: 'center',
             render: (row) => <span>{row.payroll?.period?.name || activePeriod?.name || ''}</span>
         },
         {
-            title: 'Mã NV',
+            title: t('staff.code_short', 'Mã NV'),
             align: 'center',
             render: (row) => <span>{row.staff?.staffCode || ''}</span>
         },
         {
-            title: 'Họ và tên',
+            title: t('staff.full_name', 'Họ và tên'),
             align: 'center',
             render: (row) => <span className='whitespace-nowrap'>{row.staff?.displayName || ''}</span>
         },
         {
-            title: 'Phòng ban',
+            title: t('department.name', 'Phòng ban'),
             align: 'center',
             render: (row) => <span className='whitespace-nowrap'>{row.staff?.departmentName || row.staff?.department?.name || '---'}</span>
         },
         {
-            title: 'Vị trí',
+            title: t('position.name', 'Vị trí'),
             align: 'center',
             render: (row) => <span className='whitespace-nowrap'>{row.staff?.positionName || row.staff?.position?.name || '---'}</span>
         },
         {
-            title: 'Số ngày công',
+            title: t('salary.payroll.total_work_days', 'Số ngày công'),
             align: 'center',
             render: (row) => <span>{row.totalWorkDays}</span>
         },
         {
-            title: 'Giờ OT',
+            title: t('salary.payroll.total_ot_hours', 'Giờ OT'),
             align: 'center',
             render: (row) => <span>{row.totalOtHours}</span>
         },
         {
-            title: 'Tổng thu nhập',
+            title: t('salary.payroll.total_income', 'Tổng thu nhập'),
             align: 'center',
             render: (row) => <span>{formatMoney(row.totalIncome)}</span>
         },
         {
-            title: 'Tổng khấu trừ',
+            title: t('salary.payroll.total_deduction', 'Tổng khấu trừ'),
             align: 'center',
             render: (row) => <span>{formatMoney(row.totalDeduction)}</span>
         },
         {
-            title: 'Thực nhận (Net)',
+            title: t('salary.payroll.net_salary', 'Thực nhận (Net)'),
             align: 'center',
             render: (row) => <span className="font-semibold text-emerald-600">{formatMoney(row.netSalary)}</span>
         },
         {
-            title: 'Trạng thái',
+            title: t('common.status', 'Trạng thái'),
             align: 'center',
             render: (row) => (
                 <span>
                     {row.paidStatus === 'PAID' ? (
-                        <span className="text-emerald-600 font-semibold">Đã chi trả</span>
+                        <span className="text-emerald-600 font-semibold">{t('salary.payroll.paid_status.paid', 'Đã chi trả')}</span>
                     ) : (
-                        <span className="text-amber-600 font-semibold">Chưa chi trả</span>
+                        <span className="text-amber-600 font-semibold">{t('salary.payroll.paid_status.unpaid', 'Chưa chi trả')}</span>
                     )}
                 </span>
             )
@@ -171,7 +173,7 @@ const StaffPayslipPage = () => {
                     {(formikProps) => (
                         <FormikProvider value={formikProps}>
                             <SelectInput
-                                label="Chọn kỳ lương"
+                                label={t('salary.payroll.select_period', 'Chọn kỳ lương')}
                                 name="periodId"
                                 options={periods}
                                 keyValue="id"
@@ -214,10 +216,10 @@ const StaffPayslipPage = () => {
             ) : (
                 <Box className="text-center py-8 text-text-secondary">
                     <Typography variant="body1" className="italic">
-                        Chưa có dữ liệu phiếu lương của bạn cho kỳ lương "{activePeriod?.name || 'được chọn'}".
+                        {t('salary.payslip.no_my_payslip_data', 'Chưa có dữ liệu phiếu lương của bạn cho kỳ lương "{{period}}".', { period: activePeriod?.name || t('salary.payslip.selected_period_placeholder', 'được chọn') })}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" className="block mt-2">
-                        Có thể bảng lương chưa được tính toán hoặc bạn chưa có thông tin làm việc được ghi nhận trong kỳ này.
+                        {t('salary.payslip.no_my_payslip_data_hint', 'Có thể bảng lương chưa được tính toán hoặc bạn chưa có thông tin làm việc được ghi nhận trong kỳ này.')}
                     </Typography>
                 </Box>
             )}

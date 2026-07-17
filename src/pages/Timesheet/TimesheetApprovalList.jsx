@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
     Button, Grid, IconButton, Paper, Typography, Box, 
     Chip, Avatar, Tooltip
@@ -36,6 +37,7 @@ const formatShiftTime = (timeStr) => {
 };
 
 const TimesheetApprovalList = () => {
+    const { t } = useTranslation();
     const {
         timesheets,
         loading,
@@ -106,15 +108,15 @@ const TimesheetApprovalList = () => {
         setSubmitting(true);
         try {
             await updateTimesheetStatus(selectedTimesheet.id, approvalStatus, note);
-            let statusText = 'Chờ duyệt';
-            if (approvalStatus === 'APPROVED') statusText = 'Đã duyệt';
-            else if (approvalStatus === 'REJECTED') statusText = 'Từ chối';
-            toast.success(`Đã cập nhật trạng thái ngày công sang: ${statusText}`);
+            let statusText = t('timekeeping.status.submitted', 'Chờ duyệt');
+            if (approvalStatus === 'APPROVED') statusText = t('timekeeping.status.approved', 'Đã duyệt');
+            else if (approvalStatus === 'REJECTED') statusText = t('timekeeping.status.rejected', 'Từ chối');
+            toast.success(t('timekeeping.approval.update_success', 'Đã cập nhật trạng thái ngày công sang: {{status}}', { status: statusText }));
             setApprovalOpen(false);
             setSelectedTimesheet(null);
         } catch (err) {
             console.error(err);
-            toast.error("Có lỗi xảy ra khi cập nhật trạng thái ngày công");
+            toast.error(t('timekeeping.approval.update_error', 'Có lỗi xảy ra khi cập nhật trạng thái ngày công'));
         } finally {
             setSubmitting(false);
         }
@@ -165,12 +167,12 @@ const TimesheetApprovalList = () => {
     // Table Columns
     const columns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             field: 'actions',
             width: 150,
             render: (rowData) => (
                 <div className="flex items-center space-x-1">
-                    <Tooltip title="Xem ảnh & nhật ký chấm công" arrow>
+                    <Tooltip title={t('timekeeping.approval.view_logs_tooltip', 'Xem ảnh & nhật ký chấm công')} arrow>
                         <IconButton 
                             size="small" 
                             color="info" 
@@ -180,7 +182,7 @@ const TimesheetApprovalList = () => {
                         </IconButton>
                     </Tooltip>
                     {rowData.status !== 'APPROVED' && (
-                        <Tooltip title="Duyệt công" arrow>
+                        <Tooltip title={t('timekeeping.approval.approve_tooltip', 'Duyệt công')} arrow>
                             <IconButton 
                                 size="small" 
                                 color="success" 
@@ -191,7 +193,7 @@ const TimesheetApprovalList = () => {
                         </Tooltip>
                     )}
                     {rowData.status !== 'REJECTED' && (
-                        <Tooltip title="Từ chối công" arrow>
+                        <Tooltip title={t('timekeeping.approval.reject_tooltip', 'Từ chối công')} arrow>
                             <IconButton 
                                 size="small" 
                                 color="error" 
@@ -202,7 +204,7 @@ const TimesheetApprovalList = () => {
                         </Tooltip>
                     )}
                     {rowData.status !== 'SUBMITTED' && (
-                        <Tooltip title="Đặt lại chờ duyệt" arrow>
+                        <Tooltip title={t('timekeeping.approval.reset_tooltip', 'Đặt lại chờ duyệt')} arrow>
                             <IconButton 
                                 size="small" 
                                 color="warning" 
@@ -216,13 +218,13 @@ const TimesheetApprovalList = () => {
             )
         },
         {
-            title: 'Mã NV',
+            title: t('staff.code', 'Mã NV'),
             field: 'staffCode',
             width: 100,
             render: (rowData) => <span>{rowData.staffCode || '---'}</span>
         },
         {
-            title: 'Nhân viên',
+            title: t('staff.name', 'Nhân viên'),
             field: 'staffName',
             minWidth: 150,
             width: 150,
@@ -232,26 +234,26 @@ const TimesheetApprovalList = () => {
             )
         },
         {
-            title: 'Phòng ban',
+            title: t('department.name', 'Phòng ban'),
             field: 'departmentName',
             width: 150,
             render: (rowData) => <span>{rowData.departmentName || '---'}</span>
         },
         {
-            title: 'Vị trí',
+            title: t('position.name', 'Vị trí'),
             field: 'positionName',
             width: 130,
             render: (rowData) => <span>{rowData.positionName || '---'}</span>
         },
         {
-            title: 'Ngày làm việc',
+            title: t('timekeeping.date', 'Ngày làm việc'),
             field: 'workingDate',
             align: 'center',
             width: 120,
             render: (rowData) => <span>{dayjs(rowData.workingDate).format('DD/MM/YYYY')}</span>
         },
         {
-            title: 'Ca áp dụng',
+            title: t('timekeeping.applied_shift', 'Ca áp dụng'),
             width: 170,
             render: (rowData) => {
                 const details = rowData.details || [];
@@ -268,7 +270,7 @@ const TimesheetApprovalList = () => {
             }
         },
         {
-            title: 'Giờ vào/ra',
+            title: t('timekeeping.time_in_out', 'Giờ vào/ra'),
             width: 140,
             align: 'center',
             render: (rowData) => {
@@ -291,26 +293,26 @@ const TimesheetApprovalList = () => {
                 });
                 return (
                     <div>
-                        <div>Vào: <span className="font-bold text-gray-700">{minCheckIn ? minCheckIn.format('HH:mm') : '--:--'}</span></div>
-                        <div>Ra: <span className="font-bold text-gray-700">{maxCheckOut ? maxCheckOut.format('HH:mm') : '--:--'}</span></div>
+                        <div>{t('timekeeping.check_in_short', 'Vào')}: <span className="font-bold text-gray-700">{minCheckIn ? minCheckIn.format('HH:mm') : '--:--'}</span></div>
+                        <div>{t('timekeeping.check_out_short', 'Ra')}: <span className="font-bold text-gray-700">{maxCheckOut ? maxCheckOut.format('HH:mm') : '--:--'}</span></div>
                     </div>
                 );
             }
         },
         {
-            title: 'Trạng thái',
+            title: t('common.status', 'Trạng thái'),
             field: 'status',
             width: 120,
             render: (rowData) => {
                 switch (rowData.status) {
                     case 'APPROVED':
-                        return <Chip label="Đã duyệt" size="small" color="success" variant="outlined" />;
+                        return <Chip label={t('timekeeping.status.approved', 'Đã duyệt')} size="small" color="success" variant="outlined" />;
                     case 'SUBMITTED':
-                        return <Chip label="Chờ duyệt" size="small" color="warning" variant="outlined" />;
+                        return <Chip label={t('timekeeping.status.submitted', 'Chờ duyệt')} size="small" color="warning" variant="outlined" />;
                     case 'REJECTED':
-                        return <Chip label="Từ chối" size="small" color="error" variant="outlined" />;
+                        return <Chip label={t('timekeeping.status.rejected', 'Từ chối')} size="small" color="error" variant="outlined" />;
                     default:
-                        return <Chip label="Nháp" size="small" color="default" variant="outlined" />;
+                        return <Chip label={t('timekeeping.status.draft', 'Nháp')} size="small" color="default" variant="outlined" />;
                 }
             }
         },
@@ -348,6 +350,7 @@ const TimesheetApprovalList = () => {
                                 onSearch={() => setFilters({ keyword: searchDraft })}
                                 onReset={handleResetFilters}
                                 showAdd={false}
+                                searchPlaceholder={t('timekeeping.approval.search_placeholder', 'Tìm kiếm theo tên hoặc mã nhân viên...')}
                                 filter={{
                                     open: filterOpen,
                                     onToggle: setFilterOpen,
@@ -366,7 +369,7 @@ const TimesheetApprovalList = () => {
                                     <Grid item xs={12} sm={4}>
                                         <Autocomplete
                                             name="department"
-                                            label="Phòng ban"
+                                            label={t('department.name', 'Phòng ban')}
                                             options={departments}
                                             getOptionLabel={(option) => option?.name || ''}
                                         />
@@ -374,7 +377,7 @@ const TimesheetApprovalList = () => {
                                     <Grid item xs={12} sm={4}>
                                         <Autocomplete
                                             name="staff"
-                                            label="Nhân viên"
+                                            label={t('staff.name', 'Nhân viên')}
                                             options={staffList}
                                             getOptionLabel={(option) => option ? `${option.displayName} (${option.staffCode})` : ''}
                                         />
@@ -382,21 +385,21 @@ const TimesheetApprovalList = () => {
                                     <Grid item xs={12} sm={4}>
                                         <Autocomplete
                                             name="status"
-                                            label="Trạng thái duyệt"
+                                            label={t('timekeeping.status_approval', 'Trạng thái duyệt')}
                                             options={TIMESHEET_STATUS_OPTIONS}
-                                            getOptionLabel={(option) => option?.name || ''}
+                                            getOptionLabel={(option) => option ? t('timekeeping.status.' + option.id.toLowerCase(), option.name) : ''}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <DateTimePicker
-                                            label="Từ ngày"
+                                            label={t('timekeeping.start_date', 'Từ ngày')}
                                             name="fromDate"
                                             notValueMillisecond={true}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <DateTimePicker
-                                            label="Đến ngày"
+                                            label={t('timekeeping.end_date', 'Đến ngày')}
                                             name="toDate"
                                             notValueMillisecond={true}
                                         />
@@ -426,24 +429,27 @@ const TimesheetApprovalList = () => {
                 onConfirmDialogClose={() => setApprovalOpen(false)}
                 title={
                     approvalStatus === 'APPROVED' 
-                        ? 'Xác nhận duyệt chấm công' 
+                        ? t('timekeeping.approval.confirm_approve_title', 'Xác nhận duyệt chấm công') 
                         : approvalStatus === 'REJECTED' 
-                            ? 'Xác nhận từ chối chấm công' 
-                            : 'Xác nhận đặt lại trạng thái chờ duyệt'
+                            ? t('timekeeping.approval.confirm_reject_title', 'Xác nhận từ chối chấm công') 
+                            : t('timekeeping.approval.confirm_reset_title', 'Xác nhận đặt lại trạng thái chờ duyệt')
                 }
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
                 onYesClick={() => {
                     formikRefPopup.current?.handleSubmit();
                 }}
                 disabled={submitting}
-                text={`Bạn đang ${
-                    approvalStatus === 'APPROVED' 
-                        ? 'duyệt chấm công' 
+                text={t('timekeeping.approval.confirm_text', 'Bạn đang {{action}} cho nhân viên {{name}} ({{code}}) ngày {{date}}.', { 
+                    action: approvalStatus === 'APPROVED' 
+                        ? t('timekeeping.approval.action_approve', 'duyệt chấm công') 
                         : approvalStatus === 'REJECTED' 
-                            ? 'từ chối chấm công' 
-                            : 'đặt lại trạng thái chờ duyệt'
-                } cho nhân viên ${selectedTimesheet?.staffName || ''} (${selectedTimesheet?.staffCode || ''}) ngày ${selectedTimesheet ? dayjs(selectedTimesheet.workingDate).format('DD/MM/YYYY') : ''}.`}
+                            ? t('timekeeping.approval.action_reject', 'từ chối chấm công') 
+                            : t('timekeeping.approval.action_reset', 'đặt lại trạng thái chờ duyệt'), 
+                    name: selectedTimesheet?.staffName || '', 
+                    code: selectedTimesheet?.staffCode || '', 
+                    date: selectedTimesheet ? dayjs(selectedTimesheet.workingDate).format('DD/MM/YYYY') : '' 
+                })}
             >
                 {approvalOpen && (
                     <Formik
@@ -458,7 +464,7 @@ const TimesheetApprovalList = () => {
                         {() => (
                             <Box>
                                 <TextField
-                                    label="Ghi chú / Lý do (không bắt buộc)"
+                                    label={t('timekeeping.approval.note_label', 'Ghi chú / Lý do (không bắt buộc)')}
                                     name="note"
                                     multiline
                                     rows={3}
@@ -475,7 +481,7 @@ const TimesheetApprovalList = () => {
             <Popup
                 open={detailOpen}
                 onClosePopup={() => setDetailOpen(false)}
-                title={detailTimesheet ? `Chi tiết chấm công: ${detailTimesheet.staffName || ''} (Ngày ${dayjs(detailTimesheet.workingDate).format('DD/MM/YYYY')})` : ''}
+                title={detailTimesheet ? t('timekeeping.approval.detail_title', 'Chi tiết chấm công: {{name}} (Ngày {{date}})', { name: detailTimesheet.staffName || '', date: dayjs(detailTimesheet.workingDate).format('DD/MM/YYYY') }) : ''}
                 size="sm"
                 action={
                     <Button 
@@ -562,39 +568,39 @@ const TimesheetApprovalList = () => {
                             {/* Stats */}
                             <Box className="grid grid-cols-3 gap-3">
                                 <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground">Vào</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground">{t('timekeeping.detail.check_in', 'Giờ vào')}</Typography>
                                     <Typography variant="body2" className="font-bold text-foreground">
                                         {minCheckIn ? minCheckIn.format('HH:mm') : '--:--'}
                                     </Typography>
                                 </Box>
                                 <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground">Ra</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground">{t('timekeeping.detail.check_out', 'Giờ ra')}</Typography>
                                     <Typography variant="body2" className="font-bold text-foreground">
                                         {maxCheckOut ? maxCheckOut.format('HH:mm') : '--:--'}
                                     </Typography>
                                 </Box>
                                 <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground">Công quy đổi</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground">{t('timekeeping.detail.work_ratio', 'Số công quy đổi')}</Typography>
                                     <Typography variant="body2" className="font-bold text-emerald-600 dark:text-emerald-500">
-                                        {detailTimesheet.totalWorkRatio || 0} công
+                                        {detailTimesheet.totalWorkRatio || 0} {t('timekeeping.detail.work_ratio_unit', 'công')}
                                     </Typography>
                                 </Box>
                                 <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground">Tổng số giờ làm</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground">{t('timekeeping.detail.total_hours', 'Tổng số giờ làm')}</Typography>
                                     <Typography variant="body2" className="font-bold text-primary dark:text-primary-foreground">
-                                        {displayTotalHours.toFixed(2)} giờ
+                                        {displayTotalHours.toFixed(2)} {t('timekeeping.detail.hours_unit', 'giờ')}
                                     </Typography>
                                 </Box>
                                 <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground">Giờ làm thường</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground">{t('timekeeping.detail.standard_hours', 'Giờ làm thường')}</Typography>
                                     <Typography variant="body2" className="font-bold text-indigo-600 dark:text-indigo-400">
-                                        {displayStandardHours.toFixed(2)} giờ
+                                        {displayStandardHours.toFixed(2)} {t('timekeeping.detail.hours_unit', 'giờ')}
                                     </Typography>
                                 </Box>
                                 <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground">Giờ tăng ca (OT)</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground">{t('timekeeping.detail.ot_hours', 'Giờ tăng ca (OT)')}</Typography>
                                     <Typography variant="body2" className="font-bold text-amber-600 dark:text-amber-400">
-                                        {displayOvertimeHours.toFixed(2)} giờ
+                                        {displayOvertimeHours.toFixed(2)} {t('timekeeping.detail.hours_unit', 'giờ')}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -603,13 +609,13 @@ const TimesheetApprovalList = () => {
                             {details.map((d, index) => d.shift && (
                                 <Box key={index} className="bg-blue-50 dark:bg-blue-950/20 p-3.5 rounded-xl border border-blue-100 dark:border-blue-900/50 text-xs">
                                     <Typography className="font-bold text-blue-800 dark:text-blue-300">
-                                        Ca áp dụng: {d.shift.name} ({formatShiftTime(d.shift.startTime)} - {formatShiftTime(d.shift.endTime)})
+                                        {t('timekeeping.detail.applied_shift', 'Ca áp dụng')}: {d.shift.name} ({formatShiftTime(d.shift.startTime)} - {formatShiftTime(d.shift.endTime)})
                                     </Typography>
                                     {d.shift.description && (
                                         <Typography className="text-blue-600 dark:text-blue-400 mt-1">{d.shift.description}</Typography>
                                     )}
                                     <Typography className="text-muted-foreground mt-1 block">
-                                        Công ca: <strong className="text-foreground">{d.workRatio || 0}</strong> | Vào: <strong>{d.checkInTime ? dayjs(d.checkInTime).format('HH:mm') : '--:--'}</strong> | Ra: <strong>{d.checkOutTime ? dayjs(d.checkOutTime).format('HH:mm') : '--:--'}</strong> | Số giờ: <strong>{d.checkInTime && d.checkOutTime ? dayjs(d.checkOutTime).diff(dayjs(d.checkInTime), 'hour', true).toFixed(2) + ' giờ' : '0 giờ'}</strong>
+                                        {t('timekeeping.detail.shift_work_ratio', 'Công ca')}: <strong className="text-foreground">{d.workRatio || 0}</strong> | {t('timekeeping.check_in_short', 'Vào')}: <strong>{d.checkInTime ? dayjs(d.checkInTime).format('HH:mm') : '--:--'}</strong> | {t('timekeeping.check_out_short', 'Ra')}: <strong>{d.checkOutTime ? dayjs(d.checkOutTime).format('HH:mm') : '--:--'}</strong> | {t('timekeeping.detail.total_hours', 'Số giờ')}: <strong>{d.checkInTime && d.checkOutTime ? dayjs(d.checkOutTime).diff(dayjs(d.checkInTime), 'hour', true).toFixed(2) + ' ' + t('timekeeping.detail.hours_unit', 'giờ') : '0 ' + t('timekeeping.detail.hours_unit', 'giờ')}</strong>
                                     </Typography>
                                 </Box>
                             ))}
@@ -617,12 +623,12 @@ const TimesheetApprovalList = () => {
                             {/* Raw Logs with Snapshot Photos */}
                             <Box className="space-y-2 mt-4">
                                 <Typography variant="subtitle2" className="font-bold text-foreground">
-                                    Lịch sử chấm công
+                                    {t('timekeeping.detail.logs_title', 'Lịch sử chấm công')}
                                 </Typography>
 
                                 {rawLogs.length === 0 ? (
                                     <Typography variant="body2" className="text-muted-foreground italic text-center py-4 bg-muted border border-border rounded-xl">
-                                        Chưa có nhật ký quẹt thẻ.
+                                        {t('timekeeping.approval.no_logs', 'Chưa có nhật ký quẹt thẻ.')}
                                     </Typography>
                                 ) : (
                                     <Box className="divide-y divide-border border border-border rounded-xl overflow-hidden max-h-[300px] overflow-y-auto">
@@ -630,7 +636,7 @@ const TimesheetApprovalList = () => {
                                             <Box key={log.id} className="p-3 flex items-center justify-between hover:bg-muted/30 transition-colors">
                                                 <Box className="flex items-center gap-3">
                                                     {log.photoUrl ? (
-                                                        <Tooltip title="Nhấp để xem ảnh lớn" arrow>
+                                                        <Tooltip title={t('timekeeping.approval.view_photo_tooltip', 'Nhấp để xem ảnh lớn')} arrow>
                                                             <Avatar 
                                                                 src={log.photoUrl} 
                                                                 variant="rounded" 
@@ -647,10 +653,10 @@ const TimesheetApprovalList = () => {
 
                                                     <Box>
                                                         <Typography variant="body2" className="font-semibold text-foreground">
-                                                            Lượt quét: {dayjs(log.recordTime).format('HH:mm')}
+                                                            {t('timekeeping.detail.scanned_at_label', 'Lượt quét')}: {dayjs(log.recordTime).format('HH:mm')}
                                                         </Typography>
                                                         <Typography variant="caption" className="text-muted-foreground block">
-                                                            IP: <span className="font-mono text-foreground font-semibold">{log.ipAddress || 'Unknown'}</span> | {log.deviceType || 'Web Browser'}
+                                                            IP: <span className="font-mono text-foreground font-semibold">{log.ipAddress || 'Unknown'}</span> | {t('timekeeping.detail.device', 'Thiết bị')}: {log.deviceType || 'Web Browser'}
                                                             {log.latitude && log.longitude && (
                                                                 <> | GPS: <span className="font-mono text-foreground font-semibold">{log.latitude.toFixed(6)}, {log.longitude.toFixed(6)}</span></>
                                                             )}
@@ -659,7 +665,7 @@ const TimesheetApprovalList = () => {
                                                 </Box>
 
                                                 <Chip 
-                                                    label={log.recordType === 'CHECK_IN' ? 'VÀO' : 'RA'} 
+                                                    label={log.recordType === 'CHECK_IN' ? t('timekeeping.record_type.check_in', 'VÀO') : t('timekeeping.record_type.check_out', 'RA')} 
                                                     size="small" 
                                                     className={log.recordType === 'CHECK_IN' ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' : 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50'}
                                                 />
@@ -671,7 +677,7 @@ const TimesheetApprovalList = () => {
 
                             {detailTimesheet.note && (
                                 <Box className="mt-2 text-xs text-muted-foreground bg-muted p-2.5 rounded-lg border border-border">
-                                    <span className="font-bold text-foreground">Ghi chú duyệt công:</span> {detailTimesheet.note}
+                                    <span className="font-bold text-foreground">{t('timekeeping.detail.notes_title', 'Ghi chú duyệt công:')}</span> {detailTimesheet.note}
                                 </Box>
                             )}
                         </Box>

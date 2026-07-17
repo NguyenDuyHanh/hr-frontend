@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
     Button, Grid, Paper, Typography, Box, Chip
 } from '@mui/material';
@@ -25,7 +26,22 @@ const formatShiftTime = (timeStr) => {
 };
 
 const TimekeepingSummary = () => {
+    const { t } = useTranslation();
     const user = useAuthStore(state => state.user);
+
+    const getTranslatedDayOfWeek = (dateObj) => {
+        const d = dateObj.format('dddd');
+        switch (d) {
+            case 'Sunday': return t('calendar.days.sunday', 'Chủ Nhật');
+            case 'Saturday': return t('calendar.days.saturday', 'Thứ Bảy');
+            case 'Monday': return t('calendar.days.monday', 'Thứ Hai');
+            case 'Tuesday': return t('calendar.days.tuesday', 'Thứ Ba');
+            case 'Wednesday': return t('calendar.days.wednesday', 'Thứ Tư');
+            case 'Thursday': return t('calendar.days.thursday', 'Thứ Năm');
+            case 'Friday': return t('calendar.days.friday', 'Thứ Sáu');
+            default: return '';
+        }
+    };
     
     // UI states
     const [departments, setDepartments] = useState([]);
@@ -82,7 +98,7 @@ const TimekeepingSummary = () => {
             setTimesheets(response?.data?.content || []);
         } catch (error) {
             console.error('Error loading timesheets:', error);
-            toast.error("Không thể tải dữ liệu chấm công");
+            toast.error(t('timekeeping.summary.load_error', 'Không thể tải dữ liệu chấm công'));
         } finally {
             setLoading(false);
         }
@@ -300,7 +316,7 @@ const TimekeepingSummary = () => {
             return blob;
         } catch (error) {
             console.error("Failed to export Excel:", error);
-            toast.error("Không thể xuất file báo cáo");
+            toast.error(t('timekeeping.summary.export_error', 'Không thể xuất file báo cáo'));
             return null;
         }
     };
@@ -311,33 +327,27 @@ const TimekeepingSummary = () => {
             // Day-by-day Columns (1 Employee)
             return [
                 {
-                    title: 'Ngày',
+                    title: t('timekeeping.date', 'Ngày'),
                     field: 'dateStr',
                     width: 120,
                     align: 'center',
                     render: (row) => <span className="font-semibold">{row.dateObj.format('DD/MM/YYYY')}</span>
                 },
                 {
-                    title: 'Thứ',
+                    title: t('timekeeping.day_of_week', 'Thứ'),
                     field: 'dayOfWeek',
                     width: 100,
                     align: 'center',
                     render: (row) => {
-                        const day = row.dateObj.format('dddd');
                         return (
-                            <span className={day === 'Sunday' || day === 'Saturday' ? 'text-red-500 font-medium' : 'text-gray-500'}>
-                                {day === 'Sunday' ? 'Chủ Nhật' : 
-                                 day === 'Saturday' ? 'Thứ Bảy' : 
-                                 day === 'Monday' ? 'Thứ Hai' : 
-                                 day === 'Tuesday' ? 'Thứ Ba' : 
-                                 day === 'Wednesday' ? 'Thứ Tư' : 
-                                 day === 'Thursday' ? 'Thứ Năm' : 'Thứ Sáu'}
+                            <span className={row.dateObj.format('dddd') === 'Sunday' || row.dateObj.format('dddd') === 'Saturday' ? 'text-red-500 font-medium' : 'text-gray-500'}>
+                                {getTranslatedDayOfWeek(row.dateObj)}
                             </span>
                         );
                     }
                 },
                 {
-                    title: 'Giờ vào/ra',
+                    title: t('timekeeping.time_in_out', 'Giờ vào/ra'),
                     width: 140,
                     align: 'center',
                     render: (row) => {
@@ -359,18 +369,18 @@ const TimekeepingSummary = () => {
 
                         return (
                             <Box className="space-y-0.5 text-gray-600 dark:text-gray-400">
-                                <div>Vào: <span className="font-semibold text-gray-800 dark:text-gray-200">{minCi ? minCi.format('HH:mm') : '--:--'}</span></div>
-                                <div>Ra: <span className="font-semibold text-gray-800 dark:text-gray-200">{maxCo ? maxCo.format('HH:mm') : '--:--'}</span></div>
+                                <div>{t('timekeeping.check_in_short', 'Vào')}: <span className="font-semibold text-gray-800 dark:text-gray-200">{minCi ? minCi.format('HH:mm') : '--:--'}</span></div>
+                                <div>{t('timekeeping.check_out_short', 'Ra')}: <span className="font-semibold text-gray-800 dark:text-gray-200">{maxCo ? maxCo.format('HH:mm') : '--:--'}</span></div>
                             </Box>
                         );
                     }
                 },
                 {
-                    title: 'Ca áp dụng',
+                    title: t('timekeeping.applied_shift', 'Ca áp dụng'),
                     width: 180,
                     render: (row) => {
                         if (!row.record || !row.record.details || row.record.details.length === 0) {
-                            return <span className="text-gray-400">Vắng / Nghỉ</span>;
+                            return <span className="text-gray-400">{t('timekeeping.absent_or_leave', 'Vắng / Nghỉ')}</span>;
                         }
                         return (
                             <div className="space-y-0.5">
@@ -384,21 +394,21 @@ const TimekeepingSummary = () => {
                     }
                 },
                 {
-                    title: 'Công',
+                    title: t('timekeeping.work_ratio', 'Công'),
                     field: 'totalWorkRatio',
                     align: 'center',
                     width: 90,
                     render: (row) => <span className="font-bold text-emerald-600">{row.record ? row.record.totalWorkRatio || 0 : '0'}</span>
                 },
                 {
-                    title: 'Giờ chuẩn',
+                    title: t('timekeeping.standard_hours', 'Giờ chuẩn'),
                     field: 'standardHours',
                     align: 'center',
                     width: 90,
                     render: (row) => <span>{row.record ? (row.record.standardHours || 0).toFixed(2) : '0.00'}</span>
                 },
                 {
-                    title: 'Giờ OT',
+                    title: t('timekeeping.ot_hours', 'Giờ OT'),
                     field: 'overtimeHours',
                     align: 'center',
                     width: 90,
@@ -408,7 +418,7 @@ const TimekeepingSummary = () => {
                     }
                 },
                 {
-                    title: 'Đi muộn',
+                    title: t('timekeeping.late_minutes', 'Đi muộn'),
                     align: 'center',
                     width: 90,
                     render: (row) => {
@@ -416,11 +426,11 @@ const TimekeepingSummary = () => {
                         if (row.record && row.record.details) {
                             row.record.details.forEach(d => late += d.lateMinutes || 0);
                         }
-                        return late > 0 ? <span className="font-bold text-rose-600">{late}p</span> : <span>0</span>;
+                        return late > 0 ? <span className="font-bold text-rose-600">{late}{t('timekeeping.minutes_short', 'p')}</span> : <span>0</span>;
                     }
                 },
                 {
-                    title: 'Về sớm',
+                    title: t('timekeeping.early_minutes', 'Về sớm'),
                     align: 'center',
                     width: 90,
                     render: (row) => {
@@ -428,11 +438,11 @@ const TimekeepingSummary = () => {
                         if (row.record && row.record.details) {
                             row.record.details.forEach(d => early += d.earlyMinutes || 0);
                         }
-                        return early > 0 ? <span className="font-bold text-rose-600">{early}p</span> : <span>0</span>;
+                        return early > 0 ? <span className="font-bold text-rose-600">{early}{t('timekeeping.minutes_short', 'p')}</span> : <span>0</span>;
                     }
                 },
                 {
-                    title: 'Trạng thái',
+                    title: t('common.status', 'Trạng thái'),
                     field: 'status',
                     align: 'center',
                     width: 120,
@@ -440,13 +450,13 @@ const TimekeepingSummary = () => {
                         if (!row.record) return <span className="text-gray-300 dark:text-gray-600">-</span>;
                         switch (row.record.status) {
                             case 'APPROVED':
-                                return <Chip label="Đã duyệt" size="small" color="success" variant="outlined" />;
+                                return <Chip label={t('timekeeping.status.approved', 'Đã duyệt')} size="small" color="success" variant="outlined" />;
                             case 'SUBMITTED':
-                                return <Chip label="Chờ duyệt" size="small" color="warning" variant="outlined" />;
+                                return <Chip label={t('timekeeping.status.submitted', 'Chờ duyệt')} size="small" color="warning" variant="outlined" />;
                             case 'REJECTED':
-                                return <Chip label="Từ chối" size="small" color="error" variant="outlined" />;
+                                return <Chip label={t('timekeeping.status.rejected', 'Từ chối')} size="small" color="error" variant="outlined" />;
                             default:
-                                return <Chip label="Nháp" size="small" color="default" variant="outlined" />;
+                                return <Chip label={t('timekeeping.status.draft', 'Nháp')} size="small" color="default" variant="outlined" />;
                         }
                     }
                 }
@@ -455,67 +465,67 @@ const TimekeepingSummary = () => {
             // Aggregated Summary Columns (Multiple Employees)
             return [
                 {
-                    title: 'Mã NV',
+                    title: t('staff.code', 'Mã NV'),
                     field: 'staffCode',
                     width: 100,
                     align: 'center',
                     render: (row) => <span>{row.staffCode}</span>
                 },
                 {
-                    title: 'Nhân viên',
+                    title: t('staff.name', 'Nhân viên'),
                     field: 'displayName',
                     align: 'center',    
                     minWidth: 150,
                     render: (row) => <span>{row.displayName}</span>
                 },
                 {
-                    title: 'Phòng ban',
+                    title: t('department.name', 'Phòng ban'),
                     field: 'departmentName',
                     width: 180,
                 },
                 {
-                    title: 'Vị trí',
+                    title: t('position.name', 'Vị trí'),
                     field: 'positionName',
                     width: 150,
                 },
                 {
-                    title: 'Tổng công',
+                    title: t('timekeeping.total_work_ratio', 'Tổng công'),
                     field: 'totalWorkRatio',
                     align: 'center',
                     width: 110,
                     render: (row) => <span className="font-extrabold text-emerald-600">{row.totalWorkRatio.toFixed(2)}</span>
                 },
                 {
-                    title: 'Giờ chuẩn',
+                    title: t('timekeeping.standard_hours', 'Giờ chuẩn'),
                     field: 'standardHours',
                     align: 'center',
                     width: 110,
                     render: (row) => <span className="font-semibold">{row.standardHours.toFixed(2)}</span>
                 },
                 {
-                    title: 'Giờ OT',
+                    title: t('timekeeping.ot_hours', 'Giờ OT'),
                     field: 'overtimeHours',
                     align: 'center',
                     width: 110,
                     render: (row) => <span className="font-semibold text-amber-600">{row.overtimeHours.toFixed(2)}</span>
                 },
                 {
-                    title: 'Đi muộn (phút)',
+                    title: t('timekeeping.late_minutes_with_unit', 'Đi muộn (phút)'),
                     field: 'lateMinutes',
                     align: 'center',
                     width: 120,
-                    render: (row) => row.lateMinutes > 0 ? <span className="font-bold text-rose-600">{row.lateMinutes}p</span> : <span>0</span>
+                    render: (row) => row.lateMinutes > 0 ? <span className="font-bold text-rose-600">{row.lateMinutes}{t('timekeeping.minutes_short', 'p')}</span> : <span>0</span>
                 },
                 {
-                    title: 'Về sớm (phút)',
+                    title: t('timekeeping.early_minutes_with_unit', 'Về sớm (phút)'),
                     field: 'earlyMinutes',
                     align: 'center',
                     width: 120,
-                    render: (row) => row.earlyMinutes > 0 ? <span className="font-bold text-rose-600">{row.earlyMinutes}p</span> : <span>0</span>
+                    render: (row) => row.earlyMinutes > 0 ? <span className="font-bold text-rose-600">{row.earlyMinutes}{t('timekeeping.minutes_short', 'p')}</span> : <span>0</span>
                 }
             ];
         }
-    }, [filters.staffId]);
+    }, [filters.staffId, t]);
 
     // Paginated list
     const paginatedData = useMemo(() => {
@@ -552,6 +562,7 @@ const TimekeepingSummary = () => {
                                 onReset={handleResetFilters}
                                 showAdd={false}
                                 onExport={handleExport}
+                                searchPlaceholder={t('timekeeping.summary.search_placeholder', 'Tìm kiếm theo tên hoặc mã nhân viên...')}
                                 exportFileName={
                                     filters.staffId 
                                         ? `ThongKeCong_ChiTiet_${staffList.find(s => s.id === filters.staffId)?.staffCode || ''}.xlsx`
@@ -575,7 +586,7 @@ const TimekeepingSummary = () => {
                                     <Grid item xs={12} sm={6}>
                                         <Autocomplete
                                             name="department"
-                                            label="Phòng ban"
+                                            label={t('department.name', 'Phòng ban')}
                                             options={departments}
                                             getOptionLabel={(option) => option?.name || ''}
                                             onChange={(event, val) => {
@@ -590,14 +601,14 @@ const TimekeepingSummary = () => {
                                     <Grid item xs={12} sm={6}>
                                         <Autocomplete
                                             name="staff"
-                                            label="Nhân viên"
+                                            label={t('staff.name', 'Nhân viên')}
                                             options={displayStaffList}
                                             getOptionLabel={(option) => option ? `${option.displayName} (${option.staffCode})` : ''}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <DateTimePicker
-                                            label="Từ ngày"
+                                            label={t('timekeeping.start_date', 'Từ ngày')}
                                             name="fromDate"
                                             notValueMillisecond={true}
                                             format="dd/MM/yyyy"
@@ -605,7 +616,7 @@ const TimekeepingSummary = () => {
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <DateTimePicker
-                                            label="Đến ngày"
+                                            label={t('timekeeping.end_date', 'Đến ngày')}
                                             name="toDate"
                                             notValueMillisecond={true}
                                             format="dd/MM/yyyy"

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Grid, IconButton, TextField, Paper } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -41,6 +42,7 @@ const FAKE_POSITIONS = [
 ];
 
 const StaffList = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const hasRole = useAuthStore((state) => state.hasRole);
     const canManage = hasRole([ROLES.ADMIN, ROLES.HR_MANAGER]);
@@ -155,28 +157,28 @@ const StaffList = () => {
 
     const importOpts = useMemo(() => [
         {
-            label: 'Nhập Excel nhân viên cũ',
+            label: t('staff.import_old', 'Nhập Excel nhân viên cũ'),
             onImport: async (file) => {
                 console.log('Nhập Excel nhân viên cũ:', file);
             }
         },
         {
-            label: 'Nhập Excel nhân viên mới',
+            label: t('staff.import_new', 'Nhập Excel nhân viên mới'),
             onImport: async (file) => {
                 console.log('Nhập Excel nhân viên mới:', file);
             }
         }
-    ], []);
+    ], [t]);
 
     const templateOpts = useMemo(() => [
         {
-            label: 'Tải mẫu nhập',
+            label: t('staff.download_template', 'Tải mẫu nhập'),
             fileName: 'mau_nhap_nhan_vien.xlsx',
             onDownload: async () => {
                 return new Blob([""], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
             }
         }
-    ], []);
+    ], [t]);
 
     const handleExport = async () => {
         const searchDto = {
@@ -191,7 +193,7 @@ const StaffList = () => {
 
     const columns = [
         { 
-            title: 'Thao tác', 
+            title: t('common.actions', 'Thao tác'), 
             field: 'actions',
             width: 140,
             render: (rowData) => (
@@ -207,57 +209,52 @@ const StaffList = () => {
             )
         },
         { 
-            title: 'Mã nhân viên', 
+            title: t('staff.code', 'Mã nhân viên'), 
             field: 'staffCode', 
             width: 130,
         },
         { 
-            title: 'Nhân viên', 
+            title: t('staff.staff', 'Nhân viên'), 
             field: 'displayName',
             width: 250,
             render: (rowData) => (
                 <div className="py-1">
                     <div className="font-bold leading-tight whitespace-nowrap">{rowData.displayName}</div>
-                    <div className="mt-1 whitespace-nowrap">Ngày sinh: {formatDate(rowData.birthDate) || '---'}</div>
-                    <div className="whitespace-nowrap">Ngày vào làm: {formatDate(rowData.startDate) || '---'}</div>
-                    <div>Giới tính: {getLabelFromOptions(GenderOptions, rowData.gender) || '---'}</div>
+                    <div className="mt-1 whitespace-nowrap">{t('staff.birthdate', 'Ngày sinh')}: {formatDate(rowData.birthDate) || '---'}</div>
+                    <div className="whitespace-nowrap">{t('staff.start_date', 'Ngày vào làm')}: {formatDate(rowData.startDate) || '---'}</div>
+                    <div>{t('staff.gender', 'Giới tính')}: {t('staff.gender_value.' + rowData.gender, getLabelFromOptions(GenderOptions, rowData.gender) || '---')}</div>
                 </div>
             )
         },
         { 
-            title: 'Thông tin liên hệ', 
+            title: t('staff.contact', 'Thông tin liên hệ'), 
             width: 250,
             render: (rowData) => (
                 <div className="py-1">
-                    <div>SĐT: {rowData.phoneNumber || '---'}</div>
-                    <div className="truncate max-w-[230px]">Email: {rowData.email || '---'}</div>
+                    <div>{t('staff.phone', 'SĐT')}: {rowData.phoneNumber || '---'}</div>
+                    <div className="truncate max-w-[230px]">{t('staff.email', 'Email')}: {rowData.email || '---'}</div>
                 </div>
             )
         },
         { 
-            title: 'Trạng thái nhân viên', 
+            title: t('staff.status', 'Trạng thái nhân viên'), 
             field: 'workingStatus',
             align: 'center',
             width: 150,
             render: (rowData) => (
                 <span>
-                    {getLabelFromOptions(WorkingStatusOptions, rowData.workingStatus)}
+                    {t('staff.status_value.' + rowData.workingStatus, getLabelFromOptions(WorkingStatusOptions, rowData.workingStatus))}
                 </span>
             )
         },
-        // { 
-        //     title: 'Đơn vị', 
-        //     width: 150,
-        //     render: () => <span className="uppercase whitespace-nowrap">Thẩm mỹ Linh Anh</span> 
-        // },
         { 
-            title: 'Phòng ban', 
+            title: t('staff.department', 'Phòng ban'), 
             align: 'center',
             width: 180,
             render: (rowData) => <span className="whitespace-nowrap">{rowData.departmentName || '---'}</span> 
         },
         { 
-            title: 'Vị trí', 
+            title: t('staff.position', 'Vị trí'), 
             width: 180,
             align: 'center',
             render: (rowData) => <span className="whitespace-nowrap">{rowData.positionName || '---'}</span> 
@@ -292,7 +289,8 @@ const StaffList = () => {
                                 onSearch={handleSearch}
                                 onReset={handleReset}
                                 onAdd={canManage ? handleAdd : undefined}
-                                addLabel="Thêm mới"
+                                addLabel={t('staff.add', 'Thêm mới')}
+                                searchPlaceholder={t('staff.search_placeholder', 'Tìm kiếm nhân viên...')}
                                 filter={{
                                     open: filterOpen,
                                     onToggle: setFilterOpen,
@@ -314,7 +312,7 @@ const StaffList = () => {
                                     <Grid item xs={12} sm={4}>
                                         <Autocomplete
                                             name="department"
-                                            label="Phòng ban"
+                                            label={t('staff.filter_department', 'Phòng ban')}
                                             options={departments}
                                             getOptionLabel={(option) => option?.name || ''}
                                             onChange={(event, val) => {
@@ -333,7 +331,7 @@ const StaffList = () => {
                                     <Grid item xs={12} sm={4}>
                                         <Autocomplete
                                             name="position"
-                                            label="Vị trí"
+                                            label={t('staff.filter_position', 'Vị trí')}
                                             options={
                                                 values.department?.id
                                                     ? positions.filter(pos => pos.department?.id === values.department.id)
@@ -345,10 +343,10 @@ const StaffList = () => {
                                     <Grid item xs={12} sm={4}>
                                         <SelectInput
                                             name="workingStatus"
-                                            label="Trạng thái nhân viên"
+                                            label={t('staff.status', 'Trạng thái nhân viên')}
                                             options={[
-                                                { value: '', name: 'Tất cả' },
-                                                ...WorkingStatusOptions.map(opt => ({ value: opt.value, name: opt.name }))
+                                                { value: '', name: t('common.all', 'Tất cả') },
+                                                ...WorkingStatusOptions.map(opt => ({ value: opt.value, name: t('staff.status_value.' + opt.value, opt.name) }))
                                             ]}
                                             keyValue="value"
                                             displayvalue="name"
@@ -385,10 +383,10 @@ const StaffList = () => {
                 open={openConfirm}
                 onConfirmDialogClose={() => setOpenConfirm(false)}
                 onYesClick={confirmDelete}
-                title="Xác nhận xóa"
-                text="Bạn có chắc chắn muốn xóa nhân viên này không? Hành động này không thể hoàn tác."
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                title={t('staff.delete_confirm_title', 'Xác nhận xóa')}
+                text={t('staff.delete_confirm_text', 'Bạn có chắc chắn muốn xóa nhân viên này không? Hành động này không thể hoàn tác.')}
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
         </>
     );

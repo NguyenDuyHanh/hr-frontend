@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Grid, IconButton, Paper, Chip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -24,6 +25,7 @@ import { ROLES } from '../../constants/roles';
 import useAuthStore from '../../store/useAuthStore';
 
 const ProjectList = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const user = useAuthStore((state) => state.user);
     const hasRole = useAuthStore((state) => state.hasRole);
@@ -88,7 +90,7 @@ const ProjectList = () => {
     const confirmDelete = async () => {
         if (selectedProject?.id) {
             await removeProject(selectedProject.id);
-            toast.success("Xóa dự án thành công");
+            toast.success(t('project.delete_success', 'Xóa dự án thành công'));
             setSelectedProject(null);
             setOpenConfirm(false);
         }
@@ -102,7 +104,7 @@ const ProjectList = () => {
     const confirmFinish = async () => {
         if (projectToFinish?.id) {
             await completeProject(projectToFinish.id);
-            toast.success("Đã hoàn thành dự án!");
+            toast.success(t('project.finish_success', 'Đã hoàn thành dự án!'));
             setProjectToFinish(null);
             setOpenFinishConfirm(false);
         }
@@ -116,7 +118,7 @@ const ProjectList = () => {
     const confirmUnfinish = async () => {
         if (projectToUnfinish?.id) {
             await uncompleteProject(projectToUnfinish.id);
-            toast.success("Đã bỏ đánh dấu hoàn thành dự án!");
+            toast.success(t('project.unfinish_success', 'Đã bỏ đánh dấu hoàn thành dự án!'));
             setProjectToUnfinish(null);
             setOpenUnfinishConfirm(false);
         }
@@ -140,7 +142,7 @@ const ProjectList = () => {
 
     const columns = [
         { 
-            title: 'Thao tác', 
+            title: t('common.actions', 'Thao tác'), 
             field: 'actions',
             width: 160,
             align: 'center',
@@ -153,17 +155,17 @@ const ProjectList = () => {
 
                 return (
                     <div className="flex items-center justify-center">
-                        <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleView(rowData)} title="Xem chi tiết"><VisibilityIcon fontSize="small" /></IconButton>
+                        <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleView(rowData)} title={t('common.view_detail', 'Xem chi tiết')}><VisibilityIcon fontSize="small" /></IconButton>
                         {canManageRow && (
                             <>
-                                <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)} title="Sửa"><EditIcon fontSize="small" /></IconButton>
+                                <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)} title={t('common.edit', 'Sửa')}><EditIcon fontSize="small" /></IconButton>
                                 {!rowData.isFinished && (
-                                    <IconButton size="small" sx={{ color: '#2e7d32' }} onClick={() => handleFinish(rowData)} title="Đánh dấu hoàn thành"><CheckCircleIcon fontSize="small" /></IconButton>
+                                    <IconButton size="small" sx={{ color: '#2e7d32' }} onClick={() => handleFinish(rowData)} title={t('project.finish_tooltip', 'Đánh dấu hoàn thành')}><CheckCircleIcon fontSize="small" /></IconButton>
                                 )}
                                 {rowData.isFinished && (
-                                    <IconButton size="small" sx={{ color: '#ed6c02' }} onClick={() => handleUnfinish(rowData)} title="Bỏ hoàn thành"><UndoIcon fontSize="small" /></IconButton>
+                                    <IconButton size="small" sx={{ color: '#ed6c02' }} onClick={() => handleUnfinish(rowData)} title={t('project.unfinish_tooltip', 'Bỏ hoàn thành')}><UndoIcon fontSize="small" /></IconButton>
                                 )}
-                                <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)} title="Xóa"><DeleteIcon fontSize="small" /></IconButton>
+                                <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)} title={t('common.delete', 'Xóa')}><DeleteIcon fontSize="small" /></IconButton>
                             </>
                         )}
                     </div>
@@ -171,35 +173,35 @@ const ProjectList = () => {
             }
         },
         { 
-            title: 'Mã dự án', 
+            title: t('project.code', 'Mã dự án'), 
             field: 'code', 
             width: 140,
             minWidth: 140,
             render: (rowData) => <span className="font-semibold">{rowData.code}</span>
         },
         { 
-            title: 'Tên dự án', 
+            title: t('project.name', 'Tên dự án'), 
             field: 'name',
             width: 200,
             minWidth: 200,
             render: (rowData) => <span className="font-semibold">{rowData.name}</span>
         },
         { 
-            title: 'Mô tả', 
+            title: t('common.description', 'Mô tả'), 
             field: 'description',
             width: 300,
             minWidth: 300,
             render: (rowData) => <span className="line-clamp-2">{rowData.description || '---'}</span>
         },
         { 
-            title: 'Ngày bắt đầu', 
+            title: t('common.start_date', 'Ngày bắt đầu'), 
             field: 'startDate', 
             width: 130,
             align: 'center',
             render: (rowData) => <span>{formatDate(rowData.startDate) || '---'}</span>
         },
         { 
-            title: 'Ngày kết thúc', 
+            title: t('common.end_date', 'Ngày kết thúc'), 
             field: 'endDate', 
             width: 130,
             align: 'center',
@@ -207,13 +209,13 @@ const ProjectList = () => {
         },
 
         { 
-            title: 'Trạng thái', 
+            title: t('common.status', 'Trạng thái'), 
             field: 'isFinished',
             width: 140,
             align: 'center',
             render: (rowData) => (
                 <Chip 
-                    label={rowData.isFinished ? "Hoàn thành" : "Đang thực hiện"} 
+                    label={rowData.isFinished ? t('project.status.finished', 'Hoàn thành') : t('project.status.in_progress', 'Đang thực hiện')} 
                     color={rowData.isFinished ? "success" : "warning"} 
                     size="small" 
                 />
@@ -245,7 +247,8 @@ const ProjectList = () => {
                                 onSearch={handleSearch}
                                 onReset={handleReset}
                                 onAdd={canAdd ? handleAdd : undefined}
-                                addLabel="Thêm dự án"
+                                addLabel={t('project.add_btn', 'Thêm dự án')}
+                                searchPlaceholder={t('project.search_placeholder', 'Tìm kiếm theo tên dự án...')}
                                 filter={{
                                     open: filterOpen,
                                     onToggle: setFilterOpen,
@@ -263,11 +266,11 @@ const ProjectList = () => {
                                     <Grid item xs={12} sm={6}>
                                         <SelectInput
                                             name="isFinished"
-                                            label="Trạng thái hoàn thành"
+                                            label={t('project.filter.completion_status', 'Trạng thái hoàn thành')}
                                             options={[
-                                                { value: '', name: 'Tất cả' },
-                                                { value: 'false', name: 'Đang thực hiện' },
-                                                { value: 'true', name: 'Đã hoàn thành' }
+                                                { value: '', name: t('common.all', 'Tất cả') },
+                                                { value: 'false', name: t('project.status.in_progress', 'Đang thực hiện') },
+                                                { value: 'true', name: t('project.status.finished', 'Đã hoàn thành') }
                                             ]}
                                             keyValue="value"
                                             displayvalue="name"
@@ -306,30 +309,30 @@ const ProjectList = () => {
                 open={openConfirm}
                 onConfirmDialogClose={() => setOpenConfirm(false)}
                 onYesClick={confirmDelete}
-                title="Xác nhận xóa dự án"
-                text="Bạn có chắc chắn muốn xóa dự án này? Thao tác này không thể hoàn tác."
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                title={t('project.delete_confirm_title', 'Xác nhận xóa dự án')}
+                text={t('project.delete_confirm_text', 'Bạn có chắc chắn muốn xóa dự án này? Thao tác này không thể hoàn tác.')}
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
 
             <ConfirmationDialog
                 open={openFinishConfirm}
                 onConfirmDialogClose={() => setOpenFinishConfirm(false)}
                 onYesClick={confirmFinish}
-                title="Xác nhận hoàn thành dự án"
-                text="Bạn có chắc chắn muốn đánh dấu dự án này là hoàn thành? Thao tác này không thể hoàn tác."
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                title={t('project.finish_confirm_title', 'Xác nhận hoàn thành dự án')}
+                text={t('project.finish_confirm_text', 'Bạn có chắc chắn muốn đánh dấu dự án này là hoàn thành? Thao tác này không thể hoàn tác.')}
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
 
             <ConfirmationDialog
                 open={openUnfinishConfirm}
                 onConfirmDialogClose={() => setOpenUnfinishConfirm(false)}
                 onYesClick={confirmUnfinish}
-                title="Bỏ đánh dấu hoàn thành"
-                text="Bạn có chắc chắn muốn bỏ đánh dấu hoàn thành dự án này? Ngày kết thúc sẽ bị xóa."
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                title={t('project.unfinish_confirm_title', 'Bỏ đánh dấu hoàn thành')}
+                text={t('project.unfinish_confirm_text', 'Bạn có chắc chắn muốn bỏ đánh dấu hoàn thành dự án này? Ngày kết thúc sẽ bị xóa.')}
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
         </>
     );

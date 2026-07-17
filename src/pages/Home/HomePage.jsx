@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Grid } from "@mui/material";
 import useAuthStore from "@/store/useAuthStore";
 import { navigations } from "@/navigationConfig";
@@ -30,11 +31,12 @@ const IconMap = {
 };
 
 const HomePage = () => {
+  const { t, i18n } = useTranslation();
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const userRoles = user?.role || [];
 
-  // Định dạng ngày hiện tại bằng Tiếng Việt
+  // Định dạng ngày hiện tại bằng Tiếng Việt / Tiếng Anh
   const getFormattedDate = () => {
     const today = new Date();
     const options = {
@@ -43,7 +45,7 @@ const HomePage = () => {
       month: "long",
       day: "numeric",
     };
-    return today.toLocaleDateString("vi-VN", options);
+    return today.toLocaleDateString(i18n.language === "vi" ? "vi-VN" : "en-US", options);
   };
 
   // Lọc danh sách menu được phép xem (bỏ qua trang Dashboard và Trang chủ)
@@ -83,19 +85,19 @@ const HomePage = () => {
                 <WavingHandIcon className="text-[24px]" />
               </span>
               <span className="text-sm font-semibold tracking-wide text-primary uppercase">
-                Cổng thông tin HRM Hub
+                {t("home.portal_title", "Cổng thông tin HRM Hub")}
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
-              Xin chào, {user?.staffName || user?.fullName || user?.username || "Thành viên"}!
+              {t("home.greeting", { name: user?.staffName || user?.fullName || user?.username || t("home.greeting_default", "Thành viên") })}
             </h1>
             <p className="text-muted-foreground text-sm md:text-base max-w-[600px] leading-relaxed">
-              Chào mừng bạn đến với hệ thống quản lý nhân sự hiện đại. Chúc bạn có một ngày làm việc hiệu quả và nhiều niềm vui!
+              {t("home.welcome_message", "Chào mừng bạn đến với hệ thống quản lý nhân sự hiện đại. Chúc bạn có một ngày làm việc hiệu quả và nhiều niềm vui!")}
             </p>
           </div>
           <div className="flex flex-col items-start md:items-end gap-1.5 py-2 px-4 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm self-start md:self-center">
             <span className="text-[12px] font-medium text-muted-foreground">
-              Hôm nay là
+              {t("home.today", "Hôm nay là")}
             </span>
             <span className="text-[14px] md:text-[15px] font-semibold text-primary">
               {getFormattedDate()}
@@ -108,13 +110,13 @@ const HomePage = () => {
       <div className="space-y-4">
         <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
           <span className="w-1.5 h-6 bg-primary rounded-full"></span>
-          Chức năng dành cho bạn
+          {t("home.functions_title", "Chức năng dành cho bạn")}
         </h2>
 
         {allowedMenus.length === 0 ? (
           <div className="text-center p-12 rounded-xl border border-dashed border-border bg-card">
-            <p className="text-muted-foreground">Bạn chưa được phân quyền truy cập chức năng nào trên hệ thống.</p>
-            <p className="text-xs text-gray-400 mt-2">Vui lòng liên hệ Quản trị viên để biết thêm chi tiết.</p>
+            <p className="text-muted-foreground">{t("home.no_permissions", "Bạn chưa được phân quyền truy cập chức năng nào trên hệ thống.")}</p>
+            <p className="text-xs text-gray-400 mt-2">{t("home.contact_admin", "Vui lòng liên hệ Quản trị viên để biết thêm chi tiết.")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
@@ -129,7 +131,7 @@ const HomePage = () => {
                         <IconComponent className="text-[22px]" />
                       </div>
                       <h3 className="font-bold text-[17px] text-foreground group-hover:text-primary transition-colors">
-                        {menu.name}
+                        {t(`menu.${menu.name}`, menu.name)}
                       </h3>
                     </div>
 
@@ -142,7 +144,7 @@ const HomePage = () => {
                             onClick={() => navigate(child.path)}
                             className="w-full flex items-center justify-between text-left text-sm font-semibold text-foreground/80 hover:text-primary bg-background border border-border hover:border-primary/25 hover:bg-primary/5 py-2.5 px-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group/btn"
                           >
-                            <span>{child.name}</span>
+                            <span>{t(`menu.${child.name}`, child.name)}</span>
                             <ArrowForwardIcon className="text-[14px] opacity-0 group-hover/btn:opacity-100 transition-opacity transform translate-x-[-4px] group-hover/btn:translate-x-0 duration-200 text-primary" />
                           </button>
                         ))}
@@ -159,15 +161,15 @@ const HomePage = () => {
       {/* Widget Giới thiệu & Trợ giúp nhanh */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="p-6 rounded-xl border border-border bg-card space-y-3">
-          <h3 className="font-bold text-[15px] text-foreground">Bạn cần trợ giúp?</h3>
+          <h3 className="font-bold text-[15px] text-foreground">{t("home.help_title", "Bạn cần trợ giúp?")}</h3>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Nếu bạn gặp khó khăn trong quá trình sử dụng hệ thống (chấm công lỗi, không tạo được đơn nghỉ phép, hoặc sai thông tin lương), hãy bấm vào Widget Trợ lý AI ở góc phải màn hình để được hỗ trợ giải đáp nhanh.
+            {t("home.help_desc", "Nếu bạn gặp khó khăn trong quá trình sử dụng hệ thống (chấm công lỗi, không tạo được đơn nghỉ phép, hoặc sai thông tin lương), hãy bấm vào Widget Trợ lý AI ở góc phải màn hình để được hỗ trợ giải đáp nhanh.")}
           </p>
         </div>
         <div className="p-6 rounded-xl border border-border bg-card space-y-3">
-          <h3 className="font-bold text-[15px] text-foreground">Quy định Chấm công & Nghỉ phép</h3>
+          <h3 className="font-bold text-[15px] text-foreground">{t("home.rules_title", "Quy định Chấm công & Nghỉ phép")}</h3>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Nhân viên vui lòng hoàn thành chấm công hàng ngày. Đơn xin nghỉ phép cần được tạo và phê duyệt trước ngày nghỉ tối thiểu 24 giờ. Số ngày phép năm chưa sử dụng sẽ được cộng dồn theo quy định của công ty.
+            {t("home.rules_desc", "Nhân viên vui lòng hoàn thành chấm công hàng ngày. Đơn xin nghỉ phép cần được tạo và phê duyệt trước ngày nghỉ tối thiểu 24 giờ. Số ngày phép năm chưa sử dụng sẽ được cộng dồn theo quy định của công ty.")}
           </p>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Paper, Tabs, Tab, Box, Typography, Button, Chip, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -29,6 +30,7 @@ import useAuthStore from '../../store/useAuthStore';
 import useProjectPermission from '../../hooks/useProjectPermission';
 
 const TaskList = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const hasRole = useAuthStore((state) => state.hasRole);
     const username = useAuthStore((state) => state.user?.username) || '';
@@ -167,7 +169,7 @@ const TaskList = () => {
     const confirmDelete = async () => {
         if (taskToDelete?.id) {
             await removeTask(taskToDelete.id);
-            toast.success("Xóa công việc thành công");
+            toast.success(t('task.delete_success', 'Xóa công việc thành công'));
             setTaskToDelete(null);
             setOpenConfirm(false);
         }
@@ -179,21 +181,21 @@ const TaskList = () => {
 
     const columns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             field: 'actions',
             width: 130,
             align: 'center',
             render: (rowData) => (
                 <div className="flex items-center justify-center space-x-1">
-                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => viewTask(rowData)} title="Xem chi tiết">
+                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => viewTask(rowData)} title={t('common.view_detail', 'Xem chi tiết')}>
                         <VisibilityIcon fontSize="small" />
                     </IconButton>
                     {canManageTasks && (
                         <>
-                            <IconButton size="small" color="primary" onClick={() => editTask(rowData)} title="Sửa">
+                            <IconButton size="small" color="primary" onClick={() => editTask(rowData)} title={t('common.edit', 'Sửa')}>
                                 <EditIcon fontSize="small" />
                             </IconButton>
-                            <IconButton size="small" color="error" onClick={() => initiateDelete(rowData)} title="Xóa">
+                            <IconButton size="small" color="error" onClick={() => initiateDelete(rowData)} title={t('common.delete', 'Xóa')}>
                                 <DeleteIcon fontSize="small" />
                             </IconButton>
                         </>
@@ -202,31 +204,31 @@ const TaskList = () => {
             )
         },
         {
-            title: 'Mã',
+            title: t('task.code', 'Mã'),
             field: 'code',
             width: 120,
             render: (rowData) => <span className="font-semibold text-primary">{rowData.code}</span>
         },
         {
-            title: 'Tên công việc',
+            title: t('task.name', 'Tên công việc'),
             field: 'name',
             minWidth: 200,
             render: (rowData) => <span className="font-semibold">{rowData.name}</span>
         },
         {
-            title: 'Dự án',
+            title: t('project.name', 'Dự án'),
             field: 'projectName',
             minWidth: 150,
             render: (rowData) => <span>{rowData.projectName || '—'}</span>
         },
         {
-            title: 'Hoạt động',
+            title: t('task.activity', 'Hoạt động'),
             field: 'activityName',
             width: 150,
             render: (rowData) => <span>{rowData.activityName || '—'}</span>
         },
         {
-            title: 'Trạng thái',
+            title: t('common.status', 'Trạng thái'),
             field: 'statusName',
             width: 130,
             render: (rowData) => (
@@ -242,18 +244,18 @@ const TaskList = () => {
             )
         },
         {
-            title: 'Người phụ trách',
+            title: t('task.assignee', 'Người phụ trách'),
             field: 'assigneeName',
             width: 150,
             render: (rowData) => <span>{rowData.assigneeName || '—'}</span>
         },
         {
-            title: 'Độ ưu tiên',
+            title: t('task.priority', 'Độ ưu tiên'),
             field: 'priority',
             width: 110,
             render: (rowData) => (
                 <Chip
-                    label={TASK_PRIORITY_LABELS[rowData.priority]}
+                    label={t('task.priority_label.' + rowData.priority, TASK_PRIORITY_LABELS[rowData.priority])}
                     size="small"
                     style={{
                         backgroundColor: `${TASK_PRIORITY_COLORS[rowData.priority]}15`,
@@ -263,7 +265,7 @@ const TaskList = () => {
             )
         },
         {
-            title: 'Ngày tạo',
+            title: t('common.created_date', 'Ngày tạo'),
             field: 'createDate',
             width: 130,
             render: (rowData) => <span>{formatDate(rowData.createDate)}</span>
@@ -319,7 +321,8 @@ const TaskList = () => {
                                 onSearch={handleSearch}
                                 onReset={handleReset}
                                 onAdd={canManageTasks ? handleAdd : undefined}
-                                addLabel="Thêm công việc"
+                                addLabel={t('task.add_btn', 'Thêm công việc')}
+                                searchPlaceholder={t('task.search_placeholder', 'Tìm kiếm theo tên công việc...')}
                                 filter={{
                                     open: filterOpen,
                                     onToggle: setFilterOpen,
@@ -342,7 +345,7 @@ const TaskList = () => {
                 {(() => {
                     const tabList = [
                         {
-                            label: 'Dạng danh sách',
+                            label: t('task.tab_list', 'Dạng danh sách'),
                             content: (
                                 <>
                                     {currentProjectId ? (
@@ -360,10 +363,10 @@ const TaskList = () => {
                                     ) : (
                                         <Box className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-md bg-gray-50/50">
                                             <Typography className="text-gray-500 mb-2 font-medium">
-                                                Vui lòng chọn Dự án ở phần lọc để hiển thị danh sách công việc
+                                                {t('task.select_project_hint_list', 'Vui lòng chọn Dự án ở phần lọc để hiển thị danh sách công việc')}
                                             </Typography>
                                             <Button variant="outlined" onClick={() => setFilterOpen(true)} startIcon={<AddIcon />}>
-                                                Mở bộ lọc dự án
+                                                {t('task.open_filter_btn', 'Mở bộ lọc dự án')}
                                             </Button>
                                         </Box>
                                     )}
@@ -371,7 +374,7 @@ const TaskList = () => {
                             )
                         },
                         {
-                            label: 'Bảng Kanban',
+                            label: t('task.tab_kanban', 'Bảng Kanban'),
                             content: (
                                 <>
                                     {currentProjectId ? (
@@ -382,10 +385,10 @@ const TaskList = () => {
                                     ) : (
                                         <Box className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-md bg-gray-50/50">
                                             <Typography className="text-gray-500 mb-2 font-medium">
-                                                Vui lòng chọn Dự án ở phần lọc để hiển thị bảng Kanban
+                                                {t('task.select_project_hint_kanban', 'Vui lòng chọn Dự án ở phần lọc để hiển thị bảng Kanban')}
                                             </Typography>
                                             <Button variant="outlined" onClick={() => setFilterOpen(true)} startIcon={<AddIcon />}>
-                                                Mở bộ lọc dự án
+                                                {t('task.open_filter_btn', 'Mở bộ lọc dự án')}
                                             </Button>
                                         </Box>
                                     )}
@@ -427,10 +430,10 @@ const TaskList = () => {
                 open={openConfirm}
                 onConfirmDialogClose={() => setOpenConfirm(false)}
                 onYesClick={confirmDelete}
-                title="Xác nhận xóa công việc"
-                text={`Bạn có chắc chắn muốn xóa công việc ${taskToDelete?.code} - "${taskToDelete?.name}"? Thao tác này không thể hoàn tác.`}
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                title={t('task.delete_confirm_title', 'Xác nhận xóa công việc')}
+                text={t('task.delete_confirm_text', 'Bạn có chắc chắn muốn xóa công việc {{code}} - "{{name}}"? Thao tác này không thể hoàn tác.', { code: taskToDelete?.code, name: taskToDelete?.name })}
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
         </>
     );

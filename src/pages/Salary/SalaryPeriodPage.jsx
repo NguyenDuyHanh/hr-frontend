@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
     IconButton, 
     Paper, 
@@ -28,6 +29,7 @@ import usePeriodStore from '../../store/usePeriodStore';
 import { format } from 'date-fns';
 
 const SalaryPeriodPage = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const {
         periods,
@@ -59,37 +61,37 @@ const SalaryPeriodPage = () => {
 
     // Filter Options
     const monthOptions = useMemo(() => [
-        { value: '', name: 'Tất cả' },
+        { value: '', name: t('common.all', 'Tất cả') },
         ...Array.from({ length: 12 }, (_, i) => ({
             value: i + 1,
-            name: `Tháng ${(i + 1).toString().padStart(2, '0')}`
+            name: t('calendar.month_label', 'Tháng {{month}}', { month: (i + 1).toString().padStart(2, '0') })
         }))
-    ], []);
+    ], [t]);
 
     const yearOptions = useMemo(() => {
         const currentYear = new Date().getFullYear();
         return [
-            { value: '', name: 'Tất cả' },
+            { value: '', name: t('common.all', 'Tất cả') },
             ...Array.from({ length: 5 }, (_, i) => ({
                 value: currentYear - 2 + i,
-                name: `Năm ${currentYear - 2 + i}`
+                name: t('calendar.year_label', 'Năm {{year}}', { year: currentYear - 2 + i })
             }))
         ];
-    }, []);
+    }, [t]);
 
     const monthFormOptions = useMemo(() =>
         Array.from({ length: 12 }, (_, i) => ({
             value: i + 1,
-            name: `Tháng ${(i + 1).toString().padStart(2, '0')}`
-        })), []);
+            name: t('calendar.month_label', 'Tháng {{month}}', { month: (i + 1).toString().padStart(2, '0') })
+        })), [t]);
 
     const yearFormOptions = useMemo(() => {
         const currentYear = new Date().getFullYear();
         return Array.from({ length: 5 }, (_, i) => ({
             value: currentYear - 2 + i,
-            name: `Năm ${currentYear - 2 + i}`
+            name: t('calendar.year_label', 'Năm {{year}}', { year: currentYear - 2 + i })
         }));
-    }, []);
+    }, [t]);
 
     const activeFilterCount = useMemo(() => {
         return getActiveFilterCount({ month: filterMonth, year: filterYear });
@@ -145,7 +147,7 @@ const SalaryPeriodPage = () => {
     };
 
     const buildPeriodName = (month, year) =>
-        `Kỳ lương Tháng ${String(month).padStart(2, '0')}/${year}`;
+        t('salary.period.name_format', 'Kỳ lương Tháng {{month}}/{{year}}', { month: String(month).padStart(2, '0'), year });
 
     const buildPeriodCode = (month, year) =>
         `KY_LUONG_T${month}_${year}`;
@@ -164,7 +166,7 @@ const SalaryPeriodPage = () => {
         enableReinitialize: false,
         onSubmit: async (values) => {
             if (!values.name || !values.month || !values.year) {
-                toast.warning('Vui lòng nhập đầy đủ thông tin kỳ tính lương');
+                toast.warning(t('salary.period.validation_required', 'Vui lòng nhập đầy đủ thông tin kỳ tính lương'));
                 return;
             }
             try {
@@ -173,15 +175,15 @@ const SalaryPeriodPage = () => {
                 const toDateStr = values.toDate ? format(new Date(values.toDate), 'yyyy-MM-dd') : '';
                 if (isEdit) {
                     await modifyPeriod(selectedPeriod.id, values.name, values.code, values.description, values.month, values.year, fromDateStr, toDateStr, values.standardWorkDays);
-                    toast.success('Cập nhật kỳ tính lương thành công');
+                    toast.success(t('salary.period.update_success', 'Cập nhật kỳ tính lương thành công'));
                 } else {
                     await addPeriod(values.name, values.code, values.description, values.month, values.year, fromDateStr, toDateStr, values.standardWorkDays);
-                    toast.success('Tạo kỳ tính lương mới thành công');
+                    toast.success(t('salary.period.create_success', 'Tạo kỳ tính lương mới thành công'));
                 }
                 setOpenDialog(false);
             } catch (error) {
                 console.error(isEdit ? 'Failed to update period:' : 'Failed to create period:', error);
-                const msg = error?.response?.data?.message || (isEdit ? 'Lỗi khi cập nhật kỳ tính lương' : 'Lỗi khi tạo kỳ tính lương mới');
+                const msg = error?.response?.data?.message || (isEdit ? t('salary.period.update_error', 'Lỗi khi cập nhật kỳ tính lương') : t('salary.period.create_error', 'Lỗi khi tạo kỳ tính lương mới'));
                 toast.error(msg);
             } finally {
                 setSaving(false);
@@ -246,11 +248,11 @@ const SalaryPeriodPage = () => {
         if (selectedPeriod && selectedPeriod.id) {
             try {
                 await removePeriod(selectedPeriod.id);
-                toast.success('Xóa kỳ lương thành công');
+                toast.success(t('salary.period.delete_success', 'Xóa kỳ lương thành công'));
                 setOpenConfirmDelete(false);
             } catch (error) {
                 console.error('Failed to delete period:', error);
-                const msg = error?.response?.data?.message || 'Lỗi khi xóa kỳ lương';
+                const msg = error?.response?.data?.message || t('salary.period.delete_error', 'Lỗi khi xóa kỳ lương');
                 toast.error(msg);
             }
         }
@@ -262,22 +264,22 @@ const SalaryPeriodPage = () => {
 
     const columns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             align: 'center',
             width: '1%',
             render: (rowData) => (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                    <Tooltip title="Xem danh sách bảng lương" arrow>
+                    <Tooltip title={t('salary.period.view_payrolls_tooltip', 'Xem danh sách bảng lương')} arrow>
                         <IconButton size="small" color="info" onClick={() => handleViewDetails(rowData)}>
                             <VisibilityIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Chỉnh sửa kỳ lương" arrow>
+                    <Tooltip title={t('salary.period.edit_period_tooltip', 'Chỉnh sửa kỳ lương')} arrow>
                         <IconButton size="small" color="primary" onClick={() => handleOpenEdit(rowData)}>
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Xóa kỳ lương" arrow>
+                    <Tooltip title={t('salary.period.delete_period_tooltip', 'Xóa kỳ lương')} arrow>
                         <IconButton size="small" color="error" onClick={() => handleOpenDelete(rowData)}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -285,25 +287,25 @@ const SalaryPeriodPage = () => {
                 </div>
             ),
         },
-        { title: 'Mã kỳ lương', field: 'code', align: 'center' },
-        { title: 'Kỳ tính lương', field: 'name', align: 'center' },
+        { title: t('salary.period.code', 'Mã kỳ lương'), field: 'code', align: 'center' },
+        { title: t('salary.period.name', 'Kỳ tính lương'), field: 'name', align: 'center' },
         { 
-            title: 'Thời gian', 
+            title: t('salary.period.time', 'Thời gian'), 
             align: 'center',
-            render: (row) => `Tháng ${row.month.toString().padStart(2, '0')}/${row.year}` 
+            render: (row) => t('calendar.month_year_format', 'Tháng {{month}}/{{year}}', { month: row.month.toString().padStart(2, '0'), year: row.year })
         },
         { 
-            title: 'Từ ngày', 
+            title: t('salary.period.start_date', 'Từ ngày'), 
             align: 'center',
             render: (row) => row.fromDate ? format(new Date(row.fromDate), 'dd/MM/yyyy') : '-' 
         },
         { 
-            title: 'Đến ngày', 
+            title: t('salary.period.end_date', 'Đến ngày'), 
             align: 'center',
             render: (row) => row.toDate ? format(new Date(row.toDate), 'dd/MM/yyyy') : '-' 
         },
-        { title: 'Công chuẩn', field: 'standardWorkDays', align: 'center' },
-        { title: 'Mô tả', field: 'description', align: 'center' }
+        { title: t('salary.period.standard_workdays', 'Công chuẩn'), field: 'standardWorkDays', align: 'center' },
+        { title: t('common.description', 'Mô tả'), field: 'description', align: 'center' }
     ];
 
     const paginatedPeriods = periods;
@@ -313,7 +315,7 @@ const SalaryPeriodPage = () => {
             <Paper elevation={0} className="py-4 px-2 md:px-4 border border-border">
                 <Box mb={2}>
                     <Typography variant="h6" fontWeight="bold" className="text-text-primary">
-                        Kỳ tính lương
+                        {t('salary.period.title', 'Kỳ tính lương')}
                     </Typography>
                 </Box>
 
@@ -324,8 +326,8 @@ const SalaryPeriodPage = () => {
                         onSearch={handleSearch}
                         onReset={handleReset}
                         onAdd={handleOpenAdd}
-                        addLabel="Tạo kỳ lương mới"
-                        searchPlaceholder="Tìm kiếm kỳ lương theo tên..."
+                        addLabel={t('salary.period.add_btn', 'Tạo kỳ lương mới')}
+                        searchPlaceholder={t('salary.period.search_placeholder', 'Tìm kiếm kỳ lương theo tên...')}
                         filter={{
                             open: filterOpen,
                             onToggle: setFilterOpen,
@@ -342,7 +344,7 @@ const SalaryPeriodPage = () => {
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                                 <SelectInput
-                                    label="Tháng"
+                                    label={t('calendar.month', 'Tháng')}
                                     name="month"
                                     options={monthOptions}
                                     keyValue="value"
@@ -352,7 +354,7 @@ const SalaryPeriodPage = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <SelectInput
-                                    label="Năm"
+                                    label={t('calendar.year', 'Năm')}
                                     name="year"
                                     options={yearOptions}
                                     keyValue="value"
@@ -379,12 +381,12 @@ const SalaryPeriodPage = () => {
             <Popup
                 open={openDialog}
                 onClosePopup={() => setOpenDialog(false)}
-                title={isEdit ? 'Chỉnh sửa kỳ tính lương' : 'Tạo kỳ tính lương mới'}
+                title={isEdit ? t('salary.period.edit_title', 'Chỉnh sửa kỳ tính lương') : t('salary.period.create_title', 'Tạo kỳ tính lương mới')}
                 size="xs"
                 action={
                     <>
                         <Button onClick={() => setOpenDialog(false)} color="inherit" disabled={saving}>
-                            Hủy
+                            {t('common.cancel', 'Hủy')}
                         </Button>
                         <Button
                             onClick={periodFormik.handleSubmit}
@@ -392,7 +394,7 @@ const SalaryPeriodPage = () => {
                             variant="contained"
                             disabled={saving}
                         >
-                            {saving ? 'Đang lưu...' : (isEdit ? 'Lưu thay đổi' : 'Tạo kỳ lương')}
+                            {saving ? t('common.saving', 'Đang lưu...') : (isEdit ? t('common.save_changes', 'Lưu thay đổi') : t('salary.period.create_btn', 'Tạo kỳ lương'))}
                         </Button>
                     </>
                 }
@@ -403,7 +405,7 @@ const SalaryPeriodPage = () => {
                         <Box className="flex gap-4">
                             <Box className="flex-1">
                                 <SelectInput
-                                    label="Tháng"
+                                    label={t('calendar.month', 'Tháng')}
                                     name="month"
                                     options={monthFormOptions}
                                     keyValue="value"
@@ -414,7 +416,7 @@ const SalaryPeriodPage = () => {
                             </Box>
                             <Box className="flex-1">
                                 <SelectInput
-                                    label="Năm"
+                                    label={t('calendar.year', 'Năm')}
                                     name="year"
                                     options={yearFormOptions}
                                     keyValue="value"
@@ -429,14 +431,14 @@ const SalaryPeriodPage = () => {
                         <Box className="flex gap-4">
                             <Box className="flex-1">
                                 <DateTimePicker
-                                    label="Từ ngày"
+                                    label={t('salary.period.start_date', 'Từ ngày')}
                                     name="fromDate"
                                     notValueMillisecond={true}
                                 />
                             </Box>
                             <Box className="flex-1">
                                 <DateTimePicker
-                                    label="Đến ngày"
+                                    label={t('salary.period.end_date', 'Đến ngày')}
                                     name="toDate"
                                     notValueMillisecond={true}
                                 />
@@ -447,34 +449,38 @@ const SalaryPeriodPage = () => {
                         <Box className="flex gap-4">
                             <Box className="flex-1">
                                 <TextField
-                                    label="Số ngày công chuẩn"
+                                    label={t('salary.period.standard_workdays_input', 'Số ngày công chuẩn')}
                                     name="standardWorkDays"
                                     type="number"
                                     required
+                                    size="small"
                                 />
                             </Box>
                             <Box className="flex-1">
                                 <TextField
-                                    label="Mã kỳ lương"
+                                    label={t('salary.period.code', 'Mã kỳ lương')}
                                     name="code"
-                                    placeholder="Hệ thống tự sinh nếu để trống"
+                                    placeholder={t('salary.period.code_placeholder', 'Hệ thống tự sinh nếu để trống')}
+                                    size="small"
                                 />
                             </Box>
                         </Box>
 
                         {/* Hàng 4: Tên kỳ tính lương */}
                         <TextField
-                            label="Tên kỳ tính lương"
+                            label={t('salary.period.name', 'Tên kỳ tính lương')}
                             name="name"
                             required
+                            size="small"
                         />
 
                         {/* Hàng 5: Mô tả */}
                         <TextField
-                            label="Mô tả"
+                            label={t('common.description', 'Mô tả')}
                             name="description"
                             multiline
                             rows={3}
+                            size="small"
                         />
                     </Box>
                 </FormikProvider>
@@ -485,10 +491,10 @@ const SalaryPeriodPage = () => {
                 open={openConfirmDelete}
                 onConfirmDialogClose={() => setOpenConfirmDelete(false)}
                 onYesClick={handleConfirmDelete}
-                title="Xác nhận xóa kỳ tính lương"
-                text={`Bạn có chắc chắn muốn xóa "${selectedPeriod?.name}"? Mọi dữ liệu lương đã tính của kỳ này cũng sẽ bị xóa bỏ hoàn toàn.`}
-                agree="Xác nhận xóa"
-                cancel="Hủy bỏ"
+                title={t('salary.period.delete_confirm_title', 'Xác nhận xóa kỳ tính lương')}
+                text={t('salary.period.delete_confirm_text', 'Bạn có chắc chắn muốn xóa "{{name}}"? Mọi dữ liệu lương đã tính của kỳ này cũng sẽ bị xóa bỏ hoàn toàn.', { name: selectedPeriod?.name })}
+                agree={t('common.delete_confirm_btn', 'Xác nhận xóa')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
         </div>
     );
