@@ -6,6 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { getDesignTokens } from './theme'
 import App from './App'
 import './index.css'
+import './i18n'
 import useThemeStore from './store/themeStore'
 
 const MainApp = () => {

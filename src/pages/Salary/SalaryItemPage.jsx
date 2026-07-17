@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
     Grid, 
     IconButton, 
@@ -33,6 +34,7 @@ import {
 } from '../../constants';
 
 const SalaryItemPage = () => {
+    const { t } = useTranslation();
     const [items, setItems] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -78,7 +80,7 @@ const SalaryItemPage = () => {
             }
         } catch (error) {
             console.error('Failed to load salary items:', error);
-            toast.error('Không thể tải danh sách khoản lương');
+            toast.error(t('salary.item.load_error', 'Không thể tải danh sách khoản lương'));
         } finally {
             setLoading(false);
         }
@@ -155,13 +157,13 @@ const SalaryItemPage = () => {
             setSaving(true);
             const response = await saveSalaryItem(payload);
             if (response && response.data) {
-                toast.success(selectedItem ? 'Cập nhật khoản lương thành công' : 'Thêm khoản lương mới thành công');
+                toast.success(selectedItem ? t('salary.item.update_success', 'Cập nhật khoản lương thành công') : t('salary.item.create_success', 'Thêm khoản lương mới thành công'));
                 setOpenDialog(false);
                 loadItems();
             }
         } catch (error) {
             console.error('Failed to save salary item:', error);
-            toast.error('Lỗi khi lưu thông tin khoản lương');
+            toast.error(t('salary.item.save_error', 'Lỗi khi lưu thông tin khoản lương'));
         } finally {
             setSaving(false);
         }
@@ -171,35 +173,35 @@ const SalaryItemPage = () => {
         if (selectedItem && selectedItem.id) {
             try {
                 await deleteSalaryItem(selectedItem.id);
-                toast.success('Xóa khoản lương thành công');
+                toast.success(t('salary.item.delete_success', 'Xóa khoản lương thành công'));
                 setOpenConfirm(false);
                 loadItems();
             } catch (error) {
                 console.error('Failed to delete salary item:', error);
-                toast.error('Không thể xóa khoản lương này. Có thể nó đang được sử dụng ở nơi khác.');
+                toast.error(t('salary.item.delete_error', 'Không thể xóa khoản lương này. Có thể nó đang được sử dụng ở nơi khác.'));
             }
         }
     };
 
     const calculationTypeLabels = {
-        [SalaryCalculationType.FIXED]: 'Cố định',
-        [SalaryCalculationType.BY_STANDARD_DAYS]: 'Theo công chuẩn',
-        [SalaryCalculationType.DAILY_MULTIPLIED]: 'Theo công thực tế'
+        [SalaryCalculationType.FIXED]: t('salary.item.calc.fixed', 'Cố định'),
+        [SalaryCalculationType.BY_STANDARD_DAYS]: t('salary.item.calc.standard', 'Theo công chuẩn'),
+        [SalaryCalculationType.DAILY_MULTIPLIED]: t('salary.item.calc.actual', 'Theo công thực tế')
     };
 
     const columns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             align: 'center',
             width: '1%',
             render: (rowData) => (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                    <Tooltip title="Chỉnh sửa" arrow>
+                    <Tooltip title={t('common.edit', 'Chỉnh sửa')} arrow>
                         <IconButton size="small" color="primary" onClick={() => handleOpenEdit(rowData)}>
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Xóa" arrow>
+                    <Tooltip title={t('common.delete', 'Xóa')} arrow>
                         <IconButton size="small" color="error" onClick={() => handleOpenDelete(rowData)}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -207,23 +209,23 @@ const SalaryItemPage = () => {
                 </div>
             ),
         },
-        { title: 'Tên khoản lương', field: 'name', align: 'center' },
-        { title: 'Mã khoản lương', field: 'code', align: 'center', render: (row) => <span>{row.code}</span> },
+        { title: t('salary.item.name', 'Tên khoản lương'), field: 'name', align: 'center' },
+        { title: t('salary.item.code', 'Mã khoản lương'), field: 'code', align: 'center', render: (row) => <span>{row.code}</span> },
         { 
-            title: 'Loại khoản lương', 
+            title: t('salary.item.type', 'Loại khoản lương'), 
             align: 'center',
             field: 'type', 
             render: (row) => (
-                <span>{row.type === SalaryItemType.INCOME ? 'Cộng (Thu nhập)' : 'Trừ (Khấu trừ)'}</span>
+                <span>{row.type === SalaryItemType.INCOME ? t('salary.item.income', 'Cộng (Thu nhập)') : t('salary.item.deduction', 'Trừ (Khấu trừ)')}</span>
             )
         },
         { 
-            title: 'Cách tính', 
+            title: t('salary.item.calculation_type', 'Cách tính'), 
             field: 'calculationType',
             align: 'center',
-            render: (row) => calculationTypeLabels[row.calculationType] || 'Cố định'
+            render: (row) => calculationTypeLabels[row.calculationType] || t('salary.item.calc.fixed', 'Cố định')
         },
-        { title: 'Mô tả', field: 'description', align: 'center' }
+        { title: t('common.description', 'Mô tả'), field: 'description', align: 'center' }
     ];
 
     // Client-side pagination
@@ -265,8 +267,8 @@ const SalaryItemPage = () => {
                         onSearch={handleSearch}
                         onReset={handleReset}
                         onAdd={handleOpenAdd}
-                        addLabel="Thêm khoản lương"
-                        searchPlaceholder="Tìm kiếm khoản lương theo tên hoặc mã..."
+                        addLabel={t('salary.item.add_btn', 'Thêm khoản lương')}
+                        searchPlaceholder={t('salary.item.search_placeholder', 'Tìm kiếm khoản lương theo tên hoặc mã...')}
                         filter={{
                             open: filterOpen,
                             onToggle: setFilterOpen,
@@ -283,7 +285,7 @@ const SalaryItemPage = () => {
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                                 <SelectInput
-                                    label="Loại khoản lương"
+                                    label={t('salary.item.type', 'Loại khoản lương')}
                                     name="type"
                                     options={SalaryItemTypeOptions}
                                     keyValue="value"
@@ -293,7 +295,7 @@ const SalaryItemPage = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <SelectInput
-                                    label="Cách tính giá trị"
+                                    label={t('salary.item.calculation_type', 'Cách tính giá trị')}
                                     name="calculationType"
                                     options={SalaryCalculationTypeOptions}
                                     keyValue="value"
@@ -320,12 +322,12 @@ const SalaryItemPage = () => {
             <Popup
                 open={openDialog}
                 onClosePopup={() => setOpenDialog(false)}
-                title={selectedItem ? 'Cập nhật Khoản lương' : 'Thêm Khoản lương mới'}
+                title={selectedItem ? t('salary.item.edit_title', 'Cập nhật Khoản lương') : t('salary.item.create_title', 'Thêm Khoản lương mới')}
                 size="sm"
                 action={
                     <>
                         <Button onClick={() => setOpenDialog(false)} color="inherit" disabled={saving}>
-                            Hủy bỏ
+                            {t('common.cancel', 'Hủy bỏ')}
                         </Button>
                         <Button
                             onClick={formik.handleSubmit}
@@ -333,7 +335,7 @@ const SalaryItemPage = () => {
                             variant="contained"
                             disabled={saving}
                         >
-                            {saving ? 'Đang lưu...' : 'Lưu lại'}
+                            {saving ? t('common.saving', 'Đang lưu...') : t('common.save', 'Lưu lại')}
                         </Button>
                     </>
                 }
@@ -342,24 +344,24 @@ const SalaryItemPage = () => {
                     <Grid container spacing={0}>
                         <Grid item xs={12}>
                             <TextField
-                                label="Tên khoản lương"
+                                label={t('salary.item.name', 'Tên khoản lương')}
                                 name="name"
                                 required
-                                placeholder="Ví dụ: Lương cơ bản, Phụ cấp ăn trưa..."
+                                placeholder={t('salary.item.name_placeholder', 'Ví dụ: Lương cơ bản, Phụ cấp ăn trưa...')}
                             />
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
-                                label="Mã khoản lương (Dùng trong công thức)"
+                                label={t('salary.item.code_formula', 'Mã khoản lương (Dùng trong công thức)')}
                                 name="code"
                                 required
-                                placeholder="Ví dụ: LCB, AN_TRUA, PC_DT"
+                                placeholder={t('salary.item.code_placeholder', 'Ví dụ: LCB, AN_TRUA, PC_DT')}
                                 disabled={selectedItem !== null}
                             />
                         </Grid>
                         <Grid item xs={12}>
                             <SelectInput
-                                label="Loại khoản lương"
+                                label={t('salary.item.type', 'Loại khoản lương')}
                                 name="type"
                                 options={SalaryItemTypeFormOptions}
                                 keyValue="value"
@@ -369,7 +371,7 @@ const SalaryItemPage = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <SelectInput
-                                label="Cách tính giá trị"
+                                label={t('salary.item.calculation_type', 'Cách tính giá trị')}
                                 name="calculationType"
                                 options={SalaryCalculationTypeFormOptions}
                                 keyValue="value"
@@ -379,9 +381,9 @@ const SalaryItemPage = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
-                                label="Mô tả"
+                                label={t('common.description', 'Mô tả')}
                                 name="description"
-                                placeholder="Nhập mô tả hoặc ghi chú của khoản lương..."
+                                placeholder={t('salary.item.description_placeholder', 'Nhập mô tả hoặc ghi chú của khoản lương...')}
                                 multiline
                                 rows={2}
                             />
@@ -395,10 +397,10 @@ const SalaryItemPage = () => {
                 open={openConfirm}
                 onConfirmDialogClose={() => setOpenConfirm(false)}
                 onYesClick={handleConfirmDelete}
-                title="Xác nhận xóa khoản lương"
-                text={`Bạn có chắc chắn muốn xóa khoản lương "${selectedItem?.name}" (${selectedItem?.code}) này không?`}
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                title={t('salary.item.delete_confirm_title', 'Xác nhận xóa khoản lương')}
+                text={t('salary.item.delete_confirm_text', 'Bạn có chắc chắn muốn xóa khoản lương "{{name}}" ({{code}}) này không?', { name: selectedItem?.name, code: selectedItem?.code })}
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
         </div>
     );

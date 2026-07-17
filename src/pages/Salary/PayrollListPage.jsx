@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     Paper,
     Box,
@@ -29,6 +30,7 @@ import usePeriodStore from '../../store/usePeriodStore';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 
 const PayrollListPage = () => {
+    const { t } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -96,10 +98,10 @@ const PayrollListPage = () => {
         if (!selectedPayroll) return;
         try {
             await confirmPayroll(selectedPayroll.id);
-            toast.success('Đã xác nhận bảng lương thành công!');
+            toast.success(t('salary.payroll.confirm_success', 'Đã xác nhận bảng lương thành công!'));
         } catch (error) {
             console.error('Failed to confirm payroll:', error);
-            toast.error('Không thể xác nhận bảng lương');
+            toast.error(t('salary.payroll.confirm_error', 'Không thể xác nhận bảng lương'));
         }
     };
 
@@ -107,7 +109,7 @@ const PayrollListPage = () => {
         if (!payrollId) return;
         const payrollObj = allPayrolls.find(p => p.id === payrollId);
         if (payrollObj && payrollObj.status !== 'DRAFT') {
-            toast.warning('Không thể xóa bảng lương đã xác nhận!');
+            toast.warning(t('salary.payroll.delete_warning_confirmed', 'Không thể xóa bảng lương đã xác nhận!'));
             return;
         }
         setSelectedPayroll(payrollObj);
@@ -118,11 +120,11 @@ const PayrollListPage = () => {
         if (!selectedPayroll) return;
         try {
             await deletePayroll(selectedPayroll.id);
-            toast.success('Xóa bảng lương thành công!');
+            toast.success(t('salary.payroll.delete_success', 'Xóa bảng lương thành công!'));
             await loadAllPayrolls(selectedPeriodId);
         } catch (error) {
             console.error('Failed to delete payroll:', error);
-            toast.error(error.response?.data?.message || 'Không thể xóa bảng lương');
+            toast.error(error.response?.data?.message || t('salary.payroll.delete_error', 'Không thể xóa bảng lương'));
         }
     };
 
@@ -139,9 +141,9 @@ const PayrollListPage = () => {
     }, [allPayrolls, selectedPeriodId, searchKeyword]);
 
     const periodFilterOptions = useMemo(() => [
-        { value: '', name: 'Tất cả kỳ lương' },
+        { value: '', name: t('salary.payroll.all_periods', 'Tất cả kỳ lương') },
         ...periods.map(p => ({ value: p.id, name: p.name }))
-    ], [periods]);
+    ], [periods, t]);
 
     const formatMoney = (val) => {
         if (val === undefined || val === null) return '0 ₫';
@@ -152,24 +154,24 @@ const PayrollListPage = () => {
 
     const masterColumns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             align: 'center',
             width: '1%',
             render: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                    <Tooltip title="Xem chi tiết phiếu lương" arrow>
+                    <Tooltip title={t('salary.payroll.view_details_tooltip', 'Xem chi tiết phiếu lương')} arrow>
                         <IconButton size="small" color="primary" onClick={() => navigate(`/salary/payrolls/${row.id}`)}>
                             <VisibilityIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     {row.status === 'DRAFT' && (
                         <>
-                            <Tooltip title="Xác nhận bảng lương" arrow>
+                            <Tooltip title={t('salary.payroll.confirm_tooltip', 'Xác nhận bảng lương')} arrow>
                                 <IconButton size="small" color="success" onClick={() => handleConfirmPayroll(row.id)}>
                                     <CheckIcon fontSize="small" />
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title="Xóa bảng lương" arrow>
+                            <Tooltip title={t('salary.payroll.delete_tooltip', 'Xóa bảng lương')} arrow>
                                 <IconButton size="small" color="error" onClick={() => handleDeletePayroll(row.id)}>
                                     <DeleteIcon fontSize="small" />
                                 </IconButton>
@@ -180,7 +182,7 @@ const PayrollListPage = () => {
             ),
         },
         {
-            title: 'Tên bảng lương',
+            title: t('salary.payroll.name', 'Tên bảng lương'),
             field: 'name',
             align: 'center',
             render: (row) => (
@@ -193,28 +195,28 @@ const PayrollListPage = () => {
             )
         },
         {
-            title: 'Mã bảng lương',
+            title: t('salary.payroll.code', 'Mã bảng lương'),
             field: 'code',
             align: 'center',
             render: (row) => <span>{row.code || '---'}</span>
         },
         {
-            title: 'Mô tả',
+            title: t('common.description', 'Mô tả'),
             field: 'description',
             align: 'center',
             render: (row) => <span>{row.description || '---'}</span>
         },
         {
-            title: 'Kỳ tính lương',
+            title: t('salary.period.name', 'Kỳ tính lương'),
             align: 'center',
             render: (row) => <span>{row.period?.name || '---'}</span>
         },
         {
-            title: 'Trạng thái',
+            title: t('common.status', 'Trạng thái'),
             align: 'center',
             render: (row) => {
                 const cfg = PayrollStatusConfig[row.status] ?? PayrollStatusConfig[PayrollStatus.DRAFT];
-                return <span>{cfg.label}</span>;
+                return <span>{t('salary.payroll.status.' + row.status.toLowerCase(), cfg.label)}</span>;
             }
         }
     ];
@@ -224,12 +226,12 @@ const PayrollListPage = () => {
     const searchExtraControls = (
         <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
             <FormControl variant="outlined" size="small" style={{ minWidth: 200 }}>
-                <InputLabel id="select-period-filter-label">Chọn kỳ lương</InputLabel>
+                <InputLabel id="select-period-filter-label">{t('salary.payroll.select_period', 'Chọn kỳ lương')}</InputLabel>
                 <Select
                     labelId="select-period-filter-label"
                     value={selectedPeriodId}
                     onChange={(e) => setSelectedPeriodId(e.target.value)}
-                    label="Chọn kỳ lương"
+                    label={t('salary.payroll.select_period', 'Chọn kỳ lương')}
                 >
                     {periodFilterOptions.map((opt) => (
                         <MenuItem key={opt.value} value={opt.value}>{opt.name}</MenuItem>
@@ -251,10 +253,10 @@ const PayrollListPage = () => {
                         setSearchKeyword('');
                         setSelectedPeriodId('');
                     }}
-                    searchPlaceholder="Tìm theo tên hoặc mã bảng lương..."
+                    searchPlaceholder={t('salary.payroll.search_placeholder', 'Tìm theo tên hoặc mã bảng lương...')}
                     searchExtraControls={searchExtraControls}
                     onAdd={() => setOpenNewPayrollDialog(true)}
-                    addLabel="Tạo bảng lương mới"
+                    addLabel={t('salary.payroll.add_btn', 'Tạo bảng lương mới')}
                 />
 
                 <Table
@@ -274,12 +276,12 @@ const PayrollListPage = () => {
             <Popup
                 open={openNewPayrollDialog}
                 onClosePopup={() => setOpenNewPayrollDialog(false)}
-                title="Tạo bảng lương mới"
+                title={t('salary.payroll.create_title', 'Tạo bảng lương mới')}
                 size="xs"
                 action={
                     <>
                         <Button onClick={() => setOpenNewPayrollDialog(false)} color="inherit" disabled={savingPayroll}>
-                            Hủy
+                            {t('common.cancel', 'Hủy')}
                         </Button>
                         <Button
                             onClick={() => createFormikRef.current?.handleSubmit()}
@@ -287,7 +289,7 @@ const PayrollListPage = () => {
                             variant="contained"
                             disabled={savingPayroll}
                         >
-                            {savingPayroll ? 'Đang tạo...' : 'Tạo & Tính toán'}
+                            {savingPayroll ? t('common.creating', 'Đang tạo...') : t('salary.payroll.create_and_calc_btn', 'Tạo & Tính toán')}
                         </Button>
                     </>
                 }
@@ -297,11 +299,11 @@ const PayrollListPage = () => {
                     initialValues={{ periodId: '', name: '', code: '', description: '' }}
                     onSubmit={async (values) => {
                         if (!values.periodId) {
-                            toast.warning('Vui lòng chọn kỳ tính lương');
+                            toast.warning(t('salary.payroll.validation_period_required', 'Vui lòng chọn kỳ tính lương'));
                             return;
                         }
                         if (!values.name.trim()) {
-                            toast.warning('Vui lòng nhập tên bảng lương');
+                            toast.warning(t('salary.payroll.validation_name_required', 'Vui lòng nhập tên bảng lương'));
                             return;
                         }
                         try {
@@ -312,26 +314,26 @@ const PayrollListPage = () => {
                                 values.description.trim()
                             );
                             if (response?.data) {
-                                toast.success('Tạo bảng lương mới thành công!');
+                                toast.success(t('salary.payroll.create_success', 'Tạo bảng lương mới thành công!'));
                                 const newPayroll = response.data.data || response.data;
                                 navigate(`/salary/payrolls/${newPayroll.id}`);
                                 setOpenNewPayrollDialog(false);
                             }
                         } catch (error) {
                             console.error('Failed to create payroll:', error);
-                            toast.error(error.response?.data?.message || 'Không thể tạo bảng lương mới');
+                            toast.error(error.response?.data?.message || t('salary.payroll.create_error', 'Không thể tạo bảng lương mới'));
                         }
                     }}
                 >
                     {() => (
                         <Box>
                             <Typography variant="body2" color="text.secondary" className="mb-3">
-                                Tạo bảng lương mới và tự động tính toán phiếu lương cho toàn bộ nhân viên.
+                                {t('salary.payroll.create_description', 'Tạo bảng lương mới và tự động tính toán phiếu lương cho toàn bộ nhân viên.')}
                             </Typography>
 
                             <SelectInput
                                 name="periodId"
-                                label="Chọn kỳ lương"
+                                label={t('salary.payroll.select_period', 'Chọn kỳ lương')}
                                 options={periods}
                                 keyValue="id"
                                 displayvalue="name"
@@ -341,7 +343,7 @@ const PayrollListPage = () => {
                                     const selectedPer = periods.find(p => p.id === value);
                                     if (selectedPer) {
                                         const formattedMonth = String(selectedPer.month).padStart(2, '0');
-                                        createFormikRef.current?.setFieldValue('name', `Bảng lương Kỳ lương Tháng ${formattedMonth}/${selectedPer.year}`);
+                                        createFormikRef.current?.setFieldValue('name', t('salary.payroll.new_payroll_name_format', 'Bảng lương Kỳ lương Tháng {{month}}/{{year}}', { month: formattedMonth, year: selectedPer.year }));
                                         createFormikRef.current?.setFieldValue('code', `BANG_LUONG_${formattedMonth}${selectedPer.year}`);
                                     }
                                 }}
@@ -349,21 +351,21 @@ const PayrollListPage = () => {
 
                             <TextField
                                 name="name"
-                                label="Tên bảng lương"
-                                placeholder="Nhập tên bảng lương..."
+                                label={t('salary.payroll.name', 'Tên bảng lương')}
+                                placeholder={t('salary.payroll.name_placeholder', 'Nhập tên bảng lương...')}
                                 required
                             />
 
                             <TextField
                                 name="code"
-                                label="Mã bảng lương"
-                                placeholder="Ví dụ: BANG_LUONG_032026..."
+                                label={t('salary.payroll.code', 'Mã bảng lương')}
+                                placeholder={t('salary.payroll.code_placeholder', 'Ví dụ: BANG_LUONG_032026...')}
                             />
 
                             <TextField
                                 name="description"
-                                label="Mô tả"
-                                placeholder="Nhập mô tả bảng lương..."
+                                label={t('common.description', 'Mô tả')}
+                                placeholder={t('salary.payroll.description_placeholder', 'Nhập mô tả bảng lương...')}
                                 multiline
                                 rows={2}
                             />
@@ -380,10 +382,10 @@ const PayrollListPage = () => {
                     setSelectedPayroll(null);
                 }}
                 onYesClick={handleConfirmPayrollSubmit}
-                title="Xác nhận bảng lương"
-                text={`Bạn có chắc chắn muốn xác nhận bảng lương "${selectedPayroll?.name}"? Sau khi xác nhận sẽ không thể tính toán lại.`}
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                title={t('salary.payroll.confirm_title', 'Xác nhận bảng lương')}
+                text={t('salary.payroll.confirm_text', 'Bạn có chắc chắn muốn xác nhận bảng lương "{{name}}"? Sau khi xác nhận sẽ không thể tính toán lại.', { name: selectedPayroll?.name })}
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
 
             <ConfirmationDialog
@@ -393,10 +395,10 @@ const PayrollListPage = () => {
                     setSelectedPayroll(null);
                 }}
                 onYesClick={handleDeletePayrollSubmit}
-                title="Xóa bảng lương"
-                text={`Bạn có chắc chắn muốn xóa bảng lương "${selectedPayroll?.name}" và toàn bộ phiếu lương liên quan?`}
-                agree="Xác nhận xóa"
-                cancel="Hủy bỏ"
+                title={t('salary.payroll.delete_confirm_title', 'Xóa bảng lương')}
+                text={t('salary.payroll.delete_confirm_text', 'Bạn có chắc chắn muốn xóa bảng lương "{{name}}" và toàn bộ phiếu lương liên quan?', { name: selectedPayroll?.name })}
+                agree={t('common.delete_confirm_btn', 'Xác nhận xóa')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
         </div>
     );

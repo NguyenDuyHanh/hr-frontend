@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Paper, Grid, IconButton, Tooltip, Stack, Typography } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Popup from '../../components/ui/Popup';
@@ -15,6 +16,7 @@ import { getLabelFromOptions } from '../../LocalFunction';
 import StaffSalaryConfigForm from '../Staff/components/StaffTabs/StaffSalaryConfigForm';
 
 const StaffSalaryConfigList = () => {
+    const { t } = useTranslation();
     const [staffs, setStaffs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [totalElements, setTotalElements] = useState(0);
@@ -109,12 +111,12 @@ const StaffSalaryConfigList = () => {
 
     const columns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             field: 'actions',
             width: 100,
             align: 'center',
             render: (rowData) => (
-                <Tooltip title="Cấu hình lương & phụ cấp" arrow>
+                <Tooltip title={t('salary.config.tooltip', 'Cấu hình lương & phụ cấp')} arrow>
                     <IconButton 
                         size="small" 
                         color="primary" 
@@ -127,12 +129,12 @@ const StaffSalaryConfigList = () => {
             )
         },
         {
-            title: 'Mã nhân viên',
+            title: t('staff.code', 'Mã nhân viên'),
             field: 'staffCode',
             width: 130,
         },
         {
-            title: 'Nhân viên',
+            title: t('staff.name', 'Nhân viên'),
             field: 'displayName',
             align: 'center',
             width: 250,
@@ -143,25 +145,25 @@ const StaffSalaryConfigList = () => {
             )
         },
         {
-            title: 'Phòng ban',
+            title: t('department.name', 'Phòng ban'),
             field: 'departmentName',
             width: 180,
             render: (rowData) => <span>{rowData.departmentName || '---'}</span>
         },
         {
-            title: 'Vị trí',
+            title: t('position.name', 'Vị trí'),
             field: 'positionName',
             width: 180,
             render: (rowData) => <span>{rowData.positionName || '---'}</span>
         },
         {
-            title: 'Trạng thái nhân viên',
+            title: t('staff.status', 'Trạng thái nhân viên'),
             field: 'workingStatus',
             align: 'center',
             width: 150,
             render: (rowData) => (
                 <span className="text-sm font-medium">
-                    {getLabelFromOptions(WorkingStatusOptions, rowData.workingStatus)}
+                    {rowData.workingStatus ? t('staff.status_label.' + rowData.workingStatus.toLowerCase(), getLabelFromOptions(WorkingStatusOptions, rowData.workingStatus)) : '---'}
                 </span>
             )
         }
@@ -199,6 +201,7 @@ const StaffSalaryConfigList = () => {
                                     onToggle: setFilterOpen,
                                     activeCount: activeFilterCount
                                 }}
+                                searchPlaceholder={t('salary.config.search_placeholder', 'Tìm kiếm theo tên hoặc mã nhân viên...')}
                             />
 
                             <FilterPanel
@@ -211,7 +214,7 @@ const StaffSalaryConfigList = () => {
                                     <Grid item xs={12} sm={4}>
                                         <Autocomplete
                                             name="department"
-                                            label="Phòng ban"
+                                            label={t('department.name', 'Phòng ban')}
                                             options={departments}
                                             getOptionLabel={(option) => option?.name || ''}
                                             onChange={(event, val) => {
@@ -230,7 +233,7 @@ const StaffSalaryConfigList = () => {
                                     <Grid item xs={12} sm={4}>
                                         <Autocomplete
                                             name="position"
-                                            label="Vị trí"
+                                            label={t('position.name', 'Vị trí')}
                                             options={
                                                 values.department?.id
                                                     ? positions.filter(pos => pos.department?.id === values.department.id)
@@ -242,10 +245,10 @@ const StaffSalaryConfigList = () => {
                                     <Grid item xs={12} sm={4}>
                                         <SelectInput
                                             name="workingStatus"
-                                            label="Trạng thái nhân viên"
+                                            label={t('staff.status', 'Trạng thái nhân viên')}
                                             options={[
-                                                { value: '', name: 'Tất cả' },
-                                                ...WorkingStatusOptions.map(opt => ({ value: opt.value, name: opt.name }))
+                                                { value: '', name: t('common.all', 'Tất cả') },
+                                                ...WorkingStatusOptions.map(opt => ({ value: opt.value, name: t('staff.status_label.' + opt.value.toLowerCase(), opt.name) }))
                                             ]}
                                             keyValue="value"
                                             displayvalue="name"
@@ -277,7 +280,7 @@ const StaffSalaryConfigList = () => {
             <Popup
                 open={dialogOpen}
                 onClosePopup={handleCloseConfig}
-                title={selectedStaff ? `Cấu hình lương - ${selectedStaff.displayName} (${selectedStaff.staffCode})` : "Cấu hình lương & phụ cấp"}
+                title={selectedStaff ? t('salary.config.popup_title', 'Cấu hình lương - {{name}} ({{code}})', { name: selectedStaff.displayName, code: selectedStaff.staffCode }) : t('salary.config.popup_title_default', 'Cấu hình lương & phụ cấp')}
                 size="lg"
             >
                 {selectedStaff && (

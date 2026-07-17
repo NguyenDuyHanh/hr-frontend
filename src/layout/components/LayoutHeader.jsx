@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { 
   IconButton, Button, Menu, MenuItem, Divider, Typography, Box, 
-  Chip 
+  Chip, Tooltip
 } from '@mui/material'
 import { useFormik, FormikProvider } from 'formik'
 import TextField from '@/components/ui/TextField'
@@ -42,12 +43,14 @@ import PagingAutocomplete from '@/components/ui/PagingAutocomplete'
 import { pagingStaffs } from '@/services/StaffService'
 
 const LayoutHeader = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { toggleCollapsed, toggleMobileOpen } = useSidebarStore();
   const { user, logout } = useAuthStore();
   const hasRole = useAuthStore(state => state.hasRole);
   const isManagerOrAdmin = hasRole(['ROLE_ADMIN', 'HR_MANAGER', 'HR_TIMEKEEPING_MANAGER']);
   const { mode, toggleTheme } = useThemeStore();
+  const currentLang = (i18n.language || 'vi').startsWith('vi') ? 'vi' : 'en';
   const { checkInOut, loadMyTimesheets } = useTimesheetStore();
   const { allShifts, loadAllShifts } = useShiftWorkStore();
 
@@ -334,13 +337,13 @@ const LayoutHeader = () => {
             startIcon={<AccessTimeIcon />}
             onClick={() => {
               if (!user?.staffId) {
-                toast.error("Tài khoản của bạn chưa được liên kết với hồ sơ nhân sự nào để chấm công!");
+                toast.error(t("header.link_profile_error", "Tài khoản của bạn chưa được liên kết với hồ sơ nhân sự nào để chấm công!"));
                 return;
               }
               setTimekeepingOpen(true);
             }}
           >
-            <span className='hidden md:block'>Chấm công</span>
+            <span className='hidden md:block'>{t("header.timekeeping", "Chấm công")}</span>
           </Button>
         )}
 
@@ -356,15 +359,26 @@ const LayoutHeader = () => {
         {/* <div className='flex items-center bg-muted hover:bg-primary/10 dark:hover:bg-primary/20 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'>
           <AppsIcon sx={{ fontSize: '18px' }} />
         </div> */}
- 
+
         {/* Nút bật/tắt chế độ Sáng/Tối */}
-        <div 
-          onClick={toggleTheme}
-          className='flex items-center bg-muted hover:bg-primary/10 dark:hover:bg-primary/20 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'
-          title={mode === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
-        >
-          {mode === 'light' ? <DarkModeIcon sx={{ fontSize: '18px' }} /> : <LightModeIcon sx={{ fontSize: '18px' }} />}
-        </div>
+        <Tooltip title={mode === 'light' ? t('header.toggle_dark', 'Chuyển sang chế độ tối') : t('header.toggle_light', 'Chuyển sang chế độ sáng')} arrow>
+          <div 
+            onClick={toggleTheme}
+            className='flex items-center bg-muted hover:bg-primary/10 dark:hover:bg-primary/20 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border'
+          >
+            {mode === 'light' ? <DarkModeIcon sx={{ fontSize: '18px' }} /> : <LightModeIcon sx={{ fontSize: '18px' }} />}
+          </div>
+        </Tooltip>
+
+        {/* Nút chuyển đổi ngôn ngữ */}
+        <Tooltip title={currentLang === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'} arrow>
+          <div 
+            onClick={() => i18n.changeLanguage(currentLang === 'vi' ? 'en' : 'vi')}
+            className='flex items-center justify-center bg-muted hover:bg-primary/10 dark:hover:bg-primary/20 text-primary px-2.5 py-1.5 rounded-md cursor-pointer border border-border font-bold text-xs w-9 h-[32px] select-none active:scale-95'
+          >
+            {currentLang === 'vi' ? 'EN' : 'VI'}
+          </div>
+        </Tooltip>
  
         {/* Avatar Trigger */}
         <div 
@@ -429,7 +443,7 @@ const LayoutHeader = () => {
             className="mx-1 my-0.5 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground flex items-center gap-3 group transition-colors cursor-pointer"
           >
             <PersonOutlineIcon className="text-foreground group-hover:text-sidebar-accent-foreground w-[18px] h-[18px] min-w-[18px]" />
-            Hồ sơ cá nhân
+            {t("header.profile", "Hồ sơ cá nhân")}
           </MenuItem>
           
           <MenuItem 
@@ -437,7 +451,7 @@ const LayoutHeader = () => {
             className="mx-1 my-0.5 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground flex items-center gap-3 group transition-colors cursor-pointer"
           >
             <SettingsOutlinedIcon className="text-foreground group-hover:text-sidebar-accent-foreground w-[18px] h-[18px] min-w-[18px]" />
-            Cài đặt
+            {t("header.settings", "Cài đặt")}
           </MenuItem>
           
           <MenuItem 
@@ -445,7 +459,7 @@ const LayoutHeader = () => {
             className="mx-1 my-0.5 px-3 py-2.5 rounded-md text-sm text-destructive hover:bg-destructive/10 flex items-center gap-3 group transition-colors cursor-pointer"
           >
             <LogoutIcon className="text-destructive w-[18px] h-[18px] min-w-[18px]" />
-            Đăng xuất
+            {t("header.logout", "Đăng xuất")}
           </MenuItem>
         </Menu>
  
@@ -453,10 +467,10 @@ const LayoutHeader = () => {
         <ConfirmationDialog
           open={showConfirmLogout}
           onConfirmDialogClose={() => setShowConfirmLogout(false)}
-          title="Xác nhận đăng xuất"
-          text="Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?"
-          agree="Đăng xuất"
-          cancel="Hủy"
+          title={t("header.logout_confirm_title", "Xác nhận đăng xuất")}
+          text={t("header.logout_confirm_text", "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?")}
+          agree={t("header.logout", "Đăng xuất")}
+          cancel={t("common.cancel", "Hủy")}
           onYesClick={handleConfirmLogout}
           container={document.getElementById('root')}
         />
@@ -465,10 +479,10 @@ const LayoutHeader = () => {
         <ConfirmationDialog
           open={showConfirmTimekeeping}
           onConfirmDialogClose={() => setShowConfirmTimekeeping(false)}
-          title="Xác nhận chấm công"
+          title={t("header.timekeeping_confirm_title", "Xác nhận chấm công")}
           text={confirmationText}
-          agree="Xác nhận"
-          cancel="Hủy"
+          agree={t("common.confirm", "Xác nhận")}
+          cancel={t("common.cancel", "Hủy")}
           onYesClick={() => {
             setShowConfirmTimekeeping(false);
             formik.handleSubmit();

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
     Grid, 
     IconButton, 
@@ -29,6 +30,7 @@ import { getDepartments, getPositions } from '../../services/StaffService';
 import { getActiveFilterCount } from '../../LocalFunction';
 
 const UserList = () => {
+    const { t } = useTranslation();
     const {
         users,
         roles,
@@ -70,25 +72,25 @@ const UserList = () => {
     const [searchDraft, setSearchDraft] = useState(keyword || '');
 
     const activeOptions = useMemo(() => [
-        { value: '', name: 'Tất cả' },
-        { value: true, name: 'Hoạt động' },
-        { value: false, name: 'Bị khóa' }
-    ], []);
+        { value: '', name: t('common.all', 'Tất cả') },
+        { value: true, name: t('user.status.active', 'Hoạt động') },
+        { value: false, name: t('user.status.locked', 'Bị khóa') }
+    ], [t]);
 
     const roleOptions = useMemo(() => [
-        { id: '', name: 'Tất cả' },
+        { id: '', name: t('common.all', 'Tất cả') },
         ...roles
-    ], [roles]);
+    ], [roles, t]);
 
     const departmentOptions = useMemo(() => [
-        { id: '', name: 'Tất cả' },
+        { id: '', name: t('common.all', 'Tất cả') },
         ...departments
-    ], [departments]);
+    ], [departments, t]);
 
     const positionOptions = useMemo(() => [
-        { id: '', name: 'Tất cả' },
+        { id: '', name: t('common.all', 'Tất cả') },
         ...positions
-    ], [positions]);
+    ], [positions, t]);
 
     useEffect(() => {
         setSearchDraft(keyword || '');
@@ -189,23 +191,23 @@ const UserList = () => {
 
     const columns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             align: 'center',
             render: (rowData) => (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '4px' }}>
-                    <Tooltip title="Đổi mật khẩu" arrow>
+                    <Tooltip title={t('user.change_password_tooltip', 'Đổi mật khẩu')} arrow>
                         <IconButton size="small" color="info" onClick={() => handleChangePassword(rowData)}>
                             <VpnKeyIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
 
-                    <Tooltip title="Chỉnh sửa tài khoản" arrow>
+                    <Tooltip title={t('user.edit_account_tooltip', 'Chỉnh sửa tài khoản')} arrow>
                         <IconButton size="small" color="primary" onClick={() => handleEdit(rowData)}>
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     
-                    <Tooltip title={rowData.active ? "Khóa tài khoản" : "Mở khóa tài khoản"} arrow>
+                    <Tooltip title={rowData.active ? t('user.lock_tooltip', 'Khóa tài khoản') : t('user.unlock_tooltip', 'Mở khóa tài khoản')} arrow>
                         <IconButton 
                             size="small" 
                             color={rowData.active ? "warning" : "success"} 
@@ -215,7 +217,7 @@ const UserList = () => {
                         </IconButton>
                     </Tooltip>
 
-                    <Tooltip title="Xóa tài khoản" arrow>
+                    <Tooltip title={t('user.delete_tooltip', 'Xóa tài khoản')} arrow>
                         <IconButton size="small" color="error" onClick={() => handleDelete(rowData)}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -223,9 +225,9 @@ const UserList = () => {
                 </div>
             ),
         },
-        { title: 'Tên tài khoản', field: 'username', align: 'center' },
+        { title: t('user.username', 'Tên tài khoản'), field: 'username', align: 'center' },
         { 
-            title: 'Vai trò', 
+            title: t('user.roles', 'Vai trò'), 
             render: (rowData) => {
                 if (rowData?.roles && Array.isArray(rowData.roles)) {
                     return rowData.roles.map(role => role.name).join(', ');
@@ -233,21 +235,21 @@ const UserList = () => {
                 return '';
             }
         },
-        { title: 'Nhân viên sử dụng', align: 'center', render: (rowData) => rowData.staffName || '' },
+        { title: t('user.staff_name', 'Nhân viên sử dụng'), align: 'center', render: (rowData) => rowData.staffName || '' },
         { 
-            title: 'Trạng thái', 
+            title: t('common.status', 'Trạng thái'), 
             align: 'center',
             render: (rowData) => (
                 <Box display="flex" alignItems="center" justifyContent="center">
                     {rowData.active ? (
                         <Box px={1.5} py={0.5} borderRadius={4} bgcolor="#e8f5e9" color="#2e7d32" display="flex" alignItems="center" gap={0.5}>
                             <CheckCircleIcon fontSize="inherit" />
-                            <Typography variant="caption" fontWeight="bold">Hoạt động</Typography>
+                            <Typography variant="caption" fontWeight="bold">{t('user.status.active', 'Hoạt động')}</Typography>
                         </Box>
                     ) : (
                         <Box px={1.5} py={0.5} borderRadius={4} bgcolor="#ffebee" color="#c62828" display="flex" alignItems="center" gap={0.5}>
                             <CancelIcon fontSize="inherit" />
-                            <Typography variant="caption" fontWeight="bold">Bị khóa</Typography>
+                            <Typography variant="caption" fontWeight="bold">{t('user.status.locked', 'Bị khóa')}</Typography>
                         </Box>
                     )}
                 </Box>
@@ -282,7 +284,8 @@ const UserList = () => {
                                 onSearch={handleSearch}
                                 onReset={handleReset}
                                 onAdd={handleAdd}
-                                addLabel="Thêm tài khoản"
+                                addLabel={t('user.add_btn', 'Thêm tài khoản')}
+                                searchPlaceholder={t('user.search_placeholder', 'Tìm kiếm tài khoản...')}
                                 filter={{
                                     open: filterOpen,
                                     onToggle: setFilterOpen,
@@ -299,7 +302,7 @@ const UserList = () => {
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={6} md={3}>
                                         <SelectInput
-                                            label="Trạng thái"
+                                            label={t('common.status', 'Trạng thái')}
                                             name="active"
                                             options={activeOptions}
                                             keyValue="value"
@@ -309,7 +312,7 @@ const UserList = () => {
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
                                         <SelectInput
-                                            label="Vai trò"
+                                            label={t('user.roles', 'Vai trò')}
                                             name="roleId"
                                             options={roleOptions}
                                             keyValue="id"
@@ -319,7 +322,7 @@ const UserList = () => {
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
                                         <SelectInput
-                                            label="Phòng ban"
+                                            label={t('department.name', 'Phòng ban')}
                                             name="departmentId"
                                             options={departmentOptions}
                                             keyValue="id"
@@ -329,7 +332,7 @@ const UserList = () => {
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
                                         <SelectInput
-                                            label="Chức danh"
+                                            label={t('position.name', 'Chức danh')}
                                             name="positionId"
                                             options={positionOptions}
                                             keyValue="id"
@@ -380,23 +383,23 @@ const UserList = () => {
                 open={openConfirm}
                 onConfirmDialogClose={() => setOpenConfirm(false)}
                 onYesClick={confirmDelete}
-                title="Xác nhận xóa"
-                text="Bạn có chắc chắn muốn xóa tài khoản này không? Hành động này không thể hoàn tác."
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                title={t('user.delete_confirm_title', 'Xác nhận xóa')}
+                text={t('user.delete_confirm_text', 'Bạn có chắc chắn muốn xóa tài khoản này không? Hành động này không thể hoàn tác.')}
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
 
             <ConfirmationDialog
                 open={openLockConfirm}
                 onConfirmDialogClose={() => setOpenLockConfirm(false)}
                 onYesClick={confirmToggleActive}
-                title={selectedUser?.active ? "Xác nhận khóa tài khoản" : "Xác nhận mở khóa tài khoản"}
+                title={selectedUser?.active ? t('user.lock_confirm_title', 'Xác nhận khóa tài khoản') : t('user.unlock_confirm_title', 'Xác nhận mở khóa tài khoản')}
                 text={selectedUser?.active 
-                    ? `Bạn có chắc chắn muốn khóa tài khoản "${selectedUser?.username}" này không?` 
-                    : `Bạn có chắc chắn muốn mở khóa tài khoản "${selectedUser?.username}" này không?`
+                    ? t('user.lock_confirm_text', 'Bạn có chắc chắn muốn khóa tài khoản "{{username}}" này không?', { username: selectedUser?.username })
+                    : t('user.unlock_confirm_text', 'Bạn có chắc chắn muốn mở khóa tài khoản "{{username}}" này không?', { username: selectedUser?.username })
                 }
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
         </div>
     );

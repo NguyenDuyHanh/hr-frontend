@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     Paper,
     Box,
@@ -38,6 +39,7 @@ import PayslipDetailDialog from './components/PayslipDetailDialog';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 
 const PayrollDetailPage = () => {
+    const { t } = useTranslation();
     const { id: payrollId } = useParams();
     const navigate = useNavigate();
 
@@ -114,16 +116,16 @@ const PayrollDetailPage = () => {
     const handleRecalculate = async () => {
         if (!payrollId) return;
         if (activePayroll && activePayroll.status !== 'DRAFT') {
-            toast.warning('Bảng lương này đã được xác nhận. Không thể tính toán lại!');
+            toast.warning(t('salary.payroll.warning_confirmed_cannot_recalc', 'Bảng lương này đã được xác nhận. Không thể tính toán lại!'));
             return;
         }
         try {
-            toast.info('Đang chạy lại tính toán lương...');
+            toast.info(t('salary.payroll.recalculating_info', 'Đang chạy lại tính toán lương...'));
             await recalculatePayroll(payrollId);
-            toast.success('Tính toán lại lương thành công!');
+            toast.success(t('salary.payroll.recalculate_success', 'Tính toán lại lương thành công!'));
         } catch (error) {
             console.error('Failed to recalculate:', error);
-            toast.error('Không thể tính toán lại lương');
+            toast.error(t('salary.payroll.recalculate_error', 'Không thể tính toán lại lương'));
         }
     };
 
@@ -135,10 +137,10 @@ const PayrollDetailPage = () => {
     const handleConfirmPayrollSubmit = async () => {
         try {
             await storeConfirmPayroll(payrollId);
-            toast.success('Đã xác nhận bảng lương thành công!');
+            toast.success(t('salary.payroll.confirm_success', 'Đã xác nhận bảng lương thành công!'));
         } catch (error) {
             console.error('Failed to confirm payroll:', error);
-            toast.error('Không thể xác nhận bảng lương');
+            toast.error(t('salary.payroll.confirm_error', 'Không thể xác nhận bảng lương'));
         }
     };
 
@@ -150,17 +152,17 @@ const PayrollDetailPage = () => {
     const handleUnconfirmPayrollSubmit = async () => {
         try {
             await storeUnconfirmPayroll(payrollId);
-            toast.success('Hủy xác nhận bảng lương thành công!');
+            toast.success(t('salary.payroll.unconfirm_success', 'Hủy xác nhận bảng lương thành công!'));
         } catch (error) {
             console.error('Failed to unconfirm payroll:', error);
-            toast.error('Không thể hủy xác nhận bảng lương');
+            toast.error(t('salary.payroll.unconfirm_error', 'Không thể hủy xác nhận bảng lương'));
         }
     };
 
     const handleDeletePayroll = () => {
         if (!payrollId) return;
         if (activePayroll && activePayroll.status !== 'DRAFT') {
-            toast.warning('Không thể xóa bảng lương đã xác nhận!');
+            toast.warning(t('salary.payroll.delete_warning_confirmed', 'Không thể xóa bảng lương đã xác nhận!'));
             return;
         }
         setOpenConfirmDelete(true);
@@ -169,11 +171,11 @@ const PayrollDetailPage = () => {
     const handleDeletePayrollSubmit = async () => {
         try {
             await storeDeletePayroll(payrollId);
-            toast.success('Xóa bảng lương thành công!');
+            toast.success(t('salary.payroll.delete_success', 'Xóa bảng lương thành công!'));
             navigate('/salary/payrolls');
         } catch (error) {
             console.error('Failed to delete payroll:', error);
-            toast.error(error.response?.data?.message || 'Không thể xóa bảng lương');
+            toast.error(error.response?.data?.message || t('salary.payroll.delete_error', 'Không thể xóa bảng lương'));
         }
     };
 
@@ -213,19 +215,19 @@ const PayrollDetailPage = () => {
     }, [payrollStaffs, searchKeyword, filterDepartment, filterPosition, filterPaidStatus]);
 
     const departmentOptions = useMemo(() => [
-        { value: '', name: 'Tất cả' },
+        { value: '', name: t('common.all', 'Tất cả') },
         ...departments.map(d => ({ value: d.name, name: d.name }))
-    ], [departments]);
+    ], [departments, t]);
 
     const positionOptions = useMemo(() => [
-        { value: '', name: 'Tất cả' },
+        { value: '', name: t('common.all', 'Tất cả') },
         ...positions.map(p => ({ value: p.name, name: p.name }))
-    ], [positions]);
+    ], [positions, t]);
 
     const paidStatusOptions = [
-        { value: '', name: 'Tất cả' },
-        { value: 'PAID', name: 'Đã chi trả' },
-        { value: 'UNPAID', name: 'Chưa chi trả' }
+        { value: '', name: t('common.all', 'Tất cả') },
+        { value: 'PAID', name: t('salary.payroll.paid_status.paid', 'Đã chi trả') },
+        { value: 'UNPAID', name: t('salary.payroll.paid_status.unpaid', 'Chưa chi trả') }
     ];
 
     const activeFilterCount = useMemo(() =>
@@ -266,12 +268,12 @@ const PayrollDetailPage = () => {
 
     const detailColumns = [
         {
-            title: 'Thao tác',
+            title: t('common.actions', 'Thao tác'),
             align: 'center',
             width: '1%',
             render: (row) => (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                    <Tooltip title="Xem chi tiết phiếu lương nhân viên" arrow>
+                    <Tooltip title={t('salary.payroll.view_employee_payslip_tooltip', 'Xem chi tiết phiếu lương nhân viên')} arrow>
                         <IconButton size="small" color="primary" onClick={() => handleOpenDetail(row)}>
                             <VisibilityIcon fontSize="small" />
                         </IconButton>
@@ -280,63 +282,63 @@ const PayrollDetailPage = () => {
             ),
         },
         {
-            title: 'Mã NV',
+            title: t('staff.code_short', 'Mã NV'),
             align: 'center',
             render: (row) => <span>{row.staff?.staffCode || ''}</span>
         },
         {
-            title: 'Họ và tên',
+            title: t('staff.full_name', 'Họ và tên'),
             align: 'center',
             render: (row) => <span className='whitespace-nowrap'>{row.staff?.displayName || ''}</span>
         },
         {
-            title: 'Phòng ban',
+            title: t('department.name', 'Phòng ban'),
             align: 'center',
             render: (row) => <span className='whitespace-nowrap'>{row.staff?.departmentName || row.staff?.department?.name || '---'}</span>
         },
         {
-            title: 'Vị trí',
+            title: t('position.name', 'Vị trí'),
             align: 'center',
             render: (row) => <span className='whitespace-nowrap'>{row.staff?.positionName || row.staff?.position?.name || '---'}</span>
         },
         {
-            title: 'Số ngày công',
+            title: t('salary.payroll.total_work_days', 'Số ngày công'),
             field: 'totalWorkDays',
             align: 'center',
             render: (row) => <span>{row.totalWorkDays}</span>
         },
         {
-            title: 'Giờ OT',
+            title: t('salary.payroll.total_ot_hours', 'Giờ OT'),
             field: 'totalOtHours',
             align: 'center',
             render: (row) => <span>{row.totalOtHours}</span>
         },
         {
-            title: 'Tổng thu nhập',
+            title: t('salary.payroll.total_income', 'Tổng thu nhập'),
             field: 'totalIncome',
             align: 'center',
             render: (row) => <span>{formatMoney(row.totalIncome)}</span>
         },
         {
-            title: 'Tổng khấu trừ',
+            title: t('salary.payroll.total_deduction', 'Tổng khấu trừ'),
             field: 'totalDeduction',
             align: 'center',
             render: (row) => <span>{formatMoney(row.totalDeduction)}</span>
         },
         {
-            title: 'Thực nhận (Net)',
+            title: t('salary.payroll.net_salary', 'Thực nhận (Net)'),
             field: 'netSalary',
             align: 'center',
             render: (row) => <span>{formatMoney(row.netSalary)}</span>
         },
         {
-            title: 'Trạng thái chi trả',
+            title: t('salary.payroll.paid_status_label', 'Trạng thái chi trả'),
             align: 'center',
             render: (row) => (
                 row.paidStatus === 'PAID' ? (
-                    <span className="text-emerald-600 font-semibold">Đã chi trả</span>
+                    <span className="text-emerald-600 font-semibold">{t('salary.payroll.paid_status.paid', 'Đã chi trả')}</span>
                 ) : (
-                    <span className="text-amber-600 font-semibold">Chưa chi trả</span>
+                    <span className="text-amber-600 font-semibold">{t('salary.payroll.paid_status.unpaid', 'Chưa chi trả')}</span>
                 )
             )
         }
@@ -357,7 +359,7 @@ const PayrollDetailPage = () => {
                         size="small"
                         className="normal-case font-medium border-emerald-500 text-emerald-700 hover:bg-emerald-50"
                     >
-                        Tính toán lại
+                        {t('salary.payroll.recalculate_btn', 'Tính toán lại')}
                     </Button>
                     <Button
                         variant="contained"
@@ -368,7 +370,7 @@ const PayrollDetailPage = () => {
                         size="small"
                         className="normal-case font-medium bg-emerald-600 hover:bg-emerald-700 text-white"
                     >
-                        Xác nhận
+                        {t('common.confirm', 'Xác nhận')}
                     </Button>
                 </>
             )}
@@ -382,7 +384,7 @@ const PayrollDetailPage = () => {
                     size="small"
                     className="normal-case font-medium"
                 >
-                    Hủy xác nhận
+                    {t('salary.payroll.unconfirm_btn', 'Hủy xác nhận')}
                 </Button>
             )}
         </Box>
@@ -400,7 +402,7 @@ const PayrollDetailPage = () => {
                     </IconButton>
                     <Box>
                         <Typography variant="h6" fontWeight="bold" className="text-text-primary">
-                            Chi tiết Bảng lương: {activePayroll?.name}
+                            {t('salary.payroll.detail_title', 'Chi tiết Bảng lương: {{name}}', { name: activePayroll?.name })}
                         </Typography>
                     </Box>
                 </Box>
@@ -427,7 +429,7 @@ const PayrollDetailPage = () => {
                                 onSearchDraftChange={setSearchDraft}
                                 onSearch={handleSearch}
                                 onReset={handleReset}
-                                searchPlaceholder="Tìm theo tên, mã nhân viên..."
+                                searchPlaceholder={t('salary.payroll.search_placeholder_detail', 'Tìm theo tên, mã nhân viên...')}
                                 extraButtons={extraButtons}
                                 filter={{
                                     open: filterOpen,
@@ -445,7 +447,7 @@ const PayrollDetailPage = () => {
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={4}>
                                         <SelectInput
-                                            label="Phòng ban"
+                                            label={t('department.name', 'Phòng ban')}
                                             name="department"
                                             options={departmentOptions}
                                             keyValue="value"
@@ -455,7 +457,7 @@ const PayrollDetailPage = () => {
                                     </Grid>
                                     <Grid item xs={12} sm={4}>
                                         <SelectInput
-                                            label="Vị trí"
+                                            label={t('position.name', 'Vị trí')}
                                             name="position"
                                             options={positionOptions}
                                             keyValue="value"
@@ -465,7 +467,7 @@ const PayrollDetailPage = () => {
                                     </Grid>
                                     <Grid item xs={12} sm={4}>
                                         <SelectInput
-                                            label="Trạng thái chi trả"
+                                            label={t('salary.payroll.paid_status_label', 'Trạng thái chi trả')}
                                             name="paidStatus"
                                             options={paidStatusOptions}
                                             keyValue="value"
@@ -506,30 +508,32 @@ const PayrollDetailPage = () => {
                 open={openConfirmPayroll}
                 onConfirmDialogClose={() => setOpenConfirmPayroll(false)}
                 onYesClick={handleConfirmPayrollSubmit}
-                title="Xác nhận bảng lương"
-                text={`Bạn có chắc chắn muốn xác nhận bảng lương "${activePayroll?.name}"? Sau khi xác nhận sẽ không thể tính toán lại.`}
-                agree="Xác nhận"
-                cancel="Hủy bỏ"
+                title={t('salary.payroll.confirm_title', 'Xác nhận bảng lương')}
+                text={t('salary.payroll.confirm_text', 'Bạn có chắc chắn muốn xác nhận bảng lương "{{name}}"? Sau khi xác nhận sẽ không thể tính toán lại.', { name: activePayroll?.name })}
+                agree={t('common.confirm', 'Xác nhận')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
 
+            {/* Unconfirm Dialog */}
             <ConfirmationDialog
                 open={openUnconfirmPayroll}
                 onConfirmDialogClose={() => setOpenUnconfirmPayroll(false)}
                 onYesClick={handleUnconfirmPayrollSubmit}
-                title="Hủy xác nhận bảng lương"
-                text={`Bạn có chắc chắn muốn hủy xác nhận bảng lương "${activePayroll?.name}"? Trạng thái sẽ được chuyển lại thành Nháp.`}
-                agree="Xác nhận hủy"
-                cancel="Hủy bỏ"
+                title={t('salary.payroll.unconfirm_title', 'Hủy xác nhận bảng lương')}
+                text={t('salary.payroll.unconfirm_text', 'Bạn có chắc chắn muốn hủy xác nhận bảng lương "{{name}}"? Trạng thái sẽ được chuyển lại thành Nháp.', { name: activePayroll?.name })}
+                agree={t('common.unconfirm_confirm_btn', 'Xác nhận hủy')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
 
+            {/* Delete Dialog */}
             <ConfirmationDialog
                 open={openConfirmDelete}
                 onConfirmDialogClose={() => setOpenConfirmDelete(false)}
                 onYesClick={handleDeletePayrollSubmit}
-                title="Xóa bảng lương"
-                text={`Bạn có chắc chắn muốn xóa bảng lương "${activePayroll?.name}" và toàn bộ phiếu lương liên quan?`}
-                agree="Xác nhận xóa"
-                cancel="Hủy bỏ"
+                title={t('salary.payroll.delete_confirm_title', 'Xóa bảng lương')}
+                text={t('salary.payroll.delete_confirm_text', 'Bạn có chắc chắn muốn xóa bảng lương "{{name}}" và toàn bộ phiếu lương liên quan?', { name: activePayroll?.name })}
+                agree={t('common.delete_confirm_btn', 'Xác nhận xóa')}
+                cancel={t('common.cancel', 'Hủy bỏ')}
             />
         </div>
     );

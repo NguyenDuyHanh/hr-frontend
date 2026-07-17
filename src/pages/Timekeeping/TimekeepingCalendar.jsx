@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
     Grid, Box, Card, CardContent, Typography, Button, 
     Chip, IconButton, Avatar, Tooltip,
@@ -14,8 +15,23 @@ import useTimesheetStore from '../../store/useTimesheetStore';
 import Popup from '../../components/ui/Popup';
 
 const TimekeepingCalendar = () => {
+    const { t } = useTranslation();
     const user = useAuthStore(state => state.user);
     const staffId = user?.staffId;
+
+    const getTranslatedDayOfWeek = (dateObj) => {
+        const d = dateObj.format('dddd');
+        switch (d) {
+            case 'Sunday': return t('calendar.days.sunday', 'Chủ Nhật');
+            case 'Saturday': return t('calendar.days.saturday', 'Thứ Bảy');
+            case 'Monday': return t('calendar.days.monday', 'Thứ Hai');
+            case 'Tuesday': return t('calendar.days.tuesday', 'Thứ Ba');
+            case 'Wednesday': return t('calendar.days.wednesday', 'Thứ Tư');
+            case 'Thursday': return t('calendar.days.thursday', 'Thứ Năm');
+            case 'Friday': return t('calendar.days.friday', 'Thứ Sáu');
+            default: return '';
+        }
+    };
 
     const { 
         myTimesheets, loading: tsLoading, loadMyTimesheets, 
@@ -132,13 +148,13 @@ const TimekeepingCalendar = () => {
     const getStatusChip = (status) => {
         switch (status) {
             case 'APPROVED':
-                return <Chip label="Đã duyệt" size="small" className="bg-emerald-50 text-emerald-700 border border-emerald-200" />;
+                return <Chip label={t('timekeeping.status.approved', 'Đã duyệt')} size="small" className="bg-emerald-50 text-emerald-700 border border-emerald-200" />;
             case 'SUBMITTED':
-                return <Chip label="Chờ duyệt" size="small" className="bg-amber-50 text-amber-700 border border-amber-200" />;
+                return <Chip label={t('timekeeping.status.submitted', 'Chờ duyệt')} size="small" className="bg-amber-50 text-amber-700 border border-amber-200" />;
             case 'REJECTED':
-                return <Chip label="Từ chối" size="small" className="bg-rose-50 text-rose-700 border border-rose-200" />;
+                return <Chip label={t('timekeeping.status.rejected', 'Từ chối')} size="small" className="bg-rose-50 text-rose-700 border border-rose-200" />;
             default:
-                return <Chip label="Nháp" size="small" className="bg-gray-100 text-gray-600 border border-gray-200" />;
+                return <Chip label={t('timekeeping.status.draft', 'Nháp')} size="small" className="bg-gray-100 text-gray-600 border border-gray-200" />;
         }
     };
 
@@ -160,7 +176,15 @@ const TimekeepingCalendar = () => {
     };
 
     const calendarCells = generateCalendarDays();
-    const daysOfWeek = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+    const daysOfWeek = [
+        t('calendar.mon', 'T2'),
+        t('calendar.tue', 'T3'),
+        t('calendar.wed', 'T4'),
+        t('calendar.thu', 'T5'),
+        t('calendar.fri', 'T6'),
+        t('calendar.sat', 'T7'),
+        t('calendar.sun', 'CN')
+    ];
 
     return (
         <Box className="space-y-6">
@@ -170,10 +194,10 @@ const TimekeepingCalendar = () => {
                 <Box className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 border-b border-gray-100 dark:border-zinc-800 gap-4">
                     <Box>
                         <Typography variant="h6" className="font-bold text-gray-800 dark:text-gray-100">
-                            Chi tiết lịch sử chấm công
+                            {t('timekeeping.history_detail_title', 'Chi tiết lịch sử chấm công')}
                         </Typography>
                         <Typography variant="caption" className="text-gray-400 dark:text-gray-500">
-                            Theo dõi và đối chiếu chi tiết các lượt check-in/out trong tháng
+                            {t('timekeeping.history_detail_desc', 'Theo dõi và đối chiếu chi tiết các lượt check-in/out trong tháng')}
                         </Typography>
                     </Box>
                     
@@ -211,13 +235,13 @@ const TimekeepingCalendar = () => {
                                 value="calendar" 
                                 icon={<CalendarToday className="text-sm mr-1" sx={{ fontSize: '16px' }} />} 
                                 iconPosition="start" 
-                                label="Dạng Lịch" 
+                                label={t('timekeeping.view_mode.calendar', 'Dạng Lịch')} 
                             />
                             <Tab 
                                 value="table" 
                                 icon={<ListAlt className="text-sm mr-1" sx={{ fontSize: '16px' }} />} 
                                 iconPosition="start" 
-                                label="Dạng Bảng" 
+                                label={t('timekeeping.view_mode.table', 'Dạng Bảng')} 
                             />
                         </Tabs>
 
@@ -230,7 +254,7 @@ const TimekeepingCalendar = () => {
                                 <ChevronLeft />
                             </IconButton>
                             <Typography variant="subtitle1" className="font-bold text-gray-700 dark:text-gray-200 px-2 min-w-[120px] text-center">
-                                Tháng {currentDate.format('MM / YYYY')}
+                                {t('timekeeping.month_text', 'Tháng {{month}}', { month: currentDate.format('MM / YYYY') })}
                             </Typography>
                             <IconButton 
                                 onClick={() => setCurrentDate(currentDate.add(1, 'month'))}
@@ -338,7 +362,7 @@ const TimekeepingCalendar = () => {
                                                              </Box>
                                                          );
                                                      })() : cell.day && (
-                                                        <Box className="text-[10px] text-gray-300 dark:text-gray-600 italic">Vắng / Nghỉ</Box>
+                                                        <Box className="text-[10px] text-gray-300 dark:text-gray-600 italic">{t('timekeeping.absent_or_leave', 'Vắng / Nghỉ')}</Box>
                                                      )}
                                                 </>
                                             ) : null}
@@ -353,15 +377,15 @@ const TimekeepingCalendar = () => {
                                 <Table size="small" aria-label="timesheet table" className="min-w-[800px]">
                                     <TableHead>
                                         <TableRow className="bg-gray-50 dark:bg-zinc-800/50">
-                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">Ngày</TableCell>
-                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">Giờ Vào/Ra</TableCell>
-                                            <TableCell className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">Ca áp dụng</TableCell>
-                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">Công</TableCell>
-                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">Giờ chuẩn</TableCell>
-                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">Giờ OT</TableCell>
-                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">Đi muộn</TableCell>
-                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">Về sớm</TableCell>
-                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">Trạng thái</TableCell>
+                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">{t('timekeeping.date', 'Ngày')}</TableCell>
+                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">{t('timekeeping.time_in_out', 'Giờ Vào/Ra')}</TableCell>
+                                            <TableCell className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">{t('timekeeping.applied_shift', 'Ca áp dụng')}</TableCell>
+                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">{t('timekeeping.work_ratio', 'Công')}</TableCell>
+                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">{t('timekeeping.standard_hours', 'Giờ chuẩn')}</TableCell>
+                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">{t('timekeeping.ot_hours', 'Giờ OT')}</TableCell>
+                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">{t('timekeeping.late_minutes', 'Đi muộn')}</TableCell>
+                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">{t('timekeeping.early_minutes', 'Về sớm')}</TableCell>
+                                            <TableCell align="center" className="font-bold text-gray-700 dark:text-gray-300 py-3 border-b border-gray-100 dark:border-zinc-800">{t('common.status', 'Trạng thái')}</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -412,12 +436,7 @@ const TimekeepingCalendar = () => {
                                                                 {day}
                                                             </span>
                                                             <span className="text-[10px] text-gray-400 font-medium">
-                                                                {dateObj.format('dddd') === 'Sunday' ? 'Chủ Nhật' : 
-                                                                 dateObj.format('dddd') === 'Saturday' ? 'Thứ Bảy' : 
-                                                                 dateObj.format('dddd') === 'Monday' ? 'Thứ Hai' : 
-                                                                 dateObj.format('dddd') === 'Tuesday' ? 'Thứ Ba' : 
-                                                                 dateObj.format('dddd') === 'Wednesday' ? 'Thứ Tư' : 
-                                                                 dateObj.format('dddd') === 'Thursday' ? 'Thứ Năm' : 'Thứ Sáu'}
+                                                                {getTranslatedDayOfWeek(dateObj)}
                                                             </span>
                                                         </Box>
                                                     </TableCell>
@@ -426,8 +445,8 @@ const TimekeepingCalendar = () => {
                                                     <TableCell align="center" className="py-2.5 border-b border-gray-100 dark:border-zinc-800 whitespace-nowrap">
                                                         {minCheckIn || maxCheckOut ? (
                                                             <Box className="text-xs space-y-0.5">
-                                                                <div className="whitespace-nowrap">Vào: <span className="font-semibold text-emerald-600">{minCheckIn ? minCheckIn.format('HH:mm') : '--:--'}</span></div>
-                                                                <div className="whitespace-nowrap">Ra: <span className="font-semibold text-indigo-600">{maxCheckOut ? maxCheckOut.format('HH:mm') : '--:--'}</span></div>
+                                                                <div className="whitespace-nowrap">{t('timekeeping.check_in_short', 'Vào')}: <span className="font-semibold text-emerald-600">{minCheckIn ? minCheckIn.format('HH:mm') : '--:--'}</span></div>
+                                                                <div className="whitespace-nowrap">{t('timekeeping.check_out_short', 'Ra')}: <span className="font-semibold text-indigo-600">{maxCheckOut ? maxCheckOut.format('HH:mm') : '--:--'}</span></div>
                                                             </Box>
                                                         ) : (
                                                             <span className="text-gray-300 dark:text-gray-600 text-xs">--:--</span>
@@ -445,7 +464,7 @@ const TimekeepingCalendar = () => {
                                                                 ))}
                                                             </Box>
                                                         ) : (
-                                                            <span className="text-gray-400 text-xs">Nghỉ / Vắng</span>
+                                                            <span className="text-gray-400 text-xs">{t('timekeeping.absent_or_leave', 'Nghỉ / Vắng')}</span>
                                                         )}
                                                     </TableCell>
 
@@ -468,7 +487,7 @@ const TimekeepingCalendar = () => {
                                                     <TableCell align="center" className="py-2.5 border-b border-gray-100 dark:border-zinc-800">
                                                         {record && lateMinutes > 0 ? (
                                                             <Chip 
-                                                                label={`${lateMinutes} phút`} 
+                                                                label={`${lateMinutes} ${t('timekeeping.minutes_unit_short', 'phút')}`} 
                                                                 size="small" 
                                                                 className="bg-rose-50 text-rose-700 border border-rose-100 font-bold" 
                                                                 sx={{ height: '20px', fontSize: '11px' }}
@@ -482,7 +501,7 @@ const TimekeepingCalendar = () => {
                                                     <TableCell align="center" className="py-2.5 border-b border-gray-100 dark:border-zinc-800">
                                                         {record && earlyMinutes > 0 ? (
                                                             <Chip 
-                                                                label={`${earlyMinutes} phút`} 
+                                                                label={`${earlyMinutes} ${t('timekeeping.minutes_unit_short', 'phút')}`} 
                                                                 size="small" 
                                                                 className="bg-rose-50 text-rose-700 border border-rose-100 font-bold" 
                                                                 sx={{ height: '20px', fontSize: '11px' }}
@@ -504,9 +523,9 @@ const TimekeepingCalendar = () => {
 
                                         {/* Total Row */}
                                         <TableRow className="bg-gray-50 dark:bg-zinc-800/80 border-t-2 border-gray-200 dark:border-zinc-700">
-                                            <TableCell align="center" className="py-3 font-extrabold text-gray-800 dark:text-gray-200 border-b-0">TỔNG CỘNG</TableCell>
+                                            <TableCell align="center" className="py-3 font-extrabold text-gray-800 dark:text-gray-200 border-b-0">{t('timekeeping.total_row', 'TỔNG CỘNG')}</TableCell>
                                             <TableCell align="center" className="py-3 border-b-0"></TableCell>
-                                            <TableCell className="py-3 font-semibold text-gray-500 border-b-0">Tổng các ngày trong tháng</TableCell>
+                                            <TableCell className="py-3 font-semibold text-gray-500 border-b-0">{t('timekeeping.total_days_in_month', 'Tổng các ngày trong tháng')}</TableCell>
                                             <TableCell align="center" className="py-3 font-extrabold text-emerald-600 text-sm border-b-0">
                                                 {monthlySummary.totalWorkRatio.toFixed(2)}
                                             </TableCell>
@@ -517,10 +536,10 @@ const TimekeepingCalendar = () => {
                                                 {monthlySummary.totalOvertimeHours.toFixed(2)}
                                             </TableCell>
                                             <TableCell align="center" className="py-3 font-extrabold text-rose-600 text-sm border-b-0">
-                                                {monthlySummary.totalLateMinutes > 0 ? `${monthlySummary.totalLateMinutes}p` : '0p'}
+                                                {monthlySummary.totalLateMinutes > 0 ? `${monthlySummary.totalLateMinutes}${t('timekeeping.minutes_short', 'p')}` : `0${t('timekeeping.minutes_short', 'p')}`}
                                             </TableCell>
                                             <TableCell align="center" className="py-3 font-extrabold text-rose-600 text-sm border-b-0">
-                                                {monthlySummary.totalEarlyMinutes > 0 ? `${monthlySummary.totalEarlyMinutes}p` : '0p'}
+                                                {monthlySummary.totalEarlyMinutes > 0 ? `${monthlySummary.totalEarlyMinutes}${t('timekeeping.minutes_short', 'p')}` : `0${t('timekeeping.minutes_short', 'p')}`}
                                             </TableCell>
                                             <TableCell align="center" className="py-3 border-b-0"></TableCell>
                                         </TableRow>
@@ -536,7 +555,7 @@ const TimekeepingCalendar = () => {
             <Popup
                 open={detailDialogOpen}
                 onClosePopup={() => setDetailDialogOpen(false)}
-                title={selectedDayRecord ? `Chi tiết chấm công ngày ${dayjs(selectedDayRecord.workingDate).format('DD/MM/YYYY')}` : ''}
+                title={selectedDayRecord ? t('timekeeping.detail_dialog_title', 'Chi tiết chấm công ngày {{date}}', { date: dayjs(selectedDayRecord.workingDate).format('DD/MM/YYYY') }) : ''}
                 size="sm"
                 action={
                     <Button 
@@ -545,7 +564,7 @@ const TimekeepingCalendar = () => {
                         color="primary"
                         className="font-bold px-5 py-1.5 rounded-lg shadow-sm"
                     >
-                        Đóng
+                        {t('common.close', 'Đóng')}
                     </Button>
                 }
             >
@@ -625,10 +644,10 @@ const TimekeepingCalendar = () => {
                             <Box className="flex justify-between items-center bg-muted p-3.5 rounded-xl border border-border">
                                 <Box>
                                     <Typography variant="subtitle2" className="font-bold text-foreground">
-                                        Trạng thái công ngày
+                                        {t('timekeeping.detail.status_title', 'Trạng thái công ngày')}
                                     </Typography>
                                     <Typography variant="caption" className="text-muted-foreground">
-                                        Thống kê ghi nhận chấm công hằng ngày
+                                        {t('timekeeping.detail.status_desc', 'Thống kê ghi nhận chấm công hằng ngày')}
                                     </Typography>
                                 </Box>
                                 {selectedDayRecord.status && getStatusChip(selectedDayRecord.status)}
@@ -637,39 +656,39 @@ const TimekeepingCalendar = () => {
                             {/* Summary Metrics */}
                             <Box className="grid grid-cols-2 gap-4">
                                 <Box className="bg-muted p-3 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground block font-medium">Giờ vào</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground block font-medium">{t('timekeeping.detail.check_in', 'Giờ vào')}</Typography>
                                     <Typography variant="body2" className="font-bold text-foreground mt-0.5">
                                         {minCheckIn ? minCheckIn.format('HH:mm') : '--:--'}
                                     </Typography>
                                 </Box>
                                 <Box className="bg-muted p-3 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground block font-medium">Giờ ra</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground block font-medium">{t('timekeeping.detail.check_out', 'Giờ ra')}</Typography>
                                     <Typography variant="body2" className="font-bold text-foreground mt-0.5">
                                         {maxCheckOut ? maxCheckOut.format('HH:mm') : '--:--'}
                                     </Typography>
                                 </Box>
                                 <Box className="bg-muted p-3 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground block font-medium">Số công quy đổi</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground block font-medium">{t('timekeeping.detail.work_ratio', 'Số công quy đổi')}</Typography>
                                     <Typography variant="body2" className="font-bold text-emerald-600 mt-0.5">
-                                        {selectedDayRecord.totalWorkRatio || 0} công
+                                        {selectedDayRecord.totalWorkRatio || 0} {t('timekeeping.detail.work_ratio_unit', 'công')}
                                     </Typography>
                                 </Box>
                                 <Box className="bg-muted p-3 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground block font-medium">Tổng số giờ làm</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground block font-medium">{t('timekeeping.detail.total_hours', 'Tổng số giờ làm')}</Typography>
                                     <Typography variant="body2" className="font-bold text-primary mt-0.5">
-                                        {displayTotalHours.toFixed(2)} giờ
+                                        {displayTotalHours.toFixed(2)} {t('timekeeping.detail.hours_unit', 'giờ')}
                                     </Typography>
                                 </Box>
                                 <Box className="bg-muted p-3 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground block font-medium">Giờ làm thường</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground block font-medium">{t('timekeeping.detail.standard_hours', 'Giờ làm thường')}</Typography>
                                     <Typography variant="body2" className="font-bold text-indigo-600 mt-0.5">
-                                        {displayStandardHours.toFixed(2)} giờ
+                                        {displayStandardHours.toFixed(2)} {t('timekeeping.detail.hours_unit', 'giờ')}
                                     </Typography>
                                 </Box>
                                 <Box className="bg-muted p-3 rounded-xl text-center border border-border">
-                                    <Typography variant="caption" className="text-muted-foreground block font-medium">Giờ tăng ca (OT)</Typography>
+                                    <Typography variant="caption" className="text-muted-foreground block font-medium">{t('timekeeping.detail.ot_hours', 'Giờ tăng ca (OT)')}</Typography>
                                     <Typography variant="body2" className="font-bold text-amber-600 mt-0.5">
-                                        {displayOvertimeHours.toFixed(2)} giờ
+                                        {displayOvertimeHours.toFixed(2)} {t('timekeeping.detail.hours_unit', 'giờ')}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -678,13 +697,13 @@ const TimekeepingCalendar = () => {
                             {details.map((d, index) => d.shift && (
                                 <Box key={index} className="bg-blue-50 dark:bg-blue-950/20 p-3.5 rounded-xl border border-blue-100 dark:border-blue-900/50 text-xs">
                                     <Typography className="font-bold text-blue-800 dark:text-blue-300">
-                                        Ca áp dụng: {d.shift.name} ({formatShiftTime(d.shift.startTime)} - {formatShiftTime(d.shift.endTime)})
+                                        {t('timekeeping.detail.applied_shift', 'Ca áp dụng')}: {d.shift.name} ({formatShiftTime(d.shift.startTime)} - {formatShiftTime(d.shift.endTime)})
                                     </Typography>
                                     {d.shift.description && (
                                         <Typography className="text-blue-600 dark:text-blue-400 mt-1">{d.shift.description}</Typography>
                                     )}
                                     <Typography className="text-muted-foreground mt-1 block">
-                                        Công ca: <strong className="text-foreground">{d.workRatio || 0}</strong> | Vào: <strong>{d.checkInTime ? dayjs(d.checkInTime).format('HH:mm') : '--:--'}</strong> | Ra: <strong>{d.checkOutTime ? dayjs(d.checkOutTime).format('HH:mm') : '--:--'}</strong> | Số giờ: <strong>{d.checkInTime && d.checkOutTime ? dayjs(d.checkOutTime).diff(dayjs(d.checkInTime), 'hour', true).toFixed(2) + ' giờ' : '0 giờ'}</strong>
+                                        {t('timekeeping.detail.shift_work_ratio', 'Công ca')}: <strong className="text-foreground">{d.workRatio || 0}</strong> | {t('timekeeping.check_in_short', 'Vào')}: <strong>{d.checkInTime ? dayjs(d.checkInTime).format('HH:mm') : '--:--'}</strong> | {t('timekeeping.check_out_short', 'Ra')}: <strong>{d.checkOutTime ? dayjs(d.checkOutTime).format('HH:mm') : '--:--'}</strong> | {t('timekeeping.detail.total_hours', 'Số giờ')}: <strong>{d.checkInTime && d.checkOutTime ? dayjs(d.checkOutTime).diff(dayjs(d.checkInTime), 'hour', true).toFixed(2) + ' ' + t('timekeeping.detail.hours_unit', 'giờ') : '0 ' + t('timekeeping.detail.hours_unit', 'giờ')}</strong>
                                     </Typography>
                                 </Box>
                             ))}
@@ -692,12 +711,12 @@ const TimekeepingCalendar = () => {
                             {/* Raw log history list */}
                             <Box className="space-y-2 pt-1">
                                 <Typography variant="subtitle2" className="font-bold text-foreground">
-                                    Lịch sử chấm công
+                                    {t('timekeeping.detail.logs_title', 'Lịch sử chấm công')}
                                 </Typography>
                                 
                                 {rawLogs.length === 0 ? (
                                     <Typography variant="body2" className="text-muted-foreground text-center py-4 bg-muted rounded-xl border border-border">
-                                        Chưa ghi nhận lượt chấm công nào trong ngày này.
+                                        {t('timekeeping.detail.no_logs', 'Chưa ghi nhận lượt chấm công nào trong ngày này.')}
                                     </Typography>
                                 ) : (
                                     <Box className="divide-y divide-border border border-border rounded-xl overflow-hidden max-h-[250px] overflow-y-auto">
@@ -705,7 +724,7 @@ const TimekeepingCalendar = () => {
                                             <Box key={log.id} className="p-3 flex items-center justify-between hover:bg-muted/30 transition-colors">
                                                 <Box className="flex items-center gap-3">
                                                     {log.photoUrl ? (
-                                                        <Tooltip title="Xem ảnh chấm công" arrow>
+                                                        <Tooltip title={t('timekeeping.detail.view_photo', 'Xem ảnh chấm công')} arrow>
                                                             <Avatar 
                                                                 src={log.photoUrl} 
                                                                 variant="rounded" 
@@ -722,10 +741,10 @@ const TimekeepingCalendar = () => {
 
                                                     <Box>
                                                         <Typography variant="body2" className="font-semibold text-foreground">
-                                                            Quét lúc: {dayjs(log.recordTime).format('HH:mm')}
+                                                            {t('timekeeping.detail.scanned_at', 'Quét lúc: {{time}}', { time: dayjs(log.recordTime).format('HH:mm') })}
                                                         </Typography>
                                                         <Typography variant="caption" className="text-muted-foreground block mt-0.5">
-                                                            IP: {log.ipAddress} | Thiết bị: {log.deviceType || 'Web Browser'}
+                                                            IP: {log.ipAddress} | {t('timekeeping.detail.device', 'Thiết bị')}: {log.deviceType || 'Web Browser'}
                                                             {log.latitude && log.longitude && (
                                                                 <> | GPS: <span className="font-mono text-foreground font-semibold">{log.latitude.toFixed(6)}, {log.longitude.toFixed(6)}</span></>
                                                             )}
@@ -734,7 +753,7 @@ const TimekeepingCalendar = () => {
                                                 </Box>
 
                                                 <Chip 
-                                                    label={log.recordType === 'CHECK_IN' ? 'VÀO' : 'RA'} 
+                                                    label={log.recordType === 'CHECK_IN' ? t('timekeeping.record_type.check_in', 'VÀO') : t('timekeeping.record_type.check_out', 'RA')} 
                                                     size="small" 
                                                     className={log.recordType === 'CHECK_IN' ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' : 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50'}
                                                 />
@@ -746,7 +765,7 @@ const TimekeepingCalendar = () => {
 
                             {selectedDayRecord.note && (
                                 <Box className="mt-2 text-xs text-muted-foreground bg-muted p-2.5 rounded-lg border border-border">
-                                    <span className="font-bold text-foreground">Ghi chú duyệt công:</span> {selectedDayRecord.note}
+                                    <span className="font-bold text-foreground">{t('timekeeping.detail.notes_title', 'Ghi chú duyệt công:')}</span> {selectedDayRecord.note}
                                 </Box>
                             )}
                         </Box>

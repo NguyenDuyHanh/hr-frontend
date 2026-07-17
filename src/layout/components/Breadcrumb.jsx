@@ -1,9 +1,11 @@
 import React, { Fragment } from "react";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { getBreadcrumbByPath } from "@/navigationConfig";
 
 const Breadcrumb = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const routeSegments = getBreadcrumbByPath(location.pathname);
   const displayTitle = routeSegments && routeSegments.length > 0 ? routeSegments[routeSegments.length - 1].name : "";
@@ -11,7 +13,7 @@ const Breadcrumb = () => {
   return (
     <div className="flex items-center justify-between h-15 py-4 bg-background">
       <div className="text-[18px] text-primary uppercase font-normal">
-        {displayTitle}
+        {t('menu.' + displayTitle, displayTitle)}
       </div>
 
       <div className="flex items-center text-[12px]">
@@ -25,7 +27,7 @@ const Breadcrumb = () => {
                 </span>
               )}
               <span className={`font-normal ${index === 0 ? "text-primary" : "text-primary"}`}>
-                {route.name}
+                {t('menu.' + route.name, route.name)}
               </span>
             </Fragment>
           ))}
