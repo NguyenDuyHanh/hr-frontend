@@ -42,15 +42,19 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 22
           script: |
+            set -e
+            
             # Navigate to the project directory on VPS
             cd /opt/hrm/hr-frontend
             
-            # Pull latest changes
-            git pull origin develop
+            # Pull and checkout develop branch cleanly
+            git fetch origin
+            git checkout -f develop
+            git reset --hard origin/develop
             
             # Refresh Docker container
             cd /opt/hrm
-            docker compose up -d --build --no-deps hr-frontend
+            docker compose up -d --build --force-recreate --no-deps hr-frontend
             
             # Clean up old images
             docker image prune -f
