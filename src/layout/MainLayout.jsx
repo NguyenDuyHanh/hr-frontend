@@ -1,5 +1,5 @@
 import React from 'react'
-import LayoutHeader from './components/LayoutHeader'
+import LayoutHeader from './components/header/LayoutHeader'
 import LayoutSidebar from './components/LayoutSidebar'
 import LayoutFooter from './components/LayoutFooter'
 import Breadcrumb from './components/Breadcrumb'

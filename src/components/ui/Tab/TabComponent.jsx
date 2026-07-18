@@ -36,7 +36,6 @@ function TabComponent({
 }) {
     return (
         <Box sx={{ width: '100%' }}>
-            {/* Tabs Header */}
             <Tabs
                 value={value}
                 onChange={handleChange}
@@ -48,6 +47,7 @@ function TabComponent({
                 allowScrollButtonsMobile
                 className={`Mui-tabRootCustom non-maxWidth mb-0 ${!tabList?.every(i => i?.icon) ? 'bottom-0' : ''
                     }`}
+                {...props}
             >
                 {tabList?.map((tab, index) => (
                     <Tab

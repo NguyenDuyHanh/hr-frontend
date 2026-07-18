@@ -106,3 +106,32 @@ export const formatDate = (value, format = 'dd/MM/yyyy') => {
         .replace('HH', HH)
         .replace('mm', mm);
 };
+
+/**
+ * Format date time as a "time ago" string
+ */
+export const formatTimeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const timeStr = `${hours}:${minutes}`;
+
+    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return `Hôm qua, ${timeStr}`;
+    if (diffDays < 7) return `${diffDays} ngày trước, ${timeStr}`;
+    
+    const dd = String(date.getDate()).padStart(2, '0');
+    const MM = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}/${MM}/${yyyy}, ${timeStr}`;
+};
+

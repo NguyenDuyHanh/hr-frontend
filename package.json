@@ -12,6 +12,7 @@
   "dependencies": {
     "@ai-sdk/react": "^1.1.21",
     "@emotion/react": "^11.11.4",
+    "@stomp/stompjs": "^7.0.0",
     "@emotion/styled": "^11.11.5",
     "@material-table/core": "6.2.0",
     "@mui/icons-material": "5.17.0",
