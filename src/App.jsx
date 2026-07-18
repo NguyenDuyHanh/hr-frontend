@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import 'nprogress/nprogress.css';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
+import { connectWebSocket, disconnectWebSocket } from "./services/websocketService";
+import useNotificationStore from "./store/useNotificationStore";
 
 import MainLayout from "./layout/MainLayout";
 import AuthGuard from "./components/auth/AuthGuard";
@@ -66,10 +68,49 @@ const RootRedirect = () => {
 function App() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const addNotification = useNotificationStore((state) => state.addNotification);
+  const fetchUnreadCount = useNotificationStore((state) => state.fetchUnreadCount);
   
   useEffect(() => {
     setNavigate(navigate);
   }, [navigate]);
+
+  useEffect(() => {
+    if (accessToken && user) {
+      connectWebSocket(accessToken, (newNoti) => {
+        addNotification(newNoti);
+        
+        try {
+          const audio = new Audio('/notification.mp3');
+          audio.play();
+        } catch (e) {
+          console.warn('Failed to play notification sound:', e);
+        }
+
+        toast.info(
+          <div className="flex flex-col gap-1 cursor-pointer" onClick={() => {
+            if (newNoti.linkUrl) {
+              const url = newNoti.linkUrl.startsWith('/') ? newNoti.linkUrl : `/${newNoti.linkUrl}`;
+              navigate(url);
+            }
+          }}>
+            <div className="font-bold text-[13px]">{newNoti.title}</div>
+            <div className="text-[11px] text-gray-500 leading-normal">{newNoti.content}</div>
+          </div>,
+          {
+            duration: 5000,
+          }
+        );
+      });
+
+      fetchUnreadCount();
+    }
+
+    return () => {
+      disconnectWebSocket();
+    };
+  }, [accessToken, user, addNotification, fetchUnreadCount, navigate]);
 
   const showLoading = useUiStore(state => state.showLoading);
 
