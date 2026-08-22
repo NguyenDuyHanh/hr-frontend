@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   IconButton, Badge, Popover, Box, Typography, Divider, 
-  List, ListItem, ListItemText, ListItemIcon, Button, Chip
+  List, ListItem, ListItemText, ListItemIcon, Button, Chip, CircularProgress
 } from '@mui/material';
 import TabComponent from '@/components/ui/Tab/TabComponent';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -55,6 +55,7 @@ const NotificationBell = () => {
   const { 
     notifications, 
     unreadCount, 
+    loading,
     fetchNotifications, 
     fetchUnreadCount, 
     markRead, 
@@ -101,7 +102,7 @@ const NotificationBell = () => {
   useEffect(() => {
     // Lấy số lượng unread ban đầu
     fetchUnreadCount();
-  }, [fetchUnreadCount]);
+  }, []);
 
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -126,8 +127,15 @@ const NotificationBell = () => {
   };
 
   const notificationsContent = (
-    <Box className="overflow-y-auto" sx={{ maxHeight: '350px' }}>
-      {notifications.length === 0 ? (
+    <Box className="overflow-y-auto" sx={{ maxHeight: '350px', minHeight: '180px' }}>
+      {loading ? (
+        <Box className="flex flex-col items-center justify-center py-12 px-4 text-center">
+          <CircularProgress size={32} className="text-primary mb-3" />
+          <Typography variant="body2" className="text-muted-foreground text-xs font-medium">
+            Đang tải thông báo...
+          </Typography>
+        </Box>
+      ) : notifications.length === 0 ? (
         <Box className="flex flex-col items-center justify-center py-10 px-4 text-center">
           <NotificationsIcon className="text-muted-foreground/30 mb-2" sx={{ fontSize: 48 }} />
           <Typography variant="body2" className="text-muted-foreground font-medium text-xs">

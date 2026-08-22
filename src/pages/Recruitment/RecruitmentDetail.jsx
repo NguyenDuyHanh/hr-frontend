@@ -36,6 +36,8 @@ import AsyncAutocomplete from '../../components/ui/AsyncAutocomplete';
 import TabAccordion from '../../components/ui/Tab/TabAccordion';
 import { formatDate } from '../../LocalFunction';
 
+import { useCandidates, useAddCandidate, useDeleteCandidate, useChangeCandidateStatus } from './api';
+
 const RecruitmentDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -63,9 +65,6 @@ const RecruitmentDetail = () => {
     const {
         selectedRecruitment,
         setSelectedRecruitment,
-        candidates,
-        loadingCandidates,
-        totalCandidates,
         candidatePage,
         setCandidatePage,
         candidatePageSize,
@@ -80,12 +79,22 @@ const RecruitmentDetail = () => {
         setOpenCandidateForm,
         candidateInput,
         setCandidateInput,
-        loadCandidates,
-        addCandidate,
-        removeCandidate,
-        changeCandidateStatus,
         resetStore
     } = useRecruitmentStore();
+
+    // TanStack Query Hooks for Candidates
+    const { data: candidateData, isFetching: loadingCandidates } = useCandidates(selectedRecruitment?.id, {
+        pageIndex: candidatePage,
+        pageSize: candidatePageSize,
+        keyword: candidateKeyword,
+        ...candidateFilters
+    });
+    const candidates = candidateData?.content || [];
+    const totalCandidates = candidateData?.totalElements || 0;
+
+    const addCandidateMutation = useAddCandidate();
+    const deleteCandidateMutation = useDeleteCandidate();
+    const changeCandidateStatusMutation = useChangeCandidateStatus();
 
     // Toolbar & Filter states for Candidates
     const candidateFormikRef = useRef();
@@ -140,10 +149,7 @@ const RecruitmentDetail = () => {
         };
     }, []);
 
-    // Load Candidates when selectedRecruitment or paging changes
-    useEffect(() => {
-        loadCandidates();
-    }, [selectedRecruitment, candidatePage, candidatePageSize, candidateKeyword, candidateFilters]);
+
 
     // Formik for Recruitment Info Form
     const initialValues = useMemo(() => ({
@@ -240,22 +246,21 @@ const RecruitmentDetail = () => {
     const handleConfirmDeleteCandidate = async () => {
         if (selectedCandidate?.id) {
             try {
-                await removeCandidate(selectedCandidate.id);
-                toast.success("Xóa ứng viên thành công");
+                await deleteCandidateMutation.mutateAsync(selectedCandidate.id);
                 setSelectedCandidate(null);
                 setOpenConfirmDeleteCand(false);
             } catch (err) {
-                toast.error("Lỗi khi xóa ứng viên");
+                console.error(err);
             }
         }
     };
 
     const handleSaveCandidate = async (values) => {
         try {
-            await addCandidate(values);
-            toast.success(values.id ? "Cập nhật ứng viên thành công" : "Thêm ứng viên thành công");
+            await addCandidateMutation.mutateAsync(values);
+            setOpenCandidateForm(false);
         } catch (err) {
-            toast.error(err?.response?.data?.message || "Lỗi lưu thông tin ứng viên");
+            console.error(err);
         }
     };
 
@@ -302,12 +307,11 @@ const RecruitmentDetail = () => {
 
     const submitStatusChange = async (candidateId, status, reason) => {
         try {
-            await changeCandidateStatus(candidateId, status, reason);
-            toast.success("Cập nhật trạng thái ứng viên thành công");
+            await changeCandidateStatusMutation.mutateAsync({ candidateId, status, reason });
             setOpenStatusDialog(false);
             setRefusalReason('');
         } catch (err) {
-            toast.error("Lỗi khi cập nhật trạng thái");
+            console.error(err);
         }
     };
 
@@ -639,6 +643,7 @@ const RecruitmentDetail = () => {
                     pageSize={candidatePageSize}
                     handleChangePage={(e, p) => setCandidatePage(p)}
                     setRowsPerPage={(e) => setCandidatePageSize(parseInt(e.target.value, 10))}
+                    loading={loadingCandidates}
                 />
             </TabAccordion>
 

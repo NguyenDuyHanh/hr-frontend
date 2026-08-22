@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Paper, Button, IconButton, Chip, Grid, TextField as MuiTextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Paper, IconButton, Chip, Grid, TextField as MuiTextField } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useTranslation } from 'react-i18next';
 import { Formik } from 'formik';
-import { toast } from 'sonner';
 
 import useLeaveStore from '../../store/useLeaveStore';
 import Table from '../../components/ui/Table';
@@ -18,23 +17,22 @@ import LeaveRequestForm from './components/LeaveRequestForm';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import { formatDate } from '../../LocalFunction';
 import { pagingStaffs } from '../../services/StaffService';
+import { 
+    useLeaveRequests, 
+    useApproveLeaveRequest, 
+    useRejectLeaveRequest, 
+    useDeleteLeaveRequest 
+} from './api';
 
 const LeaveRequestList = () => {
     const { t } = useTranslation();
     const {
-        requests,
-        loading,
         page,
         pageSize,
-        totalElements,
         setPage,
         setPageSize,
         setFilters,
         filters,
-        loadRequests,
-        approveRequest,
-        rejectRequest,
-        removeLeaveRequest,
         setSelectedRequest,
         selectedRequest,
         openForm,
@@ -43,6 +41,17 @@ const LeaveRequestList = () => {
         setKeyword,
         resetStore
     } = useLeaveStore();
+
+    // Query & Mutations
+    const { data: leaveData, isFetching } = useLeaveRequests({
+        pageIndex: page,
+        pageSize,
+        keyword,
+        ...filters
+    });
+    const approveMutation = useApproveLeaveRequest();
+    const rejectMutation = useRejectLeaveRequest();
+    const deleteMutation = useDeleteLeaveRequest();
 
     const [filterOpen, setFilterOpen] = useState(false);
     const [searchDraft, setSearchDraft] = useState(keyword || '');
@@ -56,21 +65,11 @@ const LeaveRequestList = () => {
         return () => {
             resetStore();
         };
-    }, [resetStore]);
+    }, []);
 
     useEffect(() => {
         setSearchDraft(keyword || '');
     }, [keyword]);
-
-    useEffect(() => {
-        // If filters has staffId but no staff filter is selected in Formik (e.g. carried-over from MyLeaveRequests),
-        // we reset the store state first to avoid loading incorrect data and calling the API twice.
-        if (filters.staffId && !formikRef.current?.values?.staff?.id) {
-            resetStore();
-            return;
-        }
-        loadRequests();
-    }, [page, pageSize, keyword, filters, loadRequests, resetStore]);
 
     const handleSearch = () => {
         setKeyword(searchDraft);
@@ -116,40 +115,26 @@ const LeaveRequestList = () => {
 
     const confirmApprove = async () => {
         if (selectedRequest?.id) {
-            try {
-                await approveRequest(selectedRequest.id, '');
-                toast.success(t('leave.message.approveSuccess', 'Phê duyệt đơn nghỉ phép thành công'));
-                setOpenApproveConfirm(false);
-                setSelectedRequest(null);
-            } catch (error) {
-                toast.error(error.response?.data?.message || t('leave.message.approveError', 'Lỗi khi phê duyệt'));
-            }
+            await approveMutation.mutateAsync({ id: selectedRequest.id, rejectReason: '' });
+            setOpenApproveConfirm(false);
+            setSelectedRequest(null);
         }
     };
 
     const confirmReject = async () => {
         if (selectedRequest?.id) {
-            try {
-                await rejectRequest(selectedRequest.id, rejectReason);
-                toast.success(t('leave.message.rejectSuccess', 'Từ chối đơn nghỉ phép thành công'));
-                setRejectReason('');
-            } catch (error) {
-                toast.error(error.response?.data?.message || t('leave.message.rejectError', 'Lỗi khi từ chối'));
-                throw error;
-            }
+            await rejectMutation.mutateAsync({ id: selectedRequest.id, rejectReason });
+            setOpenRejectDialog(false);
+            setSelectedRequest(null);
+            setRejectReason('');
         }
     };
 
     const confirmDelete = async () => {
         if (selectedRequest?.id) {
-            try {
-                await removeLeaveRequest(selectedRequest.id);
-                toast.success(t('leave.message.deleteSuccess', 'Xóa đơn nghỉ phép thành công'));
-                setOpenDeleteConfirm(false);
-                setSelectedRequest(null);
-            } catch (error) {
-                toast.error(error.response?.data?.message || t('leave.message.deleteError', 'Lỗi khi xóa đơn'));
-            }
+            await deleteMutation.mutateAsync(selectedRequest.id);
+            setOpenDeleteConfirm(false);
+            setSelectedRequest(null);
         }
     };
 
@@ -363,13 +348,13 @@ const LeaveRequestList = () => {
 
                 <Table
                     columns={columns}
-                    data={requests}
-                    totalElements={totalElements}
+                    data={leaveData?.content || []}
+                    totalElements={leaveData?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
-                    loading={loading}
+                    loading={isFetching}
                 />
             </Paper>
 

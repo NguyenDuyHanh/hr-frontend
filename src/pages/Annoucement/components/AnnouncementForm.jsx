@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Grid,
@@ -18,7 +18,6 @@ import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'sonner';
 
-import useAnnouncementStore from '../../../store/useAnnouncementStore';
 import { getAllDepartments } from '../../../services/departmentService';
 import { generateAnnouncementCode } from '../../../services/notificationService';
 import { ANNOUNCEMENT_CATEGORIES, ANNOUNCEMENT_STATUS } from '../../../constants/notification';
@@ -28,10 +27,12 @@ import Popup from '../../../components/ui/Popup';
 import Editor from '../../../components/ui/Editor';
 import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
+import { useAddAnnouncement, useModifyAnnouncement } from '../api';
 
 const AnnouncementForm = ({ open, onClose, isEdit, announcement }) => {
     const { t } = useTranslation();
-    const { addAnnouncement, modifyAnnouncement } = useAnnouncementStore();
+    const addMutation = useAddAnnouncement();
+    const modifyMutation = useModifyAnnouncement();
 
     const [departments, setDepartments] = useState([]);
     const [autoCode, setAutoCode] = useState('');
@@ -184,16 +185,13 @@ const AnnouncementForm = ({ open, onClose, isEdit, announcement }) => {
                 };
 
                 if (isEdit && announcement) {
-                    await modifyAnnouncement(announcement.id, payload);
-                    toast.success(t('announcement.message.save_success', 'Cập nhật thông báo thành công'));
+                    await modifyMutation.mutateAsync({ id: announcement.id, ...payload });
                 } else {
-                    await addAnnouncement(payload);
-                    toast.success(t('announcement.message.save_success', 'Ban hành thông báo mới thành công'));
+                    await addMutation.mutateAsync(payload);
                 }
                 onClose();
             } catch (err) {
                 console.error("Failed to save announcement:", err);
-                toast.error(err?.response?.data?.message || t('announcement.message.save_failed', 'Có lỗi xảy ra khi lưu thông báo'));
             } finally {
                 setSaving(false);
             }

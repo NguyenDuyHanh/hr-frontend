@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
-import { Grid, Button, FormControlLabel, Checkbox, Typography, Box } from '@mui/material';
+import { Grid, Button, FormControlLabel, Checkbox } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { toast } from 'sonner';
 
-import useLeaveStore from '../../../store/useLeaveStore';
 import useAuthStore from '../../../store/useAuthStore';
 import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
@@ -15,16 +13,18 @@ import AsyncAutocomplete from '../../../components/ui/AsyncAutocomplete';
 import Popup from '../../../components/ui/Popup';
 import { pagingStaffs } from '../../../services/StaffService';
 import { getAllShifts } from '../../../services/shiftWorkService';
+import { useAddLeaveRequest, useModifyLeaveRequest } from '../api';
 
 const LeaveRequestForm = ({ open, onClose, requestData, onSaveSuccess }) => {
     const { t } = useTranslation();
-    const { addLeaveRequest, modifyLeaveRequest, balance, loadLeaveBalance } = useLeaveStore();
+    const addMutation = useAddLeaveRequest();
+    const modifyMutation = useModifyLeaveRequest();
+
     const { hasRole, user } = useAuthStore();
     const [shifts, setShifts] = useState([]);
 
     const isAdminOrHR = hasRole(['ROLE_ADMIN', 'HR_MANAGER']);
 
-    // Load shifts for half day selection
     useEffect(() => {
         const fetchShifts = async () => {
             try {
@@ -83,30 +83,17 @@ const LeaveRequestForm = ({ open, onClose, requestData, onSaveSuccess }) => {
                 };
 
                 if (values.id) {
-                    await modifyLeaveRequest(values.id, submitValues);
-                    toast.success(t('leave.message.updateSuccess', 'Cập nhật đơn nghỉ phép thành công'));
+                    await modifyMutation.mutateAsync(submitValues);
                 } else {
-                    await addLeaveRequest(submitValues);
-                    toast.success(t('leave.message.createSuccess', 'Tạo đơn nghỉ phép thành công'));
+                    await addMutation.mutateAsync(submitValues);
                 }
+                onClose();
                 if (onSaveSuccess) onSaveSuccess();
             } catch (error) {
-                toast.error(error.response?.data?.message || t('leave.message.error', 'Đã xảy ra lỗi khi lưu đơn nghỉ phép'));
+                console.error(error);
             }
         },
     });
-
-    // Load balance dynamically when requestStaff or leaveType changes
-    const staffIdForBalance = formik.values.requestStaff?.id;
-    const leaveTypeForBalance = formik.values.leaveType;
-    const fromDateForBalance = formik.values.fromDate;
-
-    useEffect(() => {
-        if (staffIdForBalance && leaveTypeForBalance === 'ANNUAL' && fromDateForBalance) {
-            const year = new Date(fromDateForBalance).getFullYear();
-            loadLeaveBalance(staffIdForBalance, year);
-        }
-    }, [staffIdForBalance, leaveTypeForBalance, fromDateForBalance, loadLeaveBalance]);
 
     const isSingleDay = useMemo(() => {
         if (!formik.values.fromDate || !formik.values.toDate) return true;
@@ -127,7 +114,13 @@ const LeaveRequestForm = ({ open, onClose, requestData, onSaveSuccess }) => {
             <Button onClick={onClose} variant="outlined" color="inherit" sx={{ color: 'text.secondary', textTransform: 'none' }}>
                 {t('general.cancel', 'Hủy bỏ')}
             </Button>
-            <Button onClick={formik.handleSubmit} color="primary" variant="contained" sx={{ textTransform: 'none', px: 4, ml: 1 }}>
+            <Button 
+                onClick={formik.handleSubmit} 
+                color="primary" 
+                variant="contained" 
+                sx={{ textTransform: 'none', px: 4, ml: 1 }}
+                disabled={addMutation.isPending || modifyMutation.isPending}
+            >
                 {t('general.save', 'Lưu lại')}
             </Button>
         </>

@@ -17,11 +17,11 @@ import useTaskStore from '../../../store/useTaskStore';
 import { pagingProjects, getProjectWorkingStatuses, getProjectActivities, getProjectStaffs } from '../../../services/projectService';
 import { uploadTaskAttachmentLink, deleteTaskAttachment } from '../../../services/taskService';
 import { uploadFile } from '../../../services/CloudinaryService';
-import { TASK_PRIORITY_OPTIONS } from '../../../constants/taskConstants';
-import { toast } from 'sonner';
+import { useAddTask, useModifyTask } from '../api';
 
 const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = false }) => {
-    const { addTask, modifyTask } = useTaskStore();
+    const addTaskMutation = useAddTask();
+    const modifyTaskMutation = useModifyTask();
     const [statuses, setStatuses] = useState([]);
     const [activities, setActivities] = useState([]);
     const [attachments, setAttachments] = useState([]);
@@ -85,17 +85,14 @@ const TaskFormDialog = ({ open, onClose, taskData, onSaveSuccess, isViewMode = f
 
             try {
                 if (values.id) {
-                    await modifyTask(values.id, payload);
-                    toast.success("Cập nhật công việc thành công");
+                    await modifyTaskMutation.mutateAsync(payload);
                 } else {
-                    await addTask(payload);
-                    toast.success("Tạo công việc thành công");
+                    await addTaskMutation.mutateAsync(payload);
                 }
                 if (onSaveSuccess) onSaveSuccess();
                 onClose();
             } catch (error) {
                 console.error("Save task error:", error);
-                toast.error("Không thể lưu công việc. Vui lòng kiểm tra lại dữ liệu.");
             }
         }
     });

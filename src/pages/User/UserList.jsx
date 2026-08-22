@@ -25,16 +25,13 @@ import SelectInput from '../../components/ui/SelectInput';
 import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import { Formik } from 'formik';
-import { saveUser } from '../../services/UserService';
 import { getDepartments, getPositions } from '../../services/StaffService';
 import { getActiveFilterCount } from '../../LocalFunction';
+import { useUsers, useDeleteUser, useLockUser, useUnlockUser, useRolesQuery } from './api';
 
 const UserList = () => {
     const { t } = useTranslation();
     const {
-        users,
-        roles,
-        totalElements,
         page,
         setPage,
         pageSize,
@@ -53,13 +50,25 @@ const UserList = () => {
         setSelectedUser,
         openForm,
         setOpenForm,
-        loadUsers,
-        loadRoles,
-        removeUser,
         resetFilters,
-        lockUserAccount,
-        unlockUserAccount
+        resetStore
     } = useUserStore();
+
+    // Query Users & Roles
+    const { data: userData, isFetching } = useUsers({
+        pageIndex: page,
+        pageSize,
+        keyword,
+        active,
+        departmentId,
+        positionId,
+        roleId
+    });
+    const deleteUserMutation = useDeleteUser();
+    const lockUserMutation = useLockUser();
+    const unlockUserMutation = useUnlockUser();
+    const { data: roles = [] } = useRolesQuery();
+
     const [departments, setDepartments] = useState([]);
     const [positions, setPositions] = useState([]);
     const [filterOpen, setFilterOpen] = useState(false);
@@ -97,8 +106,10 @@ const UserList = () => {
     }, [keyword]);
 
     useEffect(() => {
-        loadUsers();
-    }, [page, pageSize, keyword, active, departmentId, positionId, roleId]);
+        return () => {
+            resetStore();
+        };
+    }, []);
 
     const handleSearch = () => {
         setKeyword(searchDraft);
@@ -136,7 +147,6 @@ const UserList = () => {
                 ]);
                 setDepartments(deptRes?.data || []);
                 setPositions(posRes?.data || []);
-                loadRoles();
             } catch (error) {
                 console.error("Failed to load filter options", error);
             }
@@ -166,7 +176,7 @@ const UserList = () => {
 
     const confirmDelete = async () => {
         if (selectedUser?.id) {
-            await removeUser(selectedUser.id);
+            await deleteUserMutation.mutateAsync(selectedUser.id);
             setSelectedUser(null);
             setOpenConfirm(false);
         }
@@ -180,9 +190,9 @@ const UserList = () => {
     const confirmToggleActive = async () => {
         if (selectedUser) {
             if (selectedUser.active) {
-                await lockUserAccount(selectedUser.id);
+                await lockUserMutation.mutateAsync(selectedUser.id);
             } else {
-                await unlockUserAccount(selectedUser.id);
+                await unlockUserMutation.mutateAsync(selectedUser.id);
             }
             setSelectedUser(null);
             setOpenLockConfirm(false);
@@ -348,12 +358,13 @@ const UserList = () => {
                 
                 <Table 
                     columns={columns} 
-                    data={users} 
-                    totalElements={totalElements}
+                    data={userData?.content || []} 
+                    totalElements={userData?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
+                    loading={isFetching}
                 />
             </Paper>
 

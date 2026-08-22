@@ -1,9 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import 'nprogress/nprogress.css';
 import { Toaster, toast } from 'sonner';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { connectWebSocket, disconnectWebSocket } from "./services/websocketService";
 import useNotificationStore from "./store/useNotificationStore";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 import MainLayout from "./layout/MainLayout";
 import AuthGuard from "./components/auth/AuthGuard";
@@ -20,9 +31,6 @@ import RecruitmentDetail from "./pages/Recruitment/RecruitmentDetail";
 import TimekeepingCalendar from "./pages/Timekeeping/TimekeepingCalendar";
 import TimekeepingSummary from "./pages/Timekeeping/TimekeepingSummary";
 import TimesheetApprovalList from "./pages/Timesheet/TimesheetApprovalList";
-import useUiStore from "./store/uiStore";
-import Loading from "./components/ui/Loading";
-import GlobalLoadingHandler from "./components/common/GlobalLoadingHandler";
 import AiChatbotWidget from "./components/ui/AiChatbotWidget";
 import LoginPage from "./pages/auth/LoginPage";
 import { setNavigate } from "./navigation";
@@ -74,7 +82,10 @@ function App() {
   const addNotification = useNotificationStore((state) => state.addNotification);
   const fetchUnreadCount = useNotificationStore((state) => state.fetchUnreadCount);
   
+  const navigateRef = useRef(navigate);
+  
   useEffect(() => {
+    navigateRef.current = navigate;
     setNavigate(navigate);
   }, [navigate]);
 
@@ -94,7 +105,7 @@ function App() {
           <div className="flex flex-col gap-1 cursor-pointer" onClick={() => {
             if (newNoti.linkUrl) {
               const url = newNoti.linkUrl.startsWith('/') ? newNoti.linkUrl : `/${newNoti.linkUrl}`;
-              navigate(url);
+              navigateRef.current(url);
             }
           }}>
             <div className="font-bold text-[13px]">{newNoti.title}</div>
@@ -112,9 +123,7 @@ function App() {
     return () => {
       disconnectWebSocket();
     };
-  }, [accessToken, user, addNotification, fetchUnreadCount, navigate]);
-
-  const showLoading = useUiStore(state => state.showLoading);
+  }, [accessToken, user?.username]);
 
   // Hàm làm phẳng danh sách menu để tạo Route tự động
   const flattenNavigations = (items) => {
@@ -162,14 +171,8 @@ function App() {
   };
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Toaster position="bottom-right" richColors closeButton />
-
-      {/* Người quan sát điều khiển thanh NProgress */}
-      <GlobalLoadingHandler />
-      
-      {/* Vòng xoay trung tâm điều khiển bởi showLoading */}
-      {showLoading && <Loading fixed />}
       
       {/* Widget Trợ lý AI */}
       {user && <AiChatbotWidget />}
@@ -269,7 +272,8 @@ function App() {
           <Route path="*" element={<RootRedirect />} />
         </Route>
       </Routes>
-    </>
+      <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
 

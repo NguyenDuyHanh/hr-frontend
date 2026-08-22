@@ -7,12 +7,10 @@ import {
     Box,
     Typography,
     Button,
-    Grid,
-    Chip
+    Grid
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { toast } from 'sonner';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 
@@ -26,14 +24,12 @@ import DateTimePicker from '../../components/ui/DateTimePicker';
 import Popup from '../../components/ui/Popup';
 import { getActiveFilterCount } from '../../LocalFunction';
 import useHolidayStore from '../../store/useHolidayStore';
+import { useHolidays, useAddHoliday, useModifyHoliday, useDeleteHoliday } from './api';
 import { format, differenceInCalendarDays } from 'date-fns';
 
 const HolidayPage = () => {
     const { t } = useTranslation();
     const {
-        holidays,
-        loading,
-        totalElements,
         page,
         setPage,
         pageSize,
@@ -46,13 +42,24 @@ const HolidayPage = () => {
         setFilterFromDate,
         filterToDate,
         setFilterToDate,
-        loadHolidays,
-        addHoliday,
-        modifyHoliday,
-        removeHoliday
+        resetFilters
     } = useHolidayStore();
 
-    const [saving, setSaving] = useState(false);
+    // Query & Mutations
+    const { data: holidayData, isFetching } = useHolidays({
+        pageIndex: page,
+        pageSize,
+        keyword,
+        year: filterYear || null,
+        fromDate: filterFromDate || null,
+        toDate: filterToDate || null
+    });
+    const addHolidayMutation = useAddHoliday();
+    const modifyHolidayMutation = useModifyHoliday();
+    const deleteHolidayMutation = useDeleteHoliday();
+
+    const saving = addHolidayMutation.isPending || modifyHolidayMutation.isPending;
+
     const [searchDraft, setSearchDraft] = useState('');
     const [filterOpen, setFilterOpen] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
@@ -88,10 +95,6 @@ const HolidayPage = () => {
         });
     }, [filterYear, filterFromDate, filterToDate]);
 
-    useEffect(() => {
-        loadHolidays();
-    }, [keyword, filterYear, filterFromDate, filterToDate, page, pageSize]);
-
     // Filter formik
     const filterFormik = useFormik({
         initialValues: { 
@@ -121,9 +124,7 @@ const HolidayPage = () => {
         setSearchDraft('');
         setKeyword('');
         filterFormik.resetForm({ values: { year: '', fromDate: null, toDate: null } });
-        setFilterYear('');
-        setFilterFromDate(null);
-        setFilterToDate(null);
+        resetFilters();
     };
 
     // Holiday validation schema
@@ -155,7 +156,6 @@ const HolidayPage = () => {
             const endDate = new Date(values.endDate);
 
             try {
-                setSaving(true);
                 const payload = {
                     code: values.code,
                     name: values.name,
@@ -166,19 +166,13 @@ const HolidayPage = () => {
                 };
 
                 if (isEdit) {
-                    await modifyHoliday(selectedHoliday.id, payload);
-                    toast.success(t('holiday.update_success', 'Cập nhật ngày lễ thành công'));
+                    await modifyHolidayMutation.mutateAsync({ id: selectedHoliday.id, ...payload });
                 } else {
-                    await addHoliday(payload);
-                    toast.success(t('holiday.create_success', 'Tạo ngày lễ mới thành công'));
+                    await addHolidayMutation.mutateAsync(payload);
                 }
                 setOpenDialog(false);
             } catch (error) {
                 console.error(isEdit ? 'Failed to update holiday:' : 'Failed to create holiday:', error);
-                const msg = error?.response?.data?.message || (isEdit ? t('holiday.update_error', 'Lỗi khi cập nhật ngày lễ') : t('holiday.create_error', 'Lỗi khi tạo ngày lễ mới'));
-                toast.error(msg);
-            } finally {
-                setSaving(false);
             }
         },
     });
@@ -232,15 +226,8 @@ const HolidayPage = () => {
 
     const handleConfirmDelete = async () => {
         if (selectedHoliday && selectedHoliday.id) {
-            try {
-                await removeHoliday(selectedHoliday.id);
-                toast.success(t('holiday.delete_success', 'Xóa ngày lễ thành công'));
-                setOpenConfirmDelete(false);
-            } catch (error) {
-                console.error('Failed to delete holiday:', error);
-                const msg = error?.response?.data?.message || t('holiday.delete_error', 'Lỗi khi xóa ngày lễ');
-                toast.error(msg);
-            }
+            await deleteHolidayMutation.mutateAsync(selectedHoliday.id);
+            setOpenConfirmDelete(false);
         }
     };
 
@@ -341,12 +328,13 @@ const HolidayPage = () => {
 
                 <Table
                     columns={columns}
-                    data={holidays}
-                    totalElements={totalElements}
+                    data={holidayData?.content || []}
+                    totalElements={holidayData?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
+                    loading={isFetching}
                 />
             </Paper>
 

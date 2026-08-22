@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Grid,
@@ -9,7 +9,8 @@ import {
     Paper,
     Card,
     CardContent,
-    Pagination
+    Pagination,
+    Skeleton
 } from '@mui/material';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -31,24 +32,33 @@ import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import SelectInput from '../../components/ui/SelectInput';
 import Popup from '../../components/ui/Popup';
+import { useAnnouncements } from './api';
 
 const AnnouncementsGridPage = () => {
     const { t } = useTranslation();
 
     const {
-        announcements,
-        loading,
-        totalElements,
         page,
         setPage,
         pageSize,
-        setPageSize,
         keyword,
         setKeyword,
         filterCategory,
         setFilterCategory,
-        loadAnnouncements
+        resetStore
     } = useAnnouncementStore();
+
+    // Query
+    const { data: announcementData, isFetching: loading } = useAnnouncements({
+        pageIndex: page,
+        pageSize,
+        keyword: keyword || null,
+        category: filterCategory || null,
+        status: 'PUBLISHED'
+    });
+
+    const announcements = announcementData?.content || [];
+    const totalElements = announcementData?.totalElements || 0;
 
     const { fetchUnreadCount } = useNotificationStore();
 
@@ -57,14 +67,11 @@ const AnnouncementsGridPage = () => {
     const [filterOpen, setFilterOpen] = useState(false);
     const [searchDraft, setSearchDraft] = useState(keyword);
 
-    // Load announcements on page, keyword, or category filter changes
     useEffect(() => {
-        // We only load PUBLISHED announcements for this client-facing grid view
-        // The store handles searching, but the backend query has category and status filter.
-        // We'll set the status filter to PUBLISHED for this view
-        useAnnouncementStore.setState({ filterStatus: 'PUBLISHED' });
-        loadAnnouncements();
-    }, [page, pageSize, keyword, filterCategory]);
+        return () => {
+            resetStore();
+        };
+    }, []);
 
     const categoryOptions = [
         { value: '', displayValue: t('announcement.categories.all', 'Tất cả danh mục') },
@@ -107,7 +114,6 @@ const AnnouncementsGridPage = () => {
         }
     };
 
-    // Filter Formik Setup
     const filterFormik = useFormik({
         initialValues: {
             category: filterCategory
@@ -146,7 +152,6 @@ const AnnouncementsGridPage = () => {
         setSelectedAnn(ann);
         setOpenViewDialog(true);
         
-        // Mark as read if not already read
         if (ann.isRead === false) {
             try {
                 const storedNotis = useNotificationStore.getState().notifications;
@@ -162,19 +167,16 @@ const AnnouncementsGridPage = () => {
         }
     };
 
-    // Utility to strip HTML tags and generate a snippet
     const stripHtml = (html) => {
         if (!html) return '';
         const rawText = html.replaceAll(/<[^>]*>/g, " ").trim();
         return rawText.replaceAll(/\s+/g, " ");
     };
 
-    // Calculate total pages
     const totalPages = Math.ceil(totalElements / pageSize) || 1;
 
     return (
         <div className="space-y-6 animate-fade-in">
-            {/* Filter toolbar */}
             <div className="pt-4 px-4 border border-border rounded-sm">
                 <FormikProvider value={filterFormik}>
                     <ListToolbar
@@ -212,13 +214,32 @@ const AnnouncementsGridPage = () => {
                 </FormikProvider>
             </div>
 
-            {/* Grid of Announcement Cards */}
             {loading ? (
-                <Box className="flex justify-center items-center py-20">
-                    <Typography className="text-muted-foreground animate-pulse text-[14px]">
-                        Đang tải danh sách thông báo...
-                    </Typography>
-                </Box>
+                <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+                    {Array.from({ length: pageSize || 6 }).map((_, index) => (
+                        <Card key={index} elevation={0} className="border border-border rounded-xl bg-card overflow-hidden h-[240px]">
+                            <CardContent className="p-5 h-full flex flex-col justify-between space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <Skeleton variant="rounded" width={110} height={24} sx={{ borderRadius: '12px' }} animation="wave" />
+                                    <Skeleton variant="text" width={65} height={16} animation="wave" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton variant="text" width="90%" height={22} animation="wave" />
+                                    <Skeleton variant="text" width="60%" height={22} animation="wave" />
+                                </div>
+                                <div className="space-y-1.5 flex-1 pt-1">
+                                    <Skeleton variant="text" width="100%" height={14} animation="wave" />
+                                    <Skeleton variant="text" width="95%" height={14} animation="wave" />
+                                    <Skeleton variant="text" width="70%" height={14} animation="wave" />
+                                </div>
+                                <div className="border-t border-border/50 pt-3 flex items-center justify-between">
+                                    <Skeleton variant="text" width={80} height={16} animation="wave" />
+                                    <Skeleton variant="text" width={110} height={16} animation="wave" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
             ) : announcements.length === 0 ? (
                 <Paper elevation={0} className="py-6 border border-border rounded-xs flex flex-col items-center justify-center text-center">
                     <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground mb-4">
@@ -247,7 +268,6 @@ const AnnouncementsGridPage = () => {
                                         className="h-full flex flex-col border border-border hover:border-primary/40 hover:shadow-md cursor-pointer rounded-xl group overflow-hidden bg-card"
                                     >
                                         <CardContent className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                                            {/* Header Tag / New Badge */}
                                             <div className="flex items-center justify-between">
                                                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase ${details.chipClass}`}>
                                                     {details.icon}
@@ -275,7 +295,6 @@ const AnnouncementsGridPage = () => {
                                                 )}
                                             </div>
 
-                                            {/* Code & Title */}
                                             <div className="space-y-1.5">
                                                 <Typography 
                                                     variant="h6" 
@@ -285,12 +304,10 @@ const AnnouncementsGridPage = () => {
                                                 </Typography>
                                             </div>
 
-                                            {/* Content excerpt */}
                                             <Typography variant="body2" className="text-muted-foreground/90 text-[13px] leading-relaxed line-clamp-3 flex-1">
                                                 {previewText}
                                             </Typography>
 
-                                            {/* Divider */}
                                             <div className="border-t border-border/50 pt-3 flex items-center justify-between text-[12px] text-muted-foreground">
                                                 <div className="flex items-center gap-1.5">
                                                     <PersonOutlineIcon sx={{ fontSize: 16 }} className="text-muted-foreground/60" />
@@ -310,7 +327,6 @@ const AnnouncementsGridPage = () => {
                         })}
                     </div>
 
-                    {/* Pagination */}
                     {totalPages > 1 && (
                         <div className="flex justify-center pt-4">
                             <Pagination 

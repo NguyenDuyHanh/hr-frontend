@@ -1,14 +1,12 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Grid, IconButton, Paper, Chip } from '@mui/material';
+import { IconButton, Paper, Chip, Grid } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import UndoIcon from '@mui/icons-material/Undo';
-import AddIcon from '@mui/icons-material/Add';
-import SearchIcon from '@mui/icons-material/Search';
 
 import Table from '../../components/ui/Table';
 import ProjectForm from './components/ProjectForm';
@@ -18,11 +16,10 @@ import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import SelectInput from '../../components/ui/SelectInput';
 import { Formik } from 'formik';
-import { toast } from 'sonner';
 import { formatDate } from '../../LocalFunction';
-import PermissionGuard from '../../components/auth/PermissionGuard';
 import { ROLES } from '../../constants/roles';
 import useAuthStore from '../../store/useAuthStore';
+import { useProjects, useDeleteProject, useCompleteProject, useUncompleteProject } from './api';
 
 const ProjectList = () => {
     const { t } = useTranslation();
@@ -38,16 +35,10 @@ const ProjectList = () => {
     const [filterOpen, setFilterOpen] = useState(false);
 
     const { 
-        projects, 
-        loadProjects, 
-        removeProject, 
-        completeProject,
-        uncompleteProject,
         page, 
         setPage, 
         pageSize, 
         setPageSize, 
-        totalElements, 
         setOpenForm, 
         openForm, 
         setSelectedProject, 
@@ -56,7 +47,19 @@ const ProjectList = () => {
         setKeyword,
         filters,
         setFilters,
+        resetStore
     } = useProjectStore();
+
+    // Query & Mutations
+    const { data: projectData, isFetching } = useProjects({
+        pageIndex: page,
+        pageSize,
+        keyword,
+        ...filters
+    });
+    const deleteProjectMutation = useDeleteProject();
+    const completeProjectMutation = useCompleteProject();
+    const uncompleteProjectMutation = useUncompleteProject();
 
     const formikRef = useRef();
     const [searchDraft, setSearchDraft] = useState(keyword || '');
@@ -66,8 +69,10 @@ const ProjectList = () => {
     }, [keyword]);
 
     useEffect(() => {
-        loadProjects();
-    }, [page, pageSize, keyword, filters]);
+        return () => {
+            resetStore();
+        };
+    }, []);
 
     const handleAdd = () => {
         setSelectedProject(null);
@@ -89,8 +94,7 @@ const ProjectList = () => {
 
     const confirmDelete = async () => {
         if (selectedProject?.id) {
-            await removeProject(selectedProject.id);
-            toast.success(t('project.delete_success', 'Xóa dự án thành công'));
+            await deleteProjectMutation.mutateAsync(selectedProject.id);
             setSelectedProject(null);
             setOpenConfirm(false);
         }
@@ -103,8 +107,7 @@ const ProjectList = () => {
 
     const confirmFinish = async () => {
         if (projectToFinish?.id) {
-            await completeProject(projectToFinish.id);
-            toast.success(t('project.finish_success', 'Đã hoàn thành dự án!'));
+            await completeProjectMutation.mutateAsync(projectToFinish.id);
             setProjectToFinish(null);
             setOpenFinishConfirm(false);
         }
@@ -117,8 +120,7 @@ const ProjectList = () => {
 
     const confirmUnfinish = async () => {
         if (projectToUnfinish?.id) {
-            await uncompleteProject(projectToUnfinish.id);
-            toast.success(t('project.unfinish_success', 'Đã bỏ đánh dấu hoàn thành dự án!'));
+            await uncompleteProjectMutation.mutateAsync(projectToUnfinish.id);
             setProjectToUnfinish(null);
             setOpenUnfinishConfirm(false);
         }
@@ -207,7 +209,6 @@ const ProjectList = () => {
             align: 'center',
             render: (rowData) => <span>{formatDate(rowData.endDate) || '---'}</span>
         },
-
         { 
             title: t('common.status', 'Trạng thái'), 
             field: 'isFinished',
@@ -285,12 +286,13 @@ const ProjectList = () => {
 
                 <Table 
                     columns={columns} 
-                    data={projects} 
-                    totalElements={totalElements}
+                    data={projectData?.content || []} 
+                    totalElements={projectData?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
+                    loading={isFetching}
                 />
             </Paper>
 

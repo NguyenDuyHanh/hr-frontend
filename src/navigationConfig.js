@@ -25,12 +25,12 @@ export const navigations = [
     auth: ALL_ROLES
   },
   {
-    name: "Bảng tin công ty",
+    name: "Thông báo công ty",
     icon: "campaign",
     auth: ALL_ROLES,
     children: [
-      { name: "Bảng tin", path: "/announcements", auth: ALL_ROLES },
-      { name: "Quản lý bảng tin", path: "/administration/announcements", auth: [ADMIN, HR_MANAGER] },
+      { name: "Thông báo", path: "/announcements", auth: ALL_ROLES },
+      { name: "Quản lý thông báo", path: "/administration/announcements", auth: [ADMIN, HR_MANAGER] },
     ]
   },
   {

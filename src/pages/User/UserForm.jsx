@@ -1,21 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Button, Box } from '@mui/material';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import TextField from '../../components/ui/TextField';
-import CheckBox from '../../components/ui/CheckBox';
 import PagingAutocomplete from '../../components/ui/PagingAutocomplete';
 import Autocomplete from '../../components/ui/Autocomplete';
 import Popup from '../../components/ui/Popup';
 import { pagingStaffs } from '../../services/StaffService';
-import useUserStore from '../../store/userStore';
+import { useAddUser, useModifyUser, useRolesQuery } from './api';
 
 const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) => {
-    const { addUser, modifyUser, roles: allRoles, loadRoles } = useUserStore();
+    const addUserMutation = useAddUser();
+    const modifyUserMutation = useModifyUser();
+    const { data: allRoles = [] } = useRolesQuery(open);
 
-    useEffect(() => {
-        loadRoles();
-    }, [loadRoles]);
+    const saving = addUserMutation.isPending || modifyUserMutation.isPending;
 
     const initialValues = useMemo(() => ({
         id: userData?.id || null,
@@ -53,9 +52,9 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                     staffId: values.staff?.id || null,
                 };
                 if (values.id) {
-                    await modifyUser(values.id, payload);
+                    await modifyUserMutation.mutateAsync(payload);
                 } else {
-                    await addUser(payload);
+                    await addUserMutation.mutateAsync(payload);
                 }
                 if (onSaveSuccess) onSaveSuccess();
             } catch (error) {
@@ -70,6 +69,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                 onClick={onClose} 
                 variant="outlined" 
                 color="inherit"
+                disabled={saving}
                 style={{ 
                     textTransform: 'none',
                     borderColor: '#d1d5db',
@@ -93,6 +93,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                     onClick={formik.handleSubmit} 
                     color="primary" 
                     variant="contained"
+                    disabled={saving}
                     style={{ 
                         textTransform: 'none',
                         height: '32px',
@@ -102,7 +103,7 @@ const UserForm = ({ open, onClose, userData, onSaveSuccess, isView = false }) =>
                         marginLeft: '8px'
                     }}
                 >
-                    Lưu lại
+                    {saving ? 'Đang lưu...' : 'Lưu lại'}
                 </Button>
             )}
         </>

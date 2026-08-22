@@ -315,6 +315,7 @@ const SalaryItemPage = () => {
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
+                    loading={loading}
                 />
             </Paper>
 

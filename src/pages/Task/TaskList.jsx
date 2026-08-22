@@ -28,6 +28,7 @@ import PermissionGuard from '../../components/auth/PermissionGuard';
 import { ROLES } from '../../constants/roles';
 import useAuthStore from '../../store/useAuthStore';
 import useProjectPermission from '../../hooks/useProjectPermission';
+import { useTasks, useDeleteTask } from './api';
 
 const TaskList = () => {
     const { t } = useTranslation();
@@ -40,14 +41,11 @@ const TaskList = () => {
     const [filterOpen, setFilterOpen] = useState(false);
 
     const {
-        tasks,
-        loadTasks,
         removeTask,
         page,
         setPage,
         pageSize,
         setPageSize,
-        totalElements,
         openForm,
         setOpenForm,
         selectedTask,
@@ -69,6 +67,14 @@ const TaskList = () => {
     } = useTaskStore();
 
     const currentProjectId = filters.projectId?.id || filters.projectId;
+    const { data: taskData, isFetching } = useTasks({
+        pageIndex: page,
+        pageSize,
+        keyword,
+        ...filters
+    });
+    const deleteTaskMutation = useDeleteTask();
+
     const { isProjectManager } = useProjectPermission(currentProjectId);
     const canManageTasks = hasRole([ROLES.ADMIN, ROLES.HR_MANAGER]) || isProjectManager;
 
@@ -99,12 +105,7 @@ const TaskList = () => {
         }
     }, [username, projectKey, assigneeKey]);
 
-    // Load tasks for table view
-    useEffect(() => {
-        if (activeTab === 0) {
-            loadTasks();
-        }
-    }, [page, pageSize, keyword, filters, activeTab]);
+
 
     // Load Kanban data when tab changes or project filter changes
     useEffect(() => {
@@ -168,8 +169,7 @@ const TaskList = () => {
 
     const confirmDelete = async () => {
         if (taskToDelete?.id) {
-            await removeTask(taskToDelete.id);
-            toast.success(t('task.delete_success', 'Xóa công việc thành công'));
+            await deleteTaskMutation.mutateAsync(taskToDelete.id);
             setTaskToDelete(null);
             setOpenConfirm(false);
         }
@@ -352,12 +352,13 @@ const TaskList = () => {
                                         <Box className="mt-4">
                                             <Table
                                                 columns={columns}
-                                                data={tasks}
-                                                totalElements={totalElements}
+                                                data={taskData?.content || []}
+                                                totalElements={taskData?.totalElements || 0}
                                                 page={page}
                                                 pageSize={pageSize}
                                                 handleChangePage={(e, p) => setPage(p)}
                                                 setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
+                                                loading={isFetching}
                                             />
                                         </Box>
                                     ) : (
@@ -416,9 +417,7 @@ const TaskList = () => {
                     taskData={selectedTask}
                     isViewMode={isViewMode}
                     onSaveSuccess={() => {
-                        if (activeTab === 0) {
-                            loadTasks();
-                        } else if (currentProjectId) {
+                        if (currentProjectId) {
                             loadKanbanData(currentProjectId);
                         }
                     }}

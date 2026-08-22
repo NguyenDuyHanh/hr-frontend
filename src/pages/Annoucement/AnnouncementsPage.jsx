@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Grid,
@@ -19,7 +19,6 @@ import InfoIcon from '@mui/icons-material/Info';
 import DownloadIcon from '@mui/icons-material/Download';
 
 import { useFormik, FormikProvider } from 'formik';
-import { toast } from 'sonner';
 
 import useAuthStore from '../../store/useAuthStore';
 import useAnnouncementStore from '../../store/useAnnouncementStore';
@@ -36,6 +35,7 @@ import Table from '../../components/ui/Table';
 import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import AnnouncementForm from './components/AnnouncementForm';
+import { useAnnouncements, useDeleteAnnouncement } from './api';
 
 const AnnouncementsPage = () => {
     const { t } = useTranslation();
@@ -44,9 +44,6 @@ const AnnouncementsPage = () => {
     const isManager = userRoles.includes(ROLES.ADMIN) || userRoles.includes(ROLES.HR_MANAGER);
 
     const {
-        announcements,
-        loading,
-        totalElements,
         page,
         setPage,
         pageSize,
@@ -57,11 +54,18 @@ const AnnouncementsPage = () => {
         setFilterCategory,
         filterStatus,
         setFilterStatus,
-        loadAnnouncements,
-        addAnnouncement,
-        modifyAnnouncement,
-        removeAnnouncement
+        resetStore
     } = useAnnouncementStore();
+
+    // Query & Mutations
+    const { data: announcementData, isFetching } = useAnnouncements({
+        pageIndex: page,
+        pageSize,
+        keyword: keyword || null,
+        category: filterCategory || null,
+        status: filterStatus || null
+    });
+    const deleteAnnouncementMutation = useDeleteAnnouncement();
 
     const { fetchUnreadCount } = useNotificationStore();
 
@@ -71,16 +75,15 @@ const AnnouncementsPage = () => {
     const [openViewDialog, setOpenViewDialog] = useState(false);
     const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
 
-    // Toolbar & Filter states
     const [searchDraft, setSearchDraft] = useState(keyword);
     const [filterOpen, setFilterOpen] = useState(false);
 
-    // Load announcements on page, search, or filter changes
     useEffect(() => {
-        loadAnnouncements();
-    }, [page, pageSize, keyword, filterCategory, filterStatus]);
+        return () => {
+            resetStore();
+        };
+    }, []);
 
-    // Options for i18n
     const categoryOptions = [
         { value: '', displayValue: t('announcement.categories.all', 'Tất cả danh mục') },
         { value: ANNOUNCEMENT_CATEGORIES.HOLIDAY, displayValue: t('announcement.categories.holiday', 'Lịch nghỉ lễ') },
@@ -95,7 +98,6 @@ const AnnouncementsPage = () => {
         { value: ANNOUNCEMENT_STATUS.PUBLISHED, displayValue: t('announcement.status.published', 'Đã ban hành') }
     ];
 
-    // Get color theme for each category
     const getCategoryDetails = (cat) => {
         switch (cat) {
             case ANNOUNCEMENT_CATEGORIES.HOLIDAY:
@@ -129,7 +131,6 @@ const AnnouncementsPage = () => {
         }
     };
 
-    // Filter Formik Setup
     const filterFormik = useFormik({
         initialValues: {
             category: filterCategory,
@@ -180,7 +181,7 @@ const AnnouncementsPage = () => {
         if (e) e.stopPropagation();
         setIsEdit(true);
         setSelectedAnn(ann);
-        setOpenViewDialog(true);
+        setOpenDialog(true);
     };
 
     const handleOpenDelete = (ann, e) => {
@@ -191,14 +192,8 @@ const AnnouncementsPage = () => {
 
     const handleConfirmDelete = async () => {
         if (selectedAnn && selectedAnn.id) {
-            try {
-                await removeAnnouncement(selectedAnn.id);
-                toast.success(t('announcement.message.delete_success', 'Xóa thông báo thành công'));
-                setOpenConfirmDelete(false);
-            } catch (err) {
-                console.error("Failed to delete:", err);
-                toast.error(t('announcement.message.delete_failed', 'Có lỗi xảy ra khi xóa thông báo'));
-            }
+            await deleteAnnouncementMutation.mutateAsync(selectedAnn.id);
+            setOpenConfirmDelete(false);
         }
     };
 
@@ -206,7 +201,6 @@ const AnnouncementsPage = () => {
         setSelectedAnn(ann);
         setOpenViewDialog(true);
         
-        // Đánh dấu đã đọc ở Notification nếu bài viết có thông báo đi kèm và chưa đọc
         if (ann.isRead === false) {
             try {
                 const storedNotis = useNotificationStore.getState().notifications;
@@ -222,7 +216,6 @@ const AnnouncementsPage = () => {
         }
     };
 
-    // Define table columns
     const columns = useMemo(() => {
         const baseColumns = [
             {
@@ -278,7 +271,6 @@ const AnnouncementsPage = () => {
         ];
 
         if (isManager) {
-            // Add status column for Managers
             baseColumns.push({
                 title: t('announcement.fields.status', 'Trạng thái'),
                 align: 'center',
@@ -296,7 +288,6 @@ const AnnouncementsPage = () => {
                 )
             });
 
-            // Prepend actions column for Managers
             baseColumns.unshift({
                 title: t('common.actions', 'Thao tác'),
                 align: 'center',
@@ -323,7 +314,6 @@ const AnnouncementsPage = () => {
 
     return (
         <div className="space-y-4 animate-fade-in">
-            {/* Table wrapper paper */}
             <Paper elevation={0} className="py-4 px-2 md:px-4 border border-border">
                 <FormikProvider value={filterFormik}>
                     <ListToolbar
@@ -376,11 +366,11 @@ const AnnouncementsPage = () => {
 
                 <Table
                     columns={columns}
-                    data={announcements}
-                    totalElements={totalElements}
+                    data={announcementData?.content || []}
+                    totalElements={announcementData?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
-                    loading={loading}
+                    loading={isFetching}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
                 />
@@ -430,7 +420,7 @@ const AnnouncementsPage = () => {
                             </div>
                             {selectedAnn.code && (
                                 <div>
-                                    {t('announcement.fields.code', 'M� th�ng b�o')}: <span className="font-mono font-bold text-primary">{selectedAnn.code}</span>
+                                    {t('announcement.fields.code', 'Mã thông báo')}: <span className="font-mono font-bold text-primary">{selectedAnn.code}</span>
                                 </div>
                             )}
                             <div>
@@ -463,7 +453,13 @@ const AnnouncementsPage = () => {
                 )}
             </Popup>
 
-            {/* Confirm Delete */}
+            <AnnouncementForm
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                isEdit={isEdit}
+                announcement={selectedAnn}
+            />
+
             <ConfirmationDialog
                 open={openConfirmDelete}
                 onConfirmDialogClose={() => setOpenConfirmDelete(false)}
