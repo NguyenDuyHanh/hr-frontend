@@ -5,6 +5,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
+import Skeleton from "@mui/material/Skeleton";
+import CircularProgress from "@mui/material/CircularProgress";
 import ChevronRight from "@mui/icons-material/ChevronRight";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import ExpandLess from "@mui/icons-material/ExpandLess";
@@ -78,9 +80,11 @@ const MobileCard = memo(({
               #{rowIndex + 1}
             </Typography>
           )}
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: (theme) => theme.palette.mode === "dark" ? "hsl(var(--foreground))" : "#333" }}>
-            {titleValue}
-          </Typography>
+          {titleValue && (!showIndex || String(titleValue).trim() !== String(rowIndex + 1)) && (
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: (theme) => theme.palette.mode === "dark" ? "hsl(var(--foreground))" : "#333" }}>
+              {titleValue}
+            </Typography>
+          )}
         </Box>
         {hasDetailPanel && (
           <IconButton 
@@ -141,8 +145,9 @@ function Table(props) {
   const [expandedRows, setExpandedRows] = useState(new Set());
 
   const {
-    data,
+    data = [],
     columns,
+    loading = false,
     totalPages: propTotalPages,
     handleChangePage,
     setRowsPerPage,
@@ -268,6 +273,89 @@ function Table(props) {
     return '-';
   }, []);
 
+  const renderDesktopSkeleton = () => {
+    const skeletonRowCount = pageSize || 5;
+    return (
+      <TableWrapper>
+        <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0 }}>
+          <thead>
+            <tr>
+              {displayColumns.map((col, idx) => (
+                <th
+                  key={idx}
+                  style={{
+                    padding: "8px",
+                    backgroundColor: "hsl(var(--muted))",
+                    border: "1px solid hsl(var(--border))",
+                    width: col.width || "auto",
+                  }}
+                >
+                  <Skeleton animation="wave" height={20} width="60%" style={{ margin: "0 auto" }} />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: skeletonRowCount }).map((_, rowIdx) => (
+              <tr key={rowIdx}>
+                {displayColumns.map((col, colIdx) => (
+                  <td key={colIdx} style={{ padding: "8px", border: "1px solid hsl(var(--border))" }}>
+                    <Skeleton
+                      animation="wave"
+                      height={20}
+                      width={colIdx === 0 ? "40%" : "75%"}
+                      style={{ margin: colIdx === 0 ? "0 auto" : "0" }}
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </TableWrapper>
+    );
+  };
+
+  const renderMobileSkeleton = () => {
+    const skeletonCount = pageSize ? Math.min(pageSize, 5) : 4;
+    return (
+      <Box sx={{ width: "100%" }}>
+        {Array.from({ length: skeletonCount }).map((_, idx) => (
+          <Box
+            key={idx}
+            sx={{
+              border: (theme) => theme.palette.mode === "dark" ? "1px solid hsl(var(--border))" : "1px solid #e0e0e0",
+              borderRadius: "8px",
+              p: 2,
+              mb: 2,
+              bgcolor: (theme) => theme.palette.mode === "dark" ? "hsl(var(--card))" : "white",
+            }}
+          >
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+              <Skeleton animation="wave" width="35%" height={24} />
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+              <Skeleton animation="wave" width="35%" height={24} />
+              <Skeleton animation="wave" width="35%" height={24} />
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+              <Skeleton animation="wave" width="35%" height={24} />
+              <Skeleton animation="wave" width="35%" height={24} />
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+              <Skeleton animation="wave" width="35%" height={24} />
+              <Skeleton animation="wave" width="35%" height={24} />
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Skeleton animation="wave" width="35%" height={24} />
+              <Skeleton animation="wave" width="35%" height={24} />
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    );
+  };
+
   const renderMobileView = () => {
     if (!data || data.length === 0) {
       return (
@@ -361,9 +449,67 @@ function Table(props) {
     </TableWrapper>
   );
 
+  const renderSpinnerLoading = () => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 240,
+        py: 6,
+        border: (theme) => theme.palette.mode === "dark" ? "1px solid hsl(var(--border))" : "1px solid #e0e0e0",
+        borderRadius: "8px",
+        bgcolor: (theme) => theme.palette.mode === "dark" ? "hsl(var(--card))" : "white",
+      }}
+    >
+      <CircularProgress size={36} color="primary" />
+    </Box>
+  );
+
+  const isDataEmpty = !data || data.length === 0;
+
   return (
     <Box sx={{ width: "100%" }}>
-      {isMobileSize ? renderMobileView() : renderDesktopView()}
+      <Box sx={{ position: "relative", width: "100%", minHeight: 180 }}>
+        {/* Desktop Spinner Overlay: Only on Desktop view when loading */}
+        {loading && !isMobileSize && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(0, 0, 0, 0.3)"
+                  : "rgba(255, 255, 255, 0.5)",
+              backdropFilter: "blur(1px)",
+              zIndex: 10,
+              borderRadius: "4px",
+            }}
+          >
+            <CircularProgress size={36} color="primary" />
+          </Box>
+        )}
+
+        <Box
+          sx={{
+            opacity: loading && !isMobileSize ? 0.8 : 1,
+            transition: "opacity 0.15s ease-in-out",
+            pointerEvents: loading && !isMobileSize ? "none" : "auto",
+          }}
+        >
+          {loading && isMobileSize ? (
+            renderMobileSkeleton()
+          ) : (
+            isMobileSize ? renderMobileView() : renderDesktopView()
+          )}
+        </Box>
+      </Box>
 
       {!nonePagination && (
         <Pagination
@@ -381,8 +527,9 @@ function Table(props) {
 }
 
 Table.propTypes = {
-    data: PropTypes.array.isRequired,
+    data: PropTypes.array,
     columns: PropTypes.array.isRequired,
+    loading: PropTypes.bool,
     selection: PropTypes.bool,
     handleSelectList: PropTypes.func,
     maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

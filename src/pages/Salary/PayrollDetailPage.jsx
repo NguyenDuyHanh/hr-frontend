@@ -487,6 +487,7 @@ const PayrollDetailPage = () => {
                                 handleChangePage={() => {}}
                                 setRowsPerPage={() => {}}
                                 nonePagination={true}
+                                loading={loading || calculating || confirming || deleting}
                             />
                         </>
                     )}

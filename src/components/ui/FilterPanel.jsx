@@ -55,7 +55,7 @@ function FilterPanel({
 
   return (
     <Collapse in={open} timeout={250} unmountOnExit className={className}>
-      <div className="mb-4 mt-4 bg-background backdrop-blur-sm shadow-sm">
+      <div className="mb-4 mt-4 bg-background">
         {/* Header */}
         {resolvedTitle && (
           <div className="flex items-center gap-2 mb-6 pb-3 border-b border-border">
@@ -72,7 +72,7 @@ function FilterPanel({
         </div>
 
         {/* Action buttons */}
-        <div className="mt-4 pt-2 border-t border-border flex flex-col sm:flex-row justify-end gap-2">
+        <div className="flex flex-col sm:flex-row justify-end gap-2">
           {/* Tìm kiếm */}
           <Button
             variant="contained"

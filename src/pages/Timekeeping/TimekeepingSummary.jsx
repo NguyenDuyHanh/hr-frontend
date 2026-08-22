@@ -14,8 +14,9 @@ import Table from '../../components/ui/Table';
 import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import Autocomplete from '../../components/ui/Autocomplete';
+import AsyncAutocomplete from '../../components/ui/AsyncAutocomplete';
 import DateTimePicker from '../../components/ui/DateTimePicker';
-import { getDepartments, getStaffs } from '../../services/StaffService';
+import { getDepartments, pagingStaffs } from '../../services/StaffService';
 import { searchTimesheets, exportTimesheetsExcel } from '../../services/timesheetService';
 import useAuthStore from '../../store/useAuthStore';
 
@@ -66,20 +67,7 @@ const TimekeepingSummary = () => {
 
     const formikRef = useRef();
 
-    // Fetch filters metadata
-    useEffect(() => {
-        const fetchRefs = async () => {
-            try {
-                const depRes = await getDepartments();
-                setDepartments(depRes?.data || []);
-                const staffRes = await getStaffs();
-                setStaffList(staffRes?.data || []);
-            } catch (err) {
-                console.error("Failed to load filter metadata:", err);
-            }
-        };
-        fetchRefs();
-    }, []);
+
 
     // Load timesheet records
     const loadData = async () => {
@@ -584,14 +572,13 @@ const TimekeepingSummary = () => {
                             >
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={6}>
-                                        <Autocomplete
+                                        <AsyncAutocomplete
                                             name="department"
                                             label={t('department.name', 'Phòng ban')}
-                                            options={departments}
+                                            api={getDepartments}
                                             getOptionLabel={(option) => option?.name || ''}
                                             onChange={(event, val) => {
                                                 setFieldValue('department', val);
-                                                // Clear selected staff if it does not belong to the selected department
                                                 if (val && values.staff && values.staff.department?.id !== val.id) {
                                                     setFieldValue('staff', null);
                                                 }
@@ -599,11 +586,12 @@ const TimekeepingSummary = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
-                                        <Autocomplete
+                                        <AsyncAutocomplete
                                             name="staff"
                                             label={t('staff.name', 'Nhân viên')}
-                                            options={displayStaffList}
-                                            getOptionLabel={(option) => option ? `${option.displayName} (${option.staffCode})` : ''}
+                                            api={pagingStaffs}
+                                            searchObject={{ pageIndex: 1, pageSize: 50 }}
+                                            getOptionLabel={(option) => option ? `${option.displayName || option.name} (${option.staffCode || ''})` : ''}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -637,6 +625,7 @@ const TimekeepingSummary = () => {
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
+                    loading={loading}
                 />
             </Paper>
         </Box>

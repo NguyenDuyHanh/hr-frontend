@@ -1,27 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Grid, Button, Box } from '@mui/material';
 import { useFormik, FormikProvider } from 'formik';
-import { toast } from 'sonner';
 
 import Popup from '../../../components/ui/Popup';
 import TextField from '../../../components/ui/TextField';
 import useRoleStore from '../../../store/roleStore';
+import { useAddRole, useModifyRole } from '../api';
 
 const RoleForm = () => {
     const {
         openForm,
         setOpenForm,
         selectedRole,
-        addRole,
-        modifyRole
     } = useRoleStore();
 
-    const [saving, setSaving] = useState(false);
+    const addRoleMutation = useAddRole();
+    const modifyRoleMutation = useModifyRole();
 
-    const formInitialValues = {
-        name: selectedRole?.name || '',
-        description: selectedRole?.description || '',
-    };
+    const saving = addRoleMutation.isPending || modifyRoleMutation.isPending;
+
+    const formik = useFormik({
+        initialValues: {
+            name: selectedRole?.name || '',
+            description: selectedRole?.description || '',
+        },
+        enableReinitialize: true,
+        onSubmit: async (values) => {
+            const payload = {
+                id: selectedRole ? selectedRole.id : null,
+                name: values.name.trim().toUpperCase(),
+                description: values.description ? values.description.trim() : ''
+            };
+
+            try {
+                if (selectedRole) {
+                    await modifyRoleMutation.mutateAsync(payload);
+                } else {
+                    await addRoleMutation.mutateAsync(payload);
+                }
+                setOpenForm(false);
+            } catch (error) {
+                console.error('Failed to save role:', error);
+            }
+        },
+    });
 
     useEffect(() => {
         if (openForm) {
@@ -33,37 +55,6 @@ const RoleForm = () => {
             });
         }
     }, [openForm, selectedRole]);
-
-    const handleSave = async (values) => {
-        const payload = {
-            id: selectedRole ? selectedRole.id : null,
-            name: values.name.trim().toUpperCase(),
-            description: values.description ? values.description.trim() : ''
-        };
-
-        try {
-            setSaving(true);
-            if (selectedRole) {
-                await modifyRole(payload);
-                toast.success('Cập nhật vai trò thành công');
-            } else {
-                await addRole(payload);
-                toast.success('Thêm vai trò mới thành công');
-            }
-        } catch (error) {
-            console.error('Failed to save role:', error);
-            const errorMsg = error.response?.data?.message || 'Lỗi khi lưu thông tin vai trò';
-            toast.error(errorMsg);
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const formik = useFormik({
-        initialValues: formInitialValues,
-        enableReinitialize: true,
-        onSubmit: handleSave,
-    });
 
     return (
         <Popup

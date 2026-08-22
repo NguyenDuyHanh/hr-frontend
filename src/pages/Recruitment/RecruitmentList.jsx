@@ -2,8 +2,7 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
-    Button, Grid, IconButton, Paper, Chip, 
-    Box, Stack
+    IconButton, Paper, Chip, Grid, Stack
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -24,22 +23,17 @@ import useAuthStore from '../../store/useAuthStore';
 import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import SelectInput from '../../components/ui/SelectInput';
-import TextField from '../../components/ui/TextField';
 import AsyncAutocomplete from '../../components/ui/AsyncAutocomplete';
+import { useRecruitments, useAddRecruitment, useDeleteRecruitment } from './api';
 
 const RecruitmentList = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const staffSearchObj = useMemo(() => ({ pageIndex: 1, pageSize: 100, extWhereClause: 'recruitment_approvers' }), []);
 
-    // Confirmation Dialog states
     const [openConfirmDeleteRecruitment, setOpenConfirmDeleteRecruitment] = useState(false);
 
-    // useRecruitmentStore Destructuring
     const {
-        recruitments,
-        loadingRecruitments,
-        totalRecruitments,
         recruitmentPage,
         setRecruitmentPage,
         recruitmentPageSize,
@@ -54,22 +48,27 @@ const RecruitmentList = () => {
         setOpenRecruitmentForm,
         recruitmentInput,
         setRecruitmentInput,
-        loadRecruitments,
-        addRecruitment,
-        removeRecruitment,
         resetStore
     } = useRecruitmentStore();
+
+    // Query & Mutations
+    const { data: recruitmentData, isFetching } = useRecruitments({
+        pageIndex: recruitmentPage,
+        pageSize: recruitmentPageSize,
+        keyword: recruitmentKeyword,
+        ...recruitmentFilters
+    });
+    const addRecruitmentMutation = useAddRecruitment();
+    const deleteRecruitmentMutation = useDeleteRecruitment();
 
     const { user } = useAuthStore();
     const userRoles = user?.role || [];
     const isRecruiterOnly = userRoles.includes(ROLES.HR_RECRUITMENT) && !userRoles.includes(ROLES.ADMIN) && !userRoles.includes(ROLES.HR_MANAGER);
 
-    // Toolbar & Filter states for Recruitments
     const recruitmentFormikRef = useRef();
     const [recruitmentSearchDraft, setRecruitmentSearchDraft] = useState(recruitmentKeyword || '');
     const [recruitmentFilterOpen, setRecruitmentFilterOpen] = useState(false);
 
-    // Sync draft with keyword from store (e.g. if reset)
     useEffect(() => {
         setRecruitmentSearchDraft(recruitmentKeyword || '');
     }, [recruitmentKeyword]);
@@ -85,15 +84,6 @@ const RecruitmentList = () => {
         };
     }, [isRecruiterOnly, user?.staffId]);
 
-    useEffect(() => {
-        // Skip initial fetch if recruiter filter is not populated yet
-        if (isRecruiterOnly && user?.staffId && !recruitmentFilters.personApproveCVId) {
-            return;
-        }
-        loadRecruitments();
-    }, [recruitmentPage, recruitmentPageSize, recruitmentKeyword, recruitmentFilters, isRecruiterOnly, user?.staffId]);
-
-    // Recruitment CRUD Handlers
     const handleAddRecruitment = async () => {
         try {
             const codeRes = await generateRecruitmentCode();
@@ -119,27 +109,17 @@ const RecruitmentList = () => {
 
     const handleConfirmDeleteRecruitment = async () => {
         if (selectedRecruitment?.id) {
-            try {
-                await removeRecruitment(selectedRecruitment.id);
-                toast.success(t("recruitment.delete_success", "Xóa tin tuyển dụng thành công"));
-                setSelectedRecruitment(null);
-                setOpenConfirmDeleteRecruitment(false);
-            } catch (err) {
-                toast.error(t("recruitment.delete_error", "Lỗi khi xóa tin tuyển dụng"));
-            }
+            await deleteRecruitmentMutation.mutateAsync(selectedRecruitment.id);
+            setSelectedRecruitment(null);
+            setOpenConfirmDeleteRecruitment(false);
         }
     };
 
     const handleSaveRecruitment = async (values) => {
-        try {
-            await addRecruitment(values);
-            toast.success(values.id ? t("recruitment.update_success", "Cập nhật tin tuyển dụng thành công") : t("recruitment.create_success", "Tạo tin tuyển dụng thành công"));
-        } catch (err) {
-            toast.error(err?.response?.data?.message || t("recruitment.save_error", "Lỗi lưu tin tuyển dụng"));
-        }
+        await addRecruitmentMutation.mutateAsync(values);
+        setOpenRecruitmentForm(false);
     };
 
-    // Recruitment Filter Handlers
     const handleRecruitmentSearch = () => {
         setRecruitmentKeyword(recruitmentSearchDraft);
     };
@@ -160,7 +140,6 @@ const RecruitmentList = () => {
         }
     };
 
-    // Recruitment Columns
     const recruitmentColumns = [
         {
             title: t('common.actions', 'Thao tác'),
@@ -204,7 +183,6 @@ const RecruitmentList = () => {
 
     return (
         <Stack spacing={3}>
-            {/* Top Section: List of Recruitments */}
             <Paper elevation={0} className="p-4 border border-border">
                 <Formik
                     innerRef={recruitmentFormikRef}
@@ -291,16 +269,16 @@ const RecruitmentList = () => {
 
                 <Table
                     columns={recruitmentColumns}
-                    data={recruitments}
-                    totalElements={totalRecruitments}
+                    data={recruitmentData?.content || []}
+                    totalElements={recruitmentData?.totalElements || 0}
                     page={recruitmentPage}
                     pageSize={recruitmentPageSize}
                     handleChangePage={(e, p) => setRecruitmentPage(p)}
                     setRowsPerPage={(e) => setRecruitmentPageSize(parseInt(e.target.value, 10))}
+                    loading={isFetching}
                 />
             </Paper>
 
-            {/* Dialog: Recruitment Add Form */}
             <RecruitmentFormDialog
                 open={openRecruitmentForm}
                 onClose={() => setOpenRecruitmentForm(false)}
@@ -308,7 +286,6 @@ const RecruitmentList = () => {
                 onSave={handleSaveRecruitment}
             />
 
-            {/* Confirmation Dialogs */}
             <ConfirmationDialog
                 open={openConfirmDeleteRecruitment}
                 onConfirmDialogClose={() => setOpenConfirmDeleteRecruitment(false)}

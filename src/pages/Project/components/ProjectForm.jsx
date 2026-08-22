@@ -2,15 +2,15 @@ import React, { useMemo } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { Grid, Button, Box } from '@mui/material';
-import useProjectStore from '../../../store/useProjectStore';
 import TextField from '../../../components/ui/TextField';
-import SelectInput from '../../../components/ui/SelectInput';
 import DateTimePicker from '../../../components/ui/DateTimePicker';
 import Popup from '../../../components/ui/Popup';
 import { format } from 'date-fns';
+import { useAddProject, useModifyProject } from '../api';
 
 const ProjectForm = ({ open, onClose, projectData, onSaveSuccess }) => {
-    const { addProject, modifyProject } = useProjectStore();
+    const addMutation = useAddProject();
+    const modifyMutation = useModifyProject();
 
     const initialValues = useMemo(() => ({
         id: projectData?.id || null,
@@ -40,10 +40,11 @@ const ProjectForm = ({ open, onClose, projectData, onSaveSuccess }) => {
             }
 
             if (values.id) {
-                await modifyProject(values.id, submitValues);
+                await modifyMutation.mutateAsync(submitValues);
             } else {
-                await addProject(submitValues);
+                await addMutation.mutateAsync(submitValues);
             }
+            onClose();
             if (onSaveSuccess) onSaveSuccess();
         },
     });
@@ -51,7 +52,15 @@ const ProjectForm = ({ open, onClose, projectData, onSaveSuccess }) => {
     const action = (
         <>
             <Button onClick={onClose} variant="outlined" color="inherit" sx={{ color: 'text.secondary', textTransform: 'none' }}>Hủy bỏ</Button>
-            <Button onClick={formik.handleSubmit} color="primary" variant="contained" sx={{ textTransform: 'none', px: 4, ml: 1 }}>Lưu lại</Button>
+            <Button 
+                onClick={formik.handleSubmit} 
+                color="primary" 
+                variant="contained" 
+                sx={{ textTransform: 'none', px: 4, ml: 1 }}
+                disabled={addMutation.isPending || modifyMutation.isPending}
+            >
+                Lưu lại
+            </Button>
         </>
     );
 

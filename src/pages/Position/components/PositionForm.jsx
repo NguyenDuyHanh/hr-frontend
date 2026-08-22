@@ -1,70 +1,57 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Grid, Button, Box } from '@mui/material';
 import { useFormik, FormikProvider } from 'formik';
-import { toast } from 'sonner';
 
 import Popup from '../../../components/ui/Popup';
 import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
 import usePositionStore from '../../../store/positionStore';
-import { getAllDepartments } from '../../../services/departmentService';
-import { generatePositionCode } from '../../../services/positionService';
+import { useAddPosition, useModifyPosition, usePositionCode, useAllDepartmentsQuery } from '../api';
 
 const PositionForm = () => {
     const {
         openForm,
         setOpenForm,
         selectedPosition,
-        addPosition,
-        modifyPosition
     } = usePositionStore();
 
-    const [saving, setSaving] = useState(false);
-    const [autoCode, setAutoCode] = useState('');
-    const [departments, setDepartments] = useState([]);
+    const addPositionMutation = useAddPosition();
+    const modifyPositionMutation = useModifyPosition();
+    const { data: autoCode } = usePositionCode(openForm, selectedPosition);
+    const { data: departments = [] } = useAllDepartmentsQuery(openForm);
 
-    // Fetch departments for select dropdown
-    useEffect(() => {
-        const fetchDepts = async () => {
-            if (openForm) {
-                try {
-                    const response = await getAllDepartments();
-                    if (response && response.data) {
-                        setDepartments(response.data || []);
-                    }
-                } catch (error) {
-                    console.error('Failed to load departments list for dropdown:', error);
+    const saving = addPositionMutation.isPending || modifyPositionMutation.isPending;
+
+    const formik = useFormik({
+        initialValues: {
+            name: selectedPosition?.name || '',
+            code: selectedPosition?.code || autoCode || '',
+            departmentId: selectedPosition?.departmentId || '',
+            description: selectedPosition?.description || '',
+        },
+        enableReinitialize: true,
+        onSubmit: async (values) => {
+            const payload = {
+                id: selectedPosition ? selectedPosition.id : null,
+                name: values.name.trim(),
+                code: values.code.toUpperCase().trim(),
+                departmentId: values.departmentId || null,
+                description: values.description ? values.description.trim() : ''
+            };
+
+            try {
+                if (selectedPosition) {
+                    await modifyPositionMutation.mutateAsync(payload);
+                } else {
+                    await addPositionMutation.mutateAsync(payload);
                 }
+                setOpenForm(false);
+            } catch (error) {
+                console.error('Failed to save position:', error);
             }
-        };
-        fetchDepts();
-    }, [openForm]);
+        },
+    });
 
-    // Fetch auto-generated code for new position
-    useEffect(() => {
-        const fetchCode = async () => {
-            if (openForm && !selectedPosition) {
-                try {
-                    const codeRes = await generatePositionCode();
-                    if (codeRes && codeRes.data) {
-                        setAutoCode(codeRes.data);
-                    }
-                } catch (e) {
-                    console.error("Failed to generate position code", e);
-                }
-            }
-        };
-        fetchCode();
-    }, [openForm, selectedPosition]);
-
-    const formInitialValues = {
-        name: selectedPosition?.name || '',
-        code: selectedPosition?.code || autoCode || '',
-        departmentId: selectedPosition?.departmentId || '',
-        description: selectedPosition?.description || '',
-    };
-
-    // Update formik when autoCode is fetched or selectedPosition changes
     useEffect(() => {
         if (openForm) {
             formik.resetForm({
@@ -77,39 +64,6 @@ const PositionForm = () => {
             });
         }
     }, [openForm, selectedPosition, autoCode]);
-
-    const handleSave = async (values) => {
-        const payload = {
-            id: selectedPosition ? selectedPosition.id : null,
-            name: values.name.trim(),
-            code: values.code.toUpperCase().trim(),
-            departmentId: values.departmentId || null,
-            description: values.description ? values.description.trim() : ''
-        };
-
-        try {
-            setSaving(true);
-            if (selectedPosition) {
-                await modifyPosition(payload);
-                toast.success('Cập nhật vị trí thành công');
-            } else {
-                await addPosition(payload);
-                toast.success('Thêm vị trí mới thành công');
-            }
-        } catch (error) {
-            console.error('Failed to save position:', error);
-            const errorMsg = error.response?.data?.message || 'Lỗi khi lưu thông tin vị trí';
-            toast.error(errorMsg);
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const formik = useFormik({
-        initialValues: formInitialValues,
-        enableReinitialize: true,
-        onSubmit: handleSave,
-    });
 
     const deptOptions = useMemo(() => {
         return departments.map(d => ({

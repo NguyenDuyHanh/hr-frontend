@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { Paper, Button, IconButton, Chip } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Paper, IconButton, Chip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -13,21 +12,18 @@ import ListToolbar from '../../components/ui/ListToolbar';
 import LeaveRequestForm from './components/LeaveRequestForm';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import { formatDate } from '../../LocalFunction';
+import { useLeaveRequests, useDeleteLeaveRequest } from './api';
 
 const MyLeaveRequests = () => {
     const { t } = useTranslation();
     const { user } = useAuthStore();
     const {
-        requests,
-        loading,
         page,
         pageSize,
-        totalElements,
         setPage,
         setPageSize,
         setFilters,
-        loadRequests,
-        removeLeaveRequest,
+        filters,
         setSelectedRequest,
         selectedRequest,
         openForm,
@@ -37,29 +33,29 @@ const MyLeaveRequests = () => {
         resetStore
     } = useLeaveStore();
 
+    // Query & Mutation
+    const { data: leaveData, isFetching } = useLeaveRequests({
+        pageIndex: page,
+        pageSize,
+        keyword,
+        ...filters
+    });
+    const deleteMutation = useDeleteLeaveRequest();
+
     const [openConfirm, setOpenConfirm] = useState(false);
     const [searchDraft, setSearchDraft] = useState(keyword || '');
 
-    // Reset store state on unmount
     useEffect(() => {
         return () => {
             resetStore();
         };
-    }, [resetStore]);
+    }, []);
 
-    // Set staffId filter to display only current employee's requests
     useEffect(() => {
         if (user?.staffId) {
             setFilters({ staffId: user.staffId });
         }
-    }, [user, setFilters]);
-
-    // Load requests when page/filters change
-    useEffect(() => {
-        if (user?.staffId) {
-            loadRequests();
-        }
-    }, [page, pageSize, keyword, loadRequests, user]);
+    }, [user]);
 
     const handleAdd = () => {
         setSelectedRequest(null);
@@ -78,14 +74,9 @@ const MyLeaveRequests = () => {
 
     const confirmDelete = async () => {
         if (selectedRequest?.id) {
-            try {
-                await removeLeaveRequest(selectedRequest.id);
-                toast.success(t('leave.message.deleteSuccess', 'Hủy đơn nghỉ phép thành công'));
-                setOpenConfirm(false);
-                setSelectedRequest(null);
-            } catch (error) {
-                toast.error(error.response?.data?.message || t('leave.message.deleteError', 'Lỗi khi hủy đơn'));
-            }
+            await deleteMutation.mutateAsync(selectedRequest.id);
+            setOpenConfirm(false);
+            setSelectedRequest(null);
         }
     };
 
@@ -205,13 +196,13 @@ const MyLeaveRequests = () => {
 
                 <Table
                     columns={columns}
-                    data={requests}
-                    totalElements={totalElements}
+                    data={leaveData?.content || []}
+                    totalElements={leaveData?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
-                    loading={loading}
+                    loading={isFetching}
                 />
             </Paper>
 

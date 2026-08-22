@@ -1,12 +1,7 @@
 import { create } from 'zustand';
-import { pagingRecruitments, saveRecruitment, deleteRecruitment } from '../services/recruitmentService';
-import { pagingCandidates, saveCandidate, deleteCandidate, updateCandidateStatus } from '../services/candidateService';
 
-const useRecruitmentStore = create((set, get) => ({
+const useRecruitmentStore = create((set) => ({
     // Recruitment states
-    recruitments: [],
-    loadingRecruitments: false,
-    totalRecruitments: 0,
     recruitmentPage: 1,
     recruitmentPageSize: 10,
     recruitmentKeyword: '',
@@ -18,9 +13,6 @@ const useRecruitmentStore = create((set, get) => ({
     },
 
     // Candidate states
-    candidates: [],
-    loadingCandidates: false,
-    totalCandidates: 0,
     candidatePage: 1,
     candidatePageSize: 10,
     candidateKeyword: '',
@@ -51,9 +43,6 @@ const useRecruitmentStore = create((set, get) => ({
     setCandidateInput: (input) => set({ candidateInput: input }),
 
     resetStore: () => set({
-        recruitments: [],
-        loadingRecruitments: false,
-        totalRecruitments: 0,
         recruitmentPage: 1,
         recruitmentPageSize: 10,
         recruitmentKeyword: '',
@@ -63,9 +52,6 @@ const useRecruitmentStore = create((set, get) => ({
         recruitmentInput: {
             id: null, code: '', name: '', description: '', status: 1, personApproveCVId: '', personApproveCVName: ''
         },
-        candidates: [],
-        loadingCandidates: false,
-        totalCandidates: 0,
         candidatePage: 1,
         candidatePageSize: 10,
         candidateKeyword: '',
@@ -78,105 +64,6 @@ const useRecruitmentStore = create((set, get) => ({
             avatarUrl: '', cvFileUrl: '', status: 'SCREENING', recruitmentId: '', departmentId: '', positionId: '', note: ''
         }
     }),
-
-    loadRecruitments: async () => {
-        set({ loadingRecruitments: true });
-        try {
-            const { recruitmentPage, recruitmentPageSize, recruitmentKeyword, recruitmentFilters } = get();
-            const res = await pagingRecruitments({
-                pageIndex: recruitmentPage,
-                pageSize: recruitmentPageSize,
-                keyword: recruitmentKeyword,
-                ...recruitmentFilters
-            });
-            set({
-                recruitments: res?.data?.content || [],
-                totalRecruitments: res?.data?.totalElements || 0,
-                loadingRecruitments: false
-            });
-        } catch (err) {
-            console.error("Lỗi tải danh sách tin tuyển dụng:", err);
-            set({ loadingRecruitments: false });
-        }
-    },
-
-    loadCandidates: async () => {
-        const { selectedRecruitment, candidatePage, candidatePageSize, candidateKeyword, candidateFilters } = get();
-        if (!selectedRecruitment?.id) {
-            set({ candidates: [], totalCandidates: 0 });
-            return;
-        }
-        set({ loadingCandidates: true });
-        try {
-            const res = await pagingCandidates({
-                pageIndex: candidatePage,
-                pageSize: candidatePageSize,
-                keyword: candidateKeyword,
-                recruitmentId: selectedRecruitment.id,
-                ...candidateFilters
-            });
-            set({
-                candidates: res?.data?.content || [],
-                totalCandidates: res?.data?.totalElements || 0,
-                loadingCandidates: false
-            });
-        } catch (err) {
-            console.error("Lỗi tải danh sách ứng viên:", err);
-            set({ loadingCandidates: false });
-        }
-    },
-
-    addRecruitment: async (values) => {
-        try {
-            await saveRecruitment(values);
-            get().loadRecruitments();
-            set({ openRecruitmentForm: false });
-        } catch (err) {
-            console.error("Error saving recruitment:", err);
-            throw err;
-        }
-    },
-
-    removeRecruitment: async (id) => {
-        try {
-            await deleteRecruitment(id);
-            get().loadRecruitments();
-        } catch (err) {
-            console.error("Error removing recruitment:", err);
-            throw err;
-        }
-    },
-
-    addCandidate: async (values) => {
-        try {
-            await saveCandidate(values);
-            get().loadCandidates();
-            set({ openCandidateForm: false });
-        } catch (err) {
-            console.error("Error saving candidate:", err);
-            throw err;
-        }
-    },
-
-    removeCandidate: async (id) => {
-        try {
-            await deleteCandidate(id);
-            get().loadCandidates();
-        } catch (err) {
-            console.error("Error removing candidate:", err);
-            throw err;
-        }
-    },
-
-    changeCandidateStatus: async (candidateId, status, reason) => {
-        try {
-            await updateCandidateStatus(candidateId, status, reason);
-            get().loadCandidates();
-        } catch (err) {
-            console.error("Error changing candidate status:", err);
-            throw err;
-        }
-    }
 }));
 
 export default useRecruitmentStore;

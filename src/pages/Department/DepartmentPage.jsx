@@ -11,7 +11,6 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import { toast } from 'sonner';
 
 import Table from '../../components/ui/Table';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
@@ -19,14 +18,11 @@ import ListToolbar from '../../components/ui/ListToolbar';
 import Popup from '../../components/ui/Popup';
 import DepartmentForm from './components/DepartmentForm';
 import useDepartmentStore from '../../store/departmentStore';
-import { pagingPositions } from '../../services/positionService';
+import { useDepartments, useDeleteDepartment, useDepartmentPositions } from './api';
 
 const DepartmentPage = () => {
     const { t } = useTranslation();
     const {
-        departments,
-        loading,
-        totalElements,
         page,
         pageSize,
         keyword,
@@ -36,10 +32,16 @@ const DepartmentPage = () => {
         setOpenForm,
         selectedDepartment,
         setSelectedDepartment,
-        loadDepartments,
-        removeDepartment,
         resetStore
     } = useDepartmentStore();
+
+    // Query departments
+    const { data: deptData, isFetching: isDeptFetching } = useDepartments({
+        pageIndex: page,
+        pageSize,
+        keyword
+    });
+    const deleteDepartmentMutation = useDeleteDepartment();
 
     // Toolbar search draft
     const [searchDraft, setSearchDraft] = useState(keyword || '');
@@ -49,19 +51,19 @@ const DepartmentPage = () => {
 
     // Position detail list dialog state
     const [openPositionsDialog, setOpenPositionsDialog] = useState(false);
-    const [positionsList, setPositionsList] = useState([]);
-    const [positionsLoading, setPositionsLoading] = useState(false);
     const [positionsPage, setPositionsPage] = useState(1);
     const [positionsPageSize, setPositionsPageSize] = useState(5);
-    const [positionsTotalElements, setPositionsTotalElements] = useState(0);
+
+    // Query positions belonging to selected department
+    const { data: positionsData, isFetching: isPositionsFetching } = useDepartmentPositions(
+        selectedDepartment?.id,
+        { pageIndex: positionsPage, pageSize: positionsPageSize },
+        openPositionsDialog
+    );
 
     useEffect(() => {
         setSearchDraft(keyword || '');
     }, [keyword]);
-
-    useEffect(() => {
-        loadDepartments();
-    }, [page, pageSize, keyword]);
 
     useEffect(() => {
         return () => {
@@ -95,52 +97,15 @@ const DepartmentPage = () => {
 
     const handleConfirmDelete = async () => {
         if (selectedDepartment && selectedDepartment.id) {
-            try {
-                await removeDepartment(selectedDepartment.id);
-                toast.success(t('department.delete_success', 'Xóa phòng ban thành công'));
-                setOpenConfirm(false);
-                setSelectedDepartment(null);
-            } catch (error) {
-                console.error('Failed to delete department:', error);
-                const errorMsg = error.response?.data?.message || t('common.error_occurred', 'Không thể xóa phòng ban này. Vui lòng thử lại sau.');
-                toast.error(errorMsg);
-            }
+            await deleteDepartmentMutation.mutateAsync(selectedDepartment.id);
+            setOpenConfirm(false);
+            setSelectedDepartment(null);
         }
     };
-
-    // Load Positions belonging to selected department
-    const loadPositionsForDepartment = async (dept) => {
-        try {
-            setPositionsLoading(true);
-            const searchDto = {
-                pageIndex: positionsPage,
-                pageSize: positionsPageSize,
-                departmentId: dept.id
-            };
-            const response = await pagingPositions(searchDto);
-            if (response && response.data) {
-                setPositionsList(response.data.content || []);
-                setPositionsTotalElements(response.data.totalElements || 0);
-            }
-        } catch (error) {
-            console.error('Failed to load positions for department:', error);
-            toast.error(t('department.load_positions_error', 'Không thể tải danh sách vị trí thuộc phòng ban'));
-        } finally {
-            setPositionsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        if (openPositionsDialog && selectedDepartment) {
-            loadPositionsForDepartment(selectedDepartment);
-        }
-    }, [openPositionsDialog, selectedDepartment, positionsPage, positionsPageSize]);
 
     const handleOpenPositionsList = (item) => {
         setSelectedDepartment(item);
         setPositionsPage(1);
-        setPositionsList([]);
-        setPositionsTotalElements(0);
         setOpenPositionsDialog(true);
     };
 
@@ -195,13 +160,13 @@ const DepartmentPage = () => {
 
                 <Table 
                     columns={columns} 
-                    data={departments} 
-                    totalElements={totalElements}
+                    data={deptData?.content || []} 
+                    totalElements={deptData?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
-                    isLoading={loading}
+                    loading={isDeptFetching}
                 />
             </Paper>
 
@@ -234,7 +199,7 @@ const DepartmentPage = () => {
                     </Button>
                 }
             >
-                {positionsList.length === 0 && !positionsLoading ? (
+                {(positionsData?.content || []).length === 0 && !isPositionsFetching ? (
                     <Box py={4} textAlign="center">
                         <Typography color="textSecondary" italic>
                             {t('department.empty_positions', 'Không có vị trí/chức danh nào thuộc phòng ban này.')}
@@ -243,13 +208,13 @@ const DepartmentPage = () => {
                 ) : (
                     <Table
                         columns={positionColumns}
-                        data={positionsList}
-                        totalElements={positionsTotalElements}
+                        data={positionsData?.content || []}
+                        totalElements={positionsData?.totalElements || 0}
                         page={positionsPage}
                         pageSize={positionsPageSize}
                         handleChangePage={(e, p) => setPositionsPage(p)}
                         setRowsPerPage={(e) => setPositionsPageSize(parseInt(e.target.value, 10))}
-                        isLoading={positionsLoading}
+                        loading={isPositionsFetching}
                     />
                 )}
             </Popup>

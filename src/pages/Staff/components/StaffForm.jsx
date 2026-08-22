@@ -2,18 +2,18 @@ import React, { useMemo, useEffect } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { Box, Button } from '@mui/material';
-import useStaffStore from '../../../store/staffStore';
+import { useAddStaff, useModifyStaff, useStaffCode } from '../api';
 import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
 import DateTimePicker from '../../../components/ui/DateTimePicker';
 import Popup from '../../../components/ui/Popup';
 import { WorkingStatusOptions } from '../../../constants';
-import { generateStaffCode } from '../../../services/StaffService';
 import { format } from 'date-fns';
-import { toast } from 'sonner';
 
 const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
-    const { addStaff, modifyStaff } = useStaffStore();
+    const addStaffMutation = useAddStaff();
+    const modifyStaffMutation = useModifyStaff();
+    const { data: generatedCode } = useStaffCode(open, staffData);
 
     const initialValues = useMemo(() => ({
         id: staffData?.id || null,
@@ -44,11 +44,12 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
 
             try {
                 if (values.id) {
-                    await modifyStaff(values.id, submitValues);
+                    await modifyStaffMutation.mutateAsync(submitValues);
                 } else {
-                    await addStaff(submitValues);
+                    await addStaffMutation.mutateAsync(submitValues);
                 }
                 if (onSaveSuccess) onSaveSuccess();
+                onClose();
             } catch (error) {
                 if (error?.response?.data?.message?.includes('Email')) {
                     setErrors({ email: 'Email đã tồn tại trong hệ thống' });
@@ -58,19 +59,10 @@ const StaffForm = ({ open, onClose, staffData, onSaveSuccess }) => {
     });
     
     useEffect(() => {
-        if (open && !staffData) {
-            const fetchCode = async () => {
-                try {
-                    const response = await generateStaffCode();
-                    const code = response?.data || '';
-                    formik.setFieldValue('staffCode', code);
-                } catch (error) {
-                    console.error("Failed to generate staff code", error);
-                }
-            };
-            fetchCode();
+        if (open && !staffData && generatedCode) {
+            formik.setFieldValue('staffCode', generatedCode);
         }
-    }, [open, staffData]);
+    }, [open, staffData, generatedCode]);
 
     const action = (
         <>

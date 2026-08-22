@@ -5,8 +5,8 @@ import {
     Chip, Avatar, Tooltip
 } from '@mui/material';
 import { 
-    CheckCircle, Cancel, Visibility, Search, CheckCircleOutline,
-    Close, Image, VideocamOff, FilterList, SettingsBackupRestore
+    CheckCircle, Cancel, Visibility,
+    SettingsBackupRestore, VideocamOff
 } from '@mui/icons-material';
 import { Formik } from 'formik';
 import dayjs from 'dayjs';
@@ -16,13 +16,14 @@ import Table from '../../components/ui/Table';
 import ListToolbar from '../../components/ui/ListToolbar';
 import FilterPanel from '../../components/ui/FilterPanel';
 import Autocomplete from '../../components/ui/Autocomplete';
+import AsyncAutocomplete from '../../components/ui/AsyncAutocomplete';
 import useTimesheetStore from '../../store/useTimesheetStore';
-import { getDepartments, getStaffs } from '../../services/StaffService';
-import { getLabelFromOptions } from '../../LocalFunction';
+import { getDepartments, pagingStaffs } from '../../services/StaffService';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import TextField from '../../components/ui/TextField';
 import DateTimePicker from '../../components/ui/DateTimePicker';
 import Popup from '../../components/ui/Popup';
+import { useTimesheets, useApproveTimesheet, useRawLogs } from './api';
 
 const TIMESHEET_STATUS_OPTIONS = [
     { id: 'SUBMITTED', name: 'Chờ duyệt' },
@@ -30,7 +31,6 @@ const TIMESHEET_STATUS_OPTIONS = [
     { id: 'REJECTED', name: 'Từ chối' }
 ];
 
-// Helper to format shift time (removing seconds, e.g. "08:00:00" -> "08:00")
 const formatShiftTime = (timeStr) => {
     if (!timeStr) return '';
     return timeStr.length >= 5 ? timeStr.substring(0, 5) : timeStr;
@@ -39,62 +39,42 @@ const formatShiftTime = (timeStr) => {
 const TimesheetApprovalList = () => {
     const { t } = useTranslation();
     const {
-        timesheets,
-        loading,
         page,
         setPage,
         pageSize,
         setPageSize,
-        totalElements,
         filters,
         setFilters,
         resetFilters,
-        loadTimesheets,
-        updateTimesheetStatus,
-        rawLogs,
-        loadRawLogs
     } = useTimesheetStore();
+
+    // Query & Mutation
+    const { data: timesheetData, isFetching } = useTimesheets({
+        pageIndex: page,
+        pageSize,
+        ...filters
+    });
+    const approveTimesheetMutation = useApproveTimesheet();
 
     // Dialog state for Approval / Rejection
     const [approvalOpen, setApprovalOpen] = useState(false);
     const [selectedTimesheet, setSelectedTimesheet] = useState(null);
     const [approvalStatus, setApprovalStatus] = useState('APPROVED');
-    const [submitting, setSubmitting] = useState(false);
 
     // Dialog state for raw logs details
     const [detailOpen, setDetailOpen] = useState(false);
     const [detailTimesheet, setDetailTimesheet] = useState(null);
 
+    const { data: rawLogs = [] } = useRawLogs(
+        detailTimesheet?.staffId,
+        detailTimesheet?.workingDate
+    );
 
-
-    // Filter metadata
-    const [departments, setDepartments] = useState([]);
-    const [staffList, setStaffList] = useState([]);
     const [filterOpen, setFilterOpen] = useState(false);
     const [searchDraft, setSearchDraft] = useState('');
 
     const formikRef = useRef();
     const formikRefPopup = useRef();
-
-    // Fetch filters metadata
-    useEffect(() => {
-        const fetchRefs = async () => {
-            try {
-                const depRes = await getDepartments();
-                setDepartments(depRes?.data || []);
-                const staffRes = await getStaffs();
-                setStaffList(staffRes?.data || []);
-            } catch (err) {
-                console.error("Failed to load filter metadata:", err);
-            }
-        };
-        fetchRefs();
-    }, []);
-
-    // Load timesheets when parameters change
-    useEffect(() => {
-        loadTimesheets();
-    }, [page, pageSize, filters]);
 
     // Handlers
     const handleOpenApproval = (timesheet, status) => {
@@ -105,29 +85,22 @@ const TimesheetApprovalList = () => {
 
     const handleConfirmApproval = async (note) => {
         if (!selectedTimesheet) return;
-        setSubmitting(true);
         try {
-            await updateTimesheetStatus(selectedTimesheet.id, approvalStatus, note);
-            let statusText = t('timekeeping.status.submitted', 'Chờ duyệt');
-            if (approvalStatus === 'APPROVED') statusText = t('timekeeping.status.approved', 'Đã duyệt');
-            else if (approvalStatus === 'REJECTED') statusText = t('timekeeping.status.rejected', 'Từ chối');
-            toast.success(t('timekeeping.approval.update_success', 'Đã cập nhật trạng thái ngày công sang: {{status}}', { status: statusText }));
+            await approveTimesheetMutation.mutateAsync({
+                id: selectedTimesheet.id,
+                status: approvalStatus,
+                note
+            });
             setApprovalOpen(false);
             setSelectedTimesheet(null);
         } catch (err) {
             console.error(err);
-            toast.error(t('timekeeping.approval.update_error', 'Có lỗi xảy ra khi cập nhật trạng thái ngày công'));
-        } finally {
-            setSubmitting(false);
         }
     };
 
-    const handleOpenDetails = async (timesheet) => {
+    const handleOpenDetails = (timesheet) => {
         setDetailTimesheet(timesheet);
         setDetailOpen(true);
-        if (timesheet.staffId) {
-            await loadRawLogs(timesheet.staffId, timesheet.workingDate);
-        }
     };
 
     const handleApplyFilters = () => {
@@ -140,7 +113,6 @@ const TimesheetApprovalList = () => {
         formikRef.current?.resetForm();
     };
 
-    // Auto-calculating active filters count
     const activeFilterCount = useMemo(() => {
         let count = 0;
         if (filters.departmentId) count++;
@@ -151,20 +123,10 @@ const TimesheetApprovalList = () => {
         return count;
     }, [filters]);
 
-    // Initial values for Autocompletes
-    const initialDepartment = useMemo(() => {
-        return departments.find(d => d.id === filters.departmentId) || null;
-    }, [departments, filters.departmentId]);
-
-    const initialStaff = useMemo(() => {
-        return staffList.find(s => s.id === filters.staffId) || null;
-    }, [staffList, filters.staffId]);
-
     const initialStatus = useMemo(() => {
         return TIMESHEET_STATUS_OPTIONS.find(s => s.id === filters.status) || null;
     }, [filters.status]);
 
-    // Table Columns
     const columns = [
         {
             title: t('common.actions', 'Thao tác'),
@@ -324,8 +286,8 @@ const TimesheetApprovalList = () => {
                 <Formik
                     innerRef={formikRef}
                     initialValues={{
-                        department: initialDepartment,
-                        staff: initialStaff,
+                        department: filters.department || null,
+                        staff: filters.staff || null,
                         status: initialStatus,
                         fromDate: filters.fromDate ? new Date(filters.fromDate) : null,
                         toDate: filters.toDate ? new Date(filters.toDate) : null
@@ -341,9 +303,8 @@ const TimesheetApprovalList = () => {
                         });
                     }}
                 >
-                    {({ values, setFieldValue }) => (
+                    {() => (
                         <>
-                            {/* Toolbar and filter toggle */}
                             <ListToolbar
                                 searchDraft={searchDraft}
                                 onSearchDraftChange={setSearchDraft}
@@ -358,7 +319,6 @@ const TimesheetApprovalList = () => {
                                 }}
                             />
 
-                            {/* Filters drawer panel */}
                             <FilterPanel
                                 open={filterOpen}
                                 onOpenChange={setFilterOpen}
@@ -367,19 +327,20 @@ const TimesheetApprovalList = () => {
                             >
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={4}>
-                                        <Autocomplete
+                                        <AsyncAutocomplete
                                             name="department"
                                             label={t('department.name', 'Phòng ban')}
-                                            options={departments}
+                                            api={getDepartments}
                                             getOptionLabel={(option) => option?.name || ''}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={4}>
-                                        <Autocomplete
+                                        <AsyncAutocomplete
                                             name="staff"
                                             label={t('staff.name', 'Nhân viên')}
-                                            options={staffList}
-                                            getOptionLabel={(option) => option ? `${option.displayName} (${option.staffCode})` : ''}
+                                            api={pagingStaffs}
+                                            searchObject={{ pageIndex: 1, pageSize: 50 }}
+                                            getOptionLabel={(option) => option ? `${option.displayName || option.name} (${option.staffCode || ''})` : ''}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={4}>
@@ -413,17 +374,16 @@ const TimesheetApprovalList = () => {
                 {/* Table */}
                 <Table 
                     columns={columns}
-                    data={timesheets}
-                    totalElements={totalElements}
+                    data={timesheetData?.content || []}
+                    totalElements={timesheetData?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
-                    loading={loading}
+                    loading={isFetching}
                 />
             </Paper>
 
-            {/* Approval / Rejection Note Dialog using shared ConfirmationDialog component */}
             <ConfirmationDialog
                 open={approvalOpen}
                 onConfirmDialogClose={() => setApprovalOpen(false)}
@@ -439,7 +399,7 @@ const TimesheetApprovalList = () => {
                 onYesClick={() => {
                     formikRefPopup.current?.handleSubmit();
                 }}
-                disabled={submitting}
+                disabled={approveTimesheetMutation.isPending}
                 text={t('timekeeping.approval.confirm_text', 'Bạn đang {{action}} cho nhân viên {{name}} ({{code}}) ngày {{date}}.', { 
                     action: approvalStatus === 'APPROVED' 
                         ? t('timekeeping.approval.action_approve', 'duyệt chấm công') 
@@ -477,7 +437,6 @@ const TimesheetApprovalList = () => {
                 )}
             </ConfirmationDialog>
 
-            {/* Detailed logs view */}
             <Popup
                 open={detailOpen}
                 onClosePopup={() => setDetailOpen(false)}
@@ -497,7 +456,6 @@ const TimesheetApprovalList = () => {
                 {detailTimesheet && (() => {
                     let minCheckIn = null;
                     let maxCheckOut = null;
-                    let totalHours = 0;
                     const details = detailTimesheet.details || [];
                     
                     details.forEach(d => {
@@ -511,12 +469,6 @@ const TimesheetApprovalList = () => {
                             const co = dayjs(d.checkOutTime);
                             if (!maxCheckOut || co.isAfter(maxCheckOut)) {
                                 maxCheckOut = co;
-                            }
-                        }
-                        if (d.checkInTime && d.checkOutTime) {
-                            const diff = dayjs(d.checkOutTime).diff(dayjs(d.checkInTime), 'hour', true);
-                            if (diff > 0) {
-                                totalHours += diff;
                             }
                         }
                     });
@@ -565,7 +517,6 @@ const TimesheetApprovalList = () => {
 
                     return (
                         <Box className="space-y-4 pt-1 pb-1">
-                            {/* Stats */}
                             <Box className="grid grid-cols-3 gap-3">
                                 <Box className="bg-muted p-2.5 rounded-xl text-center border border-border">
                                     <Typography variant="caption" className="text-muted-foreground">{t('timekeeping.detail.check_in', 'Giờ vào')}</Typography>
@@ -605,7 +556,6 @@ const TimesheetApprovalList = () => {
                                 </Box>
                             </Box>
 
-                            {/* Shift detail details */}
                             {details.map((d, index) => d.shift && (
                                 <Box key={index} className="bg-blue-50 dark:bg-blue-950/20 p-3.5 rounded-xl border border-blue-100 dark:border-blue-900/50 text-xs">
                                     <Typography className="font-bold text-blue-800 dark:text-blue-300">
@@ -620,7 +570,6 @@ const TimesheetApprovalList = () => {
                                 </Box>
                             ))}
 
-                            {/* Raw Logs with Snapshot Photos */}
                             <Box className="space-y-2 mt-4">
                                 <Typography variant="subtitle2" className="font-bold text-foreground">
                                     {t('timekeeping.detail.logs_title', 'Lịch sử chấm công')}
@@ -684,7 +633,6 @@ const TimesheetApprovalList = () => {
                     );
                 })()}
             </Popup>
-
         </Box>
     );
 };

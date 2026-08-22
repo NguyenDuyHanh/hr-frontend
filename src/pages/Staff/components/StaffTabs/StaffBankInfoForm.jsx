@@ -2,12 +2,12 @@ import React, { useMemo } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { Grid, Button, Box, Paper } from '@mui/material';
-import useStaffStore from '../../../../store/staffStore';
+import { useModifyStaff } from '../../api';
 import TextField from '../../../../components/ui/TextField';
 import TabAccordion from '../../../../components/ui/Tab/TabAccordion';
 
 const StaffBankInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
-    const { modifyStaff } = useStaffStore();
+    const modifyStaffMutation = useModifyStaff();
 
     const initialValues = useMemo(() => ({
         bankName: staffData?.bankName || '',
@@ -31,7 +31,7 @@ const StaffBankInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
                 ...values
             };
 
-            await modifyStaff(staffData.id, submitValues);
+            await modifyStaffMutation.mutateAsync(submitValues);
             if (onSaveSuccess) {
                 onSaveSuccess();
             }

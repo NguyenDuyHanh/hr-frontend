@@ -7,7 +7,6 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { toast } from 'sonner';
 import { useFormik, FormikProvider } from 'formik';
 
 import Table from '../../components/ui/Table';
@@ -18,13 +17,10 @@ import SelectInput from '../../components/ui/SelectInput';
 import PositionForm from './components/PositionForm';
 import { getActiveFilterCount } from '../../LocalFunction';
 import usePositionStore from '../../store/positionStore';
-import { getAllDepartments } from '../../services/departmentService';
+import { usePositions, useDeletePosition, useAllDepartmentsQuery } from './api';
 
 const PositionPage = () => {
     const {
-        positions,
-        loading,
-        totalElements,
         page,
         pageSize,
         keyword,
@@ -36,12 +32,19 @@ const PositionPage = () => {
         setOpenForm,
         selectedPosition,
         setSelectedPosition,
-        loadPositions,
-        removePosition,
         resetStore
     } = usePositionStore();
 
-    const [departments, setDepartments] = useState([]);
+    // Queries & Mutations
+    const { data: posData, isFetching } = usePositions({
+        pageIndex: page,
+        pageSize,
+        keyword,
+        ...filters
+    });
+    const deletePositionMutation = useDeletePosition();
+    const { data: departments = [] } = useAllDepartmentsQuery();
+
     const [filterOpen, setFilterOpen] = useState(false);
     const [searchDraft, setSearchDraft] = useState(keyword || '');
 
@@ -60,28 +63,9 @@ const PositionPage = () => {
         });
     }, [filters.departmentId]);
 
-    const loadDepts = async () => {
-        try {
-            const response = await getAllDepartments();
-            if (response && response.data) {
-                setDepartments(response.data || []);
-            }
-        } catch (error) {
-            console.error('Failed to load departments list for filter dropdown:', error);
-        }
-    };
-
-    useEffect(() => {
-        loadDepts();
-    }, []);
-
     useEffect(() => {
         setSearchDraft(keyword || '');
     }, [keyword]);
-
-    useEffect(() => {
-        loadPositions();
-    }, [page, pageSize, keyword, filters]);
 
     useEffect(() => {
         return () => {
@@ -128,16 +112,9 @@ const PositionPage = () => {
 
     const handleConfirmDelete = async () => {
         if (selectedPosition && selectedPosition.id) {
-            try {
-                await removePosition(selectedPosition.id);
-                toast.success('Xóa vị trí thành công');
-                setOpenConfirm(false);
-                setSelectedPosition(null);
-            } catch (error) {
-                console.error('Failed to delete position:', error);
-                const errorMsg = error.response?.data?.message || 'Không thể xóa vị trí này. Vui lòng thử lại sau.';
-                toast.error(errorMsg);
-            }
+            await deletePositionMutation.mutateAsync(selectedPosition.id);
+            setOpenConfirm(false);
+            setSelectedPosition(null);
         }
     };
 
@@ -215,13 +192,13 @@ const PositionPage = () => {
 
                 <Table 
                     columns={columns} 
-                    data={positions} 
-                    totalElements={totalElements}
+                    data={posData?.content || []} 
+                    totalElements={posData?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
-                    isLoading={loading}
+                    loading={isFetching}
                 />
             </Paper>
 

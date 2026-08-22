@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import { Grid, Button, Box, Typography } from '@mui/material';
-import useStaffStore from '../../../../store/staffStore';
+import { useAddStaff, useModifyStaff } from '../../api';
 import TextField from '../../../../components/ui/TextField';
 import SelectInput from '../../../../components/ui/SelectInput';
 import DateTimePicker from '../../../../components/ui/DateTimePicker';
@@ -18,7 +18,8 @@ import { format } from 'date-fns';
 import { getLeaveBalance } from '../../../../services/leaveService';
 
 const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
-    const { addStaff, modifyStaff } = useStaffStore();
+    const addStaffMutation = useAddStaff();
+    const modifyStaffMutation = useModifyStaff();
     const [departments, setDepartments] = useState([]);
     const [positions, setPositions] = useState([]);
 
@@ -114,9 +115,9 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
             });
 
             if (values.id) {
-                await modifyStaff(values.id, submitValues);
+                await modifyStaffMutation.mutateAsync(submitValues);
             } else {
-                await addStaff(submitValues);
+                await addStaffMutation.mutateAsync(submitValues);
             }
             if (onSaveSuccess) onSaveSuccess();
         },

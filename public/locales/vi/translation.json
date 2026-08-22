@@ -289,6 +289,8 @@
   },
   "menu": {
     "Trang chủ": "Trang chủ",
+    "Bảng tin công ty": "Bảng tin công ty",
+    "Bảng tin": "Bảng tin",
     "Dashboard": "Dashboard",
     "Cơ cấu tổ chức": "Cơ cấu tổ chức",
     "Phòng ban": "Phòng ban",
@@ -315,8 +317,56 @@
     "Công việc & Dự án": "Công việc & Dự án",
     "Công việc": "Công việc",
     "Dự án": "Dự án",
+    "Quản lý bảng tin": "Quản lý bảng tin",
     "Quản trị": "Quản trị",
     "Tài khoản": "Tài khoản",
     "Vai trò": "Vai trò"
+  },
+  "announcement": {
+    "title": "Bảng tin & Sự kiện công ty",
+    "desc": "Xem các thông báo mới nhất, lịch nghỉ lễ và các sự kiện đang diễn ra trong doanh nghiệp.",
+    "add_btn": "Ban hành thông báo",
+    "edit_btn": "Cập nhật thông báo",
+    "create_title": "Ban hành thông báo mới",
+    "edit_title": "Cập nhật thông báo",
+    "delete_title": "Xác nhận xóa thông báo",
+    "delete_confirm": "Bạn có chắc chắn muốn xóa thông báo \"{{title}}\"? Hành động này không thể hoàn tác.",
+    "fields": {
+      "code": "Mã thông báo",
+      "code_auto": "Hệ thống tự sinh",
+      "title": "Tiêu đề thông báo",
+      "category": "Phân loại danh mục",
+      "status": "Trạng thái",
+      "targetDept": "Phòng ban nhận tin (Để trống gửi toàn công ty)",
+      "attachments": "Đính kèm (URL file quy định, PDF...)",
+      "content": "Nội dung chi tiết thông báo",
+      "createdBy": "Người đăng",
+      "publishDate": "Ngày đăng"
+    },
+    "categories": {
+      "all": "Tất cả danh mục",
+      "holiday": "Lịch nghỉ lễ",
+      "event": "Sự kiện",
+      "policy": "Chính sách",
+      "general": "Thông báo chung"
+    },
+    "status": {
+      "all": "Tất cả trạng thái",
+      "draft": "Bản nháp",
+      "published": "Đã ban hành"
+    },
+    "upload_btn": "Tải lên hình ảnh hoặc tài liệu",
+    "message": {
+      "save_success": "Lưu thông báo thành công",
+      "save_failed": "Lưu thông báo thất bại",
+      "delete_success": "Xóa thông báo thành công",
+      "delete_failed": "Có lỗi xảy ra khi xóa thông báo",
+      "required_title": "Tiêu đề không được để trống",
+      "required_category": "Phân loại danh mục là bắt buộc",
+      "required_content": "Nội dung thông báo là bắt buộc",
+      "file_too_large": "Dung lượng file tối đa là 10MB",
+      "upload_success": "Tải tệp đính kèm lên thành công!",
+      "upload_failed": "Lỗi khi tải tệp lên."
+    }
   }
 }

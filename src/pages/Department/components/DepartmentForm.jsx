@@ -1,46 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Grid, Button, Box } from '@mui/material';
 import { useFormik, FormikProvider } from 'formik';
-import { toast } from 'sonner';
 
 import Popup from '../../../components/ui/Popup';
 import TextField from '../../../components/ui/TextField';
 import useDepartmentStore from '../../../store/departmentStore';
-import { generateDepartmentCode } from '../../../services/departmentService';
+import { useAddDepartment, useModifyDepartment, useDepartmentCode } from '../api';
 
 const DepartmentForm = () => {
     const {
         openForm,
         setOpenForm,
         selectedDepartment,
-        addDepartment,
-        modifyDepartment
     } = useDepartmentStore();
 
-    const [saving, setSaving] = useState(false);
-    const [autoCode, setAutoCode] = useState('');
+    const addDepartmentMutation = useAddDepartment();
+    const modifyDepartmentMutation = useModifyDepartment();
+    const { data: autoCode } = useDepartmentCode(openForm, selectedDepartment);
 
-    useEffect(() => {
-        const fetchCode = async () => {
-            if (openForm && !selectedDepartment) {
-                try {
-                    const codeRes = await generateDepartmentCode();
-                    if (codeRes && codeRes.data) {
-                        setAutoCode(codeRes.data);
-                    }
-                } catch (e) {
-                    console.error("Failed to generate department code", e);
+    const saving = addDepartmentMutation.isPending || modifyDepartmentMutation.isPending;
+
+    const formik = useFormik({
+        initialValues: {
+            name: selectedDepartment?.name || '',
+            code: selectedDepartment?.code || autoCode || '',
+            description: selectedDepartment?.description || '',
+        },
+        enableReinitialize: true,
+        onSubmit: async (values) => {
+            const payload = {
+                id: selectedDepartment ? selectedDepartment.id : null,
+                name: values.name.trim(),
+                code: values.code.toUpperCase().trim(),
+                description: values.description ? values.description.trim() : ''
+            };
+
+            try {
+                if (selectedDepartment) {
+                    await modifyDepartmentMutation.mutateAsync(payload);
+                } else {
+                    await addDepartmentMutation.mutateAsync(payload);
                 }
+                setOpenForm(false);
+            } catch (error) {
+                console.error('Failed to save department:', error);
             }
-        };
-        fetchCode();
-    }, [openForm, selectedDepartment]);
-
-    const formInitialValues = {
-        name: selectedDepartment?.name || '',
-        code: selectedDepartment?.code || autoCode || '',
-        description: selectedDepartment?.description || '',
-    };
+        },
+    });
 
     useEffect(() => {
         if (openForm) {
@@ -53,38 +59,6 @@ const DepartmentForm = () => {
             });
         }
     }, [openForm, selectedDepartment, autoCode]);
-
-    const handleSave = async (values) => {
-        const payload = {
-            id: selectedDepartment ? selectedDepartment.id : null,
-            name: values.name.trim(),
-            code: values.code.toUpperCase().trim(),
-            description: values.description ? values.description.trim() : ''
-        };
-
-        try {
-            setSaving(true);
-            if (selectedDepartment) {
-                await modifyDepartment(payload);
-                toast.success('Cập nhật phòng ban thành công');
-            } else {
-                await addDepartment(payload);
-                toast.success('Thêm phòng ban mới thành công');
-            }
-        } catch (error) {
-            console.error('Failed to save department:', error);
-            const errorMsg = error.response?.data?.message || 'Lỗi khi lưu thông tin phòng ban';
-            toast.error(errorMsg);
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const formik = useFormik({
-        initialValues: formInitialValues,
-        enableReinitialize: true,
-        onSubmit: handleSave,
-    });
 
     return (
         <Popup

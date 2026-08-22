@@ -7,20 +7,17 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { toast } from 'sonner';
 
 import Table from '../../components/ui/Table';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import ListToolbar from '../../components/ui/ListToolbar';
 import RoleForm from './components/RoleForm';
 import useRoleStore from '../../store/roleStore';
+import { useRoles, useDeleteRole } from './api';
 
 const RolePage = () => {
     const { t } = useTranslation();
     const {
-        roles,
-        loading,
-        totalElements,
         page,
         pageSize,
         keyword,
@@ -30,10 +27,16 @@ const RolePage = () => {
         setOpenForm,
         selectedRole,
         setSelectedRole,
-        loadRoles,
-        removeRole,
         resetStore
     } = useRoleStore();
+
+    // Query & Mutation
+    const { data: roleData, isFetching } = useRoles({
+        pageIndex: page,
+        pageSize,
+        keyword
+    });
+    const deleteRoleMutation = useDeleteRole();
 
     // Toolbar search draft
     const [searchDraft, setSearchDraft] = useState(keyword || '');
@@ -44,10 +47,6 @@ const RolePage = () => {
     useEffect(() => {
         setSearchDraft(keyword || '');
     }, [keyword]);
-
-    useEffect(() => {
-        loadRoles();
-    }, [page, pageSize, keyword]);
 
     useEffect(() => {
         return () => {
@@ -81,16 +80,9 @@ const RolePage = () => {
 
     const handleConfirmDelete = async () => {
         if (selectedRole && selectedRole.id) {
-            try {
-                await removeRole(selectedRole.id);
-                toast.success(t('role.delete_success', 'Xóa vai trò thành công'));
-                setOpenConfirm(false);
-                setSelectedRole(null);
-            } catch (error) {
-                console.error('Failed to delete role:', error);
-                const errorMsg = error.response?.data?.message || t('role.delete_error_fallback', 'Không thể xóa vai trò này. Vui lòng thử lại sau.');
-                toast.error(errorMsg);
-            }
+            await deleteRoleMutation.mutateAsync(selectedRole.id);
+            setOpenConfirm(false);
+            setSelectedRole(null);
         }
     };
 
@@ -133,13 +125,13 @@ const RolePage = () => {
 
                 <Table 
                     columns={columns} 
-                    data={roles} 
-                    totalElements={totalElements}
+                    data={roleData?.content || []} 
+                    totalElements={roleData?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}
                     setRowsPerPage={(e) => setPageSize(parseInt(e.target.value, 10))}
-                    isLoading={loading}
+                    loading={isFetching}
                 />
             </Paper>
 

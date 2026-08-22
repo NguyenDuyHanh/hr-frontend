@@ -11,8 +11,8 @@ import {
 import dayjs from 'dayjs';
 
 import useAuthStore from '../../store/useAuthStore';
-import useTimesheetStore from '../../store/useTimesheetStore';
 import Popup from '../../components/ui/Popup';
+import { useMyTimesheets, useRawLogs } from '../Timesheet/api';
 
 const TimekeepingCalendar = () => {
     const { t } = useTranslation();
@@ -33,16 +33,17 @@ const TimekeepingCalendar = () => {
         }
     };
 
-    const { 
-        myTimesheets, loading: tsLoading, loadMyTimesheets, 
-        rawLogs, loadRawLogs 
-    } = useTimesheetStore();
-
     // Local states
     const [currentDate, setCurrentDate] = useState(dayjs());
     const [selectedDayRecord, setSelectedDayRecord] = useState(null);
     const [detailDialogOpen, setDetailDialogOpen] = useState(false);
     const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'table'
+
+    const fromDate = currentDate.startOf('month').format('YYYY-MM-DD');
+    const toDate = currentDate.endOf('month').format('YYYY-MM-DD');
+
+    const { data: myTimesheets = [], isFetching: tsLoading } = useMyTimesheets(staffId, fromDate, toDate);
+    const { data: rawLogs = [] } = useRawLogs(staffId, selectedDayRecord?.workingDate);
 
     // Helper to format shift time (removing seconds, e.g. "08:00:00" -> "08:00")
     const formatShiftTime = (timeStr) => {
@@ -50,14 +51,7 @@ const TimekeepingCalendar = () => {
         return timeStr.length >= 5 ? timeStr.substring(0, 5) : timeStr;
     };
 
-    // Load monthly timesheets when month or staffId changes
-    useEffect(() => {
-        if (staffId) {
-            const startOfMonth = currentDate.startOf('month').format('YYYY-MM-DD');
-            const endOfMonth = currentDate.endOf('month').format('YYYY-MM-DD');
-            loadMyTimesheets(staffId, startOfMonth, endOfMonth);
-        }
-    }, [staffId, currentDate, loadMyTimesheets]);
+
 
     // Calculate monthly summary statistics from myTimesheets
     const monthlySummary = useMemo(() => {
@@ -158,21 +152,15 @@ const TimekeepingCalendar = () => {
         }
     };
 
-    const handleDayClick = async (cell) => {
+    const handleDayClick = (cell) => {
         if (!cell.dateStr) return;
         
-        // Show current local cached record first so it opens instantly
         const initialRecord = getTimesheetForDate(cell.dateStr) || { 
             workingDate: cell.dateStr,
             isNew: true 
         };
         setSelectedDayRecord(initialRecord);
         setDetailDialogOpen(true);
-
-        if (staffId) {
-            // Fetch raw records for this day (needed for the logs view list)
-            await loadRawLogs(staffId, cell.dateStr);
-        }
     };
 
     const calendarCells = generateCalendarDays();

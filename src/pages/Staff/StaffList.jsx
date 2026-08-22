@@ -17,6 +17,7 @@ import StaffForm from './components/StaffForm';
 import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
 import useStaffStore from '../../store/staffStore';
 import useAuthStore from '../../store/useAuthStore';
+import { useStaffs, useDeleteStaff } from './api';
 import { ROLES } from '../../constants/roles';
 import { WorkingStatusOptions, GenderOptions } from '../../constants';
 import { getLabelFromOptions, getActiveFilterCount, formatDate } from '../../LocalFunction';
@@ -53,14 +54,10 @@ const StaffList = () => {
     const [filterOpen, setFilterOpen] = useState(false);
 
     const { 
-        staffs, 
-        loadStaffs, 
-        removeStaff, 
         page, 
         setPage, 
         pageSize, 
         setPageSize, 
-        totalElements, 
         setOpenForm, 
         openForm, 
         setSelectedStaff, 
@@ -70,6 +67,9 @@ const StaffList = () => {
         filters,
         setFilters,
     } = useStaffStore();
+
+    const { data, isFetching } = useStaffs({ pageIndex: page, pageSize, keyword, ...filters });
+    const deleteStaffMutation = useDeleteStaff();
 
     const formikRef = useRef();
     const [searchDraft, setSearchDraft] = useState(keyword || '');
@@ -94,10 +94,6 @@ const StaffList = () => {
         setSearchDraft(keyword || '');
     }, [keyword]);
 
-    useEffect(() => {
-        loadStaffs();
-    }, [page, pageSize, keyword, filters]);
-
     const handleAdd = () => {
         setSelectedStaff(null);
         setOpenForm(true);
@@ -118,7 +114,7 @@ const StaffList = () => {
 
     const confirmDelete = async () => {
         if (selectedStaff?.id) {
-            await removeStaff(selectedStaff.id);
+            await deleteStaffMutation.mutateAsync(selectedStaff.id);
             setSelectedStaff(null);
             setOpenConfirm(false);
         }
@@ -195,15 +191,22 @@ const StaffList = () => {
         { 
             title: t('common.actions', 'Thao tác'), 
             field: 'actions',
-            width: 140,
+            align: 'center',
+            width: 110,
             render: (rowData) => (
-                <div className="flex items-center space-x-0">
-                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleView(rowData)}><VisibilityIcon fontSize="small" /></IconButton>
+                <div className="flex items-center justify-center space-x-1">
+                    <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleView(rowData)}>
+                        <VisibilityIcon fontSize="small" />
+                    </IconButton>
                     {canManage && (
-                        <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)}><EditIcon fontSize="small" /></IconButton>
+                        <IconButton size="small" sx={{ color: '#1976d2' }} onClick={() => handleEdit(rowData)}>
+                            <EditIcon fontSize="small" />
+                        </IconButton>
                     )}
                     {canDelete && (
-                        <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)}><DeleteIcon fontSize="small" /></IconButton>
+                        <IconButton size="small" sx={{ color: '#d32f2f' }} onClick={() => handleDelete(rowData)}>
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
                     )}
                 </div>
             )
@@ -211,53 +214,69 @@ const StaffList = () => {
         { 
             title: t('staff.code', 'Mã nhân viên'), 
             field: 'staffCode', 
-            width: 130,
+            width: 120,
         },
         { 
-            title: t('staff.staff', 'Nhân viên'), 
+            title: t('staff.fullName', 'Họ và tên'), 
             field: 'displayName',
-            width: 250,
-            render: (rowData) => (
-                <div className="py-1">
-                    <div className="font-bold leading-tight whitespace-nowrap">{rowData.displayName}</div>
-                    <div className="mt-1 whitespace-nowrap">{t('staff.birthdate', 'Ngày sinh')}: {formatDate(rowData.birthDate) || '---'}</div>
-                    <div className="whitespace-nowrap">{t('staff.start_date', 'Ngày vào làm')}: {formatDate(rowData.startDate) || '---'}</div>
-                    <div>{t('staff.gender', 'Giới tính')}: {t('staff.gender_value.' + rowData.gender, getLabelFromOptions(GenderOptions, rowData.gender) || '---')}</div>
-                </div>
-            )
+            width: 160,
+            render: (rowData) => <span className="font-bold">{rowData.displayName || '---'}</span>
         },
         { 
-            title: t('staff.contact', 'Thông tin liên hệ'), 
-            width: 250,
-            render: (rowData) => (
-                <div className="py-1">
-                    <div>{t('staff.phone', 'SĐT')}: {rowData.phoneNumber || '---'}</div>
-                    <div className="truncate max-w-[230px]">{t('staff.email', 'Email')}: {rowData.email || '---'}</div>
-                </div>
-            )
+            title: t('staff.birthdate', 'Ngày sinh'), 
+            field: 'birthDate',
+            align: 'center',
+            width: 120,
+            render: (rowData) => formatDate(rowData.birthDate) || '---'
         },
         { 
-            title: t('staff.status', 'Trạng thái nhân viên'), 
+            title: t('staff.start_date', 'Ngày vào làm'), 
+            field: 'startDate',
+            align: 'center',
+            width: 120,
+            render: (rowData) => formatDate(rowData.startDate) || '---'
+        },
+        { 
+            title: t('staff.gender', 'Giới tính'), 
+            field: 'gender',
+            align: 'center',
+            width: 100,
+            render: (rowData) => t('staff.gender_value.' + rowData.gender, getLabelFromOptions(GenderOptions, rowData.gender) || '---')
+        },
+        { 
+            title: t('staff.phone', 'SĐT'), 
+            field: 'phoneNumber',
+            width: 130,
+            render: (rowData) => rowData.phoneNumber || '---'
+        },
+        { 
+            title: t('staff.email', 'Email'), 
+            field: 'email',
+            width: 190,
+            render: (rowData) => rowData.email || '---'
+        },
+        { 
+            title: t('staff.department', 'Phòng ban'), 
+            field: 'departmentName',
+            width: 160,
+            render: (rowData) => rowData.departmentName || '---' 
+        },
+        { 
+            title: t('staff.position', 'Vị trí'), 
+            field: 'positionName',
+            width: 160,
+            render: (rowData) => rowData.positionName || '---' 
+        },
+        { 
+            title: t('staff.status', 'Trạng thái'), 
             field: 'workingStatus',
             align: 'center',
-            width: 150,
+            width: 140,
             render: (rowData) => (
                 <span>
                     {t('staff.status_value.' + rowData.workingStatus, getLabelFromOptions(WorkingStatusOptions, rowData.workingStatus))}
                 </span>
             )
-        },
-        { 
-            title: t('staff.department', 'Phòng ban'), 
-            align: 'center',
-            width: 180,
-            render: (rowData) => <span className="whitespace-nowrap">{rowData.departmentName || '---'}</span> 
-        },
-        { 
-            title: t('staff.position', 'Vị trí'), 
-            width: 180,
-            align: 'center',
-            render: (rowData) => <span className="whitespace-nowrap">{rowData.positionName || '---'}</span> 
         },
     ];
 
@@ -362,8 +381,9 @@ const StaffList = () => {
                 {/* Table */}
                 <Table 
                     columns={columns} 
-                    data={staffs} 
-                    totalElements={totalElements}
+                    data={data?.content || []} 
+                    loading={isFetching}
+                    totalElements={data?.totalElements || 0}
                     page={page}
                     pageSize={pageSize}
                     handleChangePage={(e, p) => setPage(p)}

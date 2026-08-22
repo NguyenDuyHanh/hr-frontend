@@ -19,7 +19,7 @@ import PagingAutocomplete from '@/components/ui/PagingAutocomplete';
 import WebcamCapture from '@/pages/Timekeeping/components/WebcamCapture';
 
 import useAuthStore from '@/store/useAuthStore';
-import useTimesheetStore from '@/store/useTimesheetStore';
+import { useCheckInOut } from '@/pages/Timesheet/api';
 import useShiftWorkStore from '@/store/useShiftWorkStore';
 import { uploadImage } from '@/services/CloudinaryService';
 import { getTimesheetByStaffAndRange } from '@/services/timesheetService';
@@ -30,7 +30,7 @@ const QuickTimekeeping = ({ open, onClose }) => {
   const { user } = useAuthStore();
   const hasRole = useAuthStore((state) => state.hasRole);
   const isManagerOrAdmin = hasRole(['ROLE_ADMIN', 'HR_MANAGER', 'HR_TIMEKEEPING_MANAGER']);
-  const { checkInOut, loadMyTimesheets } = useTimesheetStore();
+  const checkInOutMutation = useCheckInOut();
   const { allShifts, loadAllShifts } = useShiftWorkStore();
 
   const [time, setTime] = useState(dayjs());
@@ -155,17 +155,7 @@ const QuickTimekeeping = ({ open, onClose }) => {
           shiftId: values.shiftId || null
         };
 
-        await checkInOut(checkInOutDto);
-        toast.success(`Chấm công ${values.recordType === 'CHECK_IN' ? 'Vào ca' : 'Ra ca'} thành công!`);
-        
-        if (selectedStaffId) {
-          const startOfMonth = dayjs(values.recordTime).startOf('month').format('YYYY-MM-DD');
-          const endOfMonth = dayjs(values.recordTime).endOf('month').format('YYYY-MM-DD');
-          loadMyTimesheets(selectedStaffId, startOfMonth, endOfMonth).catch(err => 
-            console.error("Failed to refresh monthly timesheets after check-in/out:", err)
-          );
-        }
-        
+        await checkInOutMutation.mutateAsync(checkInOutDto);
         handleClose();
       } catch (err) {
         console.error('Quick check in out submit error:', err);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
-import { Box, Paper, Typography, IconButton, Tooltip, Button } from '@mui/material';
+import { Box, Paper, Typography, IconButton, Tooltip, Button, Skeleton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import TaskCard from './TaskCard';
 import useTaskStore from '../../../store/useTaskStore';

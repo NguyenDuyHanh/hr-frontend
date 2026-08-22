@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { toast } from 'sonner';
-import useUiStore from '../store/uiStore';
 import useAuthStore from '../store/useAuthStore';
 import ConstantList from '../appConfig';
 import { navigateTo } from '../navigation';
@@ -12,7 +11,6 @@ const HttpService = axios.create({
 
 HttpService.interceptors.request.use(
     (config) => {
-        useUiStore.getState().startLoading();
         const token = useAuthStore.getState().accessToken;
         
         // Don't send Authorization header for login and refresh endpoints
@@ -28,7 +26,6 @@ HttpService.interceptors.request.use(
         return config;
     },
     (error) => {
-        useUiStore.getState().stopLoading();
         return Promise.reject(error);
     }
 );
@@ -67,11 +64,9 @@ const processQueue = (error, token = null) => {
 
 HttpService.interceptors.response.use(
     (response) => {
-        useUiStore.getState().stopLoading();
         return response;
     },
     async (error) => {
-        useUiStore.getState().stopLoading();
         const originalRequest = error.config;
 
         // Xử lý 403 Forbidden — không có quyền truy cập
