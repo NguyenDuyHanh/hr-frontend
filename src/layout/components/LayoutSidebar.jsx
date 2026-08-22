@@ -24,6 +24,7 @@ import TokenIcon from "@mui/icons-material/Token";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import EventIcon from "@mui/icons-material/Event";
+import CampaignIcon from "@mui/icons-material/Campaign";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Tooltip from "@mui/material/Tooltip";
@@ -52,6 +53,7 @@ const IconMapper = memo(({ iconName, ...props }) => {
     bookmark: BookmarkIcon,
     list_alt: ListAltIcon,
     event: EventIcon,
+    campaign: CampaignIcon,
   };
   const IconComponent = icons[iconName];
   return IconComponent ? <IconComponent {...props} /> : null;
@@ -283,19 +285,19 @@ const LayoutSidebar = () => {
     return navigations
       .filter((item) => !item.auth || item.auth.some((r) => userRoles.includes(r)))
       .map((item) => {
-        // Nếu có con, tạo bản sao và lọc các con của bản sao đó
         if (item.children) {
+          const children = item.children.filter((child) => !child.auth || child.auth.some((r) => userRoles.includes(r)));
           return {
             ...item,
-            children: item.children.filter((child) => !child.auth || child.auth.some((r) => userRoles.includes(r))),
+            children
           };
         }
         return item;
       })
-      // Chỉ giữ lại các menu cha có con (nếu ban đầu có con) hoặc menu đơn lẻ
+      // Chỉ giữ lại các menu cha có con (nếu ban đầu có con và chưa bị làm phẳng) hoặc menu đơn lẻ
       .filter((item) => {
         const originalItem = navigations.find(n => n.name === item.name);
-        if (originalItem?.children && item.children?.length === 0) return false;
+        if (originalItem?.children && item.children !== null && item.children?.length === 0) return false;
         return true;
       });
   }, [user?.role]);

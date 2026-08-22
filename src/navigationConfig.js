@@ -13,16 +13,25 @@ const ALL_ROLES = Object.values(ROLES);
 
 export const navigations = [
   {
+    name: "Dashboard",
+    path: "/dashboard",
+    icon: "assessment",
+    auth: [ADMIN]
+  },
+  {
     name: "Trang chủ",
     path: "/home",
     icon: "home",
     auth: ALL_ROLES
   },
   {
-    name: "Dashboard",
-    path: "/dashboard",
-    icon: "assessment",
-    auth: [ADMIN]
+    name: "Bảng tin công ty",
+    icon: "campaign",
+    auth: ALL_ROLES,
+    children: [
+      { name: "Bảng tin", path: "/announcements", auth: ALL_ROLES },
+      { name: "Quản lý bảng tin", path: "/administration/announcements", auth: [ADMIN, HR_MANAGER] },
+    ]
   },
   {
     name: "Cơ cấu tổ chức",

@@ -42,6 +42,8 @@ import DashboardPage from "./pages/Dashboard/DashboardPage";
 import HomePage from "./pages/Home/HomePage";
 import HolidayPage from "./pages/Holiday/HolidayPage";
 import RolePage from "./pages/Role/RolePage";
+import AnnouncementsPage from "./pages/Annoucement/AnnouncementsPage";
+import AnnouncementsGridPage from "./pages/Annoucement/AnnouncementsGridPage";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -133,6 +135,8 @@ function App() {
   // Map các component đặc biệt
   const componentMap = {
     "/home": <HomePage />,
+    "/announcements": <AnnouncementsGridPage />,
+    "/administration/announcements": <AnnouncementsPage />,
     "/dashboard": <DashboardPage />,
     "/staff/all": <StaffList />,
 
