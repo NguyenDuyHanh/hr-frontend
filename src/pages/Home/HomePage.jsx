@@ -85,7 +85,7 @@ const HomePage = () => {
                 <WavingHandIcon className="text-[24px]" />
               </span>
               <span className="text-sm font-semibold tracking-wide text-primary uppercase">
-                {t("home.portal_title", "Cổng thông tin HRM Hub")}
+                {t("home.portal_title", "Cổng thông tin HRM")}
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">

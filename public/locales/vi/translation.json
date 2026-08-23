@@ -186,7 +186,7 @@
     }
   },
   "home": {
-    "portal_title": "Cổng thông tin HRM Hub",
+    "portal_title": "Cổng thông tin HRM",
     "greeting": "Xin chào, {{name}}!",
     "greeting_default": "Thành viên",
     "welcome_message": "Chào mừng bạn đến với hệ thống quản lý nhân sự hiện đại. Chúc bạn có một ngày làm việc hiệu quả và nhiều niềm vui!",

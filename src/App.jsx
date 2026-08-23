@@ -272,7 +272,7 @@ function App() {
           <Route path="*" element={<RootRedirect />} />
         </Route>
       </Routes>
-      <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
+      {/* <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }

@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useCallback, memo } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -12,7 +9,6 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SecurityIcon from "@mui/icons-material/Security";
 import PersonIcon from "@mui/icons-material/Person";
 import WorkIcon from "@mui/icons-material/Work";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
@@ -25,12 +21,20 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import EventIcon from "@mui/icons-material/Event";
 import CampaignIcon from "@mui/icons-material/Campaign";
-import IconButton from "@mui/material/IconButton";
+import SearchIcon from "@mui/icons-material/Search";
+import AppsIcon from "@mui/icons-material/Apps";
+import LogoutIcon from "@mui/icons-material/Logout";
 import CloseIcon from "@mui/icons-material/Close";
+import ViewSidebarIcon from "@mui/icons-material/ViewSidebar";
+import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
+
+
 import { navigations } from "@/navigationConfig";
 import useAuthStore from "@/store/useAuthStore";
 import useSidebarStore from "@/store/sidebarStore";
+import useMenuFilterStore from "@/store/useMenuFilterStore";
+import ConfirmationDialog from "@/components/ui/ConfirmationDialog";
 
 const IconMapper = memo(({ iconName, ...props }) => {
   const icons = {
@@ -55,332 +59,285 @@ const IconMapper = memo(({ iconName, ...props }) => {
     event: EventIcon,
     campaign: CampaignIcon,
   };
-  const IconComponent = icons[iconName];
-  return IconComponent ? <IconComponent {...props} /> : null;
-});
-
-const SubSidebarItem = memo(({ child }) => {
-  const { t } = useTranslation();
-  const location = useLocation();
-  const hasActiveSubChild = child.children?.some(c => 
-    c.path && location.pathname.startsWith(c.path)
-  );
-  
-  const [isOpen, setIsOpen] = useState(() => hasActiveSubChild);
-
-  useEffect(() => {
-    if (hasActiveSubChild) {
-      setIsOpen(true);
-    }
-  }, [hasActiveSubChild]);
-
-  return (
-    <li>
-      <div
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border ${
-          hasActiveSubChild 
-            ? "bg-sidebar-accent/60 text-sidebar-accent-foreground" 
-            : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
-        }`}
-      >
-        <span>{t('menu.' + child.name, child.name)}</span>
-        <ExpandMoreIcon 
-          sx={{ 
-            fontSize: "18px", 
-            color: "currentColor", 
-            transition: "transform 0.2s",
-            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)"
-          }} 
-        />
-      </div>
-      {isOpen && (
-        <ul className="list-none p-0 m-0 bg-sidebar">
-          {child.children.map((subChild, sIdx) => (
-            <li key={sIdx}>
-              <NavLink
-                to={subChild.path}
-                className={({ isActive }) =>
-                  `flex items-center pl-16 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border/50 no-underline 
-                  ${isActive 
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                    : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/30 hover:text-sidebar-accent-foreground"}`
-                }
-              >
-                {t('menu.' + subChild.name, subChild.name)}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      )}
-    </li>
-  );
-});
-
-const SidebarItem = memo(({ item, expanded, onToggle, isCollapsed, onExpandSidebar }) => {
-  const { t } = useTranslation();
-  const location = useLocation();
-  const isExpanded = expanded === item.name;
-  
-  // Kiểm tra xem có con nào đang active không
-  const hasActiveChild = item.children?.some(child => {
-    if (child.children && child.children.length > 0) {
-      return child.children.some(c => c.path && location.pathname.startsWith(c.path));
-    }
-    return child.path && location.pathname.startsWith(child.path);
-  });
-
-  if (isCollapsed) {
-    const itemContent = item.children && item.children.length > 0 ? (
-      <div
-        onClick={onExpandSidebar}
-        className={`flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border ${
-          hasActiveChild 
-            ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
-            : "text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
-        }`}
-      >
-        <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
-      </div>
-    ) : item.external ? (
-      <a
-        href={item.path}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="no-underline block w-full"
-      >
-        <div
-          className="flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
-        >
-          <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
-        </div>
-      </a>
-    ) : (
-      <NavLink
-        to={item.path}
-        className="no-underline block w-full"
-      >
-        {({ isActive }) => (
-          <div
-            className={`flex items-center justify-center py-[12px] cursor-pointer border-b border-sidebar-border ${
-              isActive 
-                ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
-                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
-            }`}
-          >
-            <IconMapper iconName={item.icon} style={{ fontSize: "20px" }} />
-          </div>
-        )}
-      </NavLink>
-    );
-
-    return (
-      <Tooltip title={t('menu.' + item.name, item.name)} placement="right" arrow enterDelay={100} leaveDelay={100}>
-        {itemContent}
-      </Tooltip>
-    );
-  }
-
-  return (
-    <div className="w-full">
-      {item.children && item.children.length > 0 ? (
-        <Accordion
-          expanded={isExpanded}
-          onChange={(e, isOpened) => onToggle(item.name, isOpened)}
-          disableGutters
-          square
-          className="bg-background text-sidebar-foreground border-none shadow-none before:hidden"
-          sx={{
-            transition: "none !important",
-            "&.MuiAccordion-root": {
-              transition: "none !important",
-            },
-            "& .MuiAccordionSummary-root": {
-              minHeight: "unset",
-              px: "12px",
-              py: "10px",
-              borderBottom: "1px solid hsl(var(--sidebar-border))",
-              backgroundColor: hasActiveChild ? "hsl(var(--sidebar-accent))" : "transparent",
-              color: hasActiveChild ? "hsl(var(--sidebar-accent-foreground))" : "hsl(var(--sidebar-foreground))",
-              transition: "none !important",
-              "&:hover": {
-                backgroundColor: hasActiveChild ? "hsl(var(--sidebar-accent))" : "hsl(var(--sidebar-accent) / 0.4)",
-                color: "hsl(var(--sidebar-accent-foreground))",
-              },
-            },
-            "& .MuiAccordionSummary-content": { margin: 0, display: "flex", alignItems: "center" },
-            "& .MuiAccordionSummary-expandIconWrapper": { color: "hsl(var(--sidebar-foreground) / 0.7)" },
-            "& .MuiAccordionDetails-root": { padding: 0, backgroundColor: "transparent" },
-          }}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ fontSize: "18px", color: "currentColor" }} />}>
-            <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
-            <span className="flex-1 font-normal text-[14px]">{t('menu.' + item.name, item.name)}</span>
-          </AccordionSummary>
-          <AccordionDetails>
-            <ul className="list-none p-0 m-0">
-              {item.children.map((child, idx) => (
-                child.children && child.children.length > 0 ? (
-                  <SubSidebarItem key={idx} child={child} />
-                ) : (
-                  <li key={idx}>
-                    <NavLink
-                      to={child.path}
-                      className={({ isActive }) =>
-                        `flex items-center pl-10 pr-3 py-[8px] cursor-pointer text-[14px] border-b border-sidebar-border no-underline 
-                        ${isActive 
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                          : "bg-sidebar text-sidebar-foreground/80 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
-                      }
-                    >
-                      {t('menu.' + child.name, child.name)}
-                    </NavLink>
-                  </li>
-                )
-              ))}
-            </ul>
-          </AccordionDetails>
-        </Accordion>
-      ) : (
-        <div className="">
-          {item.external ? (
-            <a
-              href={item.path}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline bg-sidebar text-sidebar-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
-            >
-              <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
-              <span className="flex-1 font-normal text-[14px]">{t('menu.' + item.name, item.name)}</span>
-            </a>
-          ) : (
-            <NavLink
-              to={item.path}
-              className={({ isActive }) =>
-                `flex items-center px-3 py-[10px] cursor-pointer border-b border-sidebar-border no-underline
-                ${isActive 
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" 
-                  : "bg-sidebar text-sidebar-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"}`
-              }
-            >
-              <IconMapper iconName={item.icon} className="mr-3" style={{ fontSize: "18px" }} />
-              <span className="flex-1 font-normal text-[14px]">{t('menu.' + item.name, item.name)}</span>
-            </NavLink>
-          )}
-        </div>
-      )}
-    </div>
-  );
+  const IconComponent = icons[iconName] || HomeIcon;
+  return <IconComponent {...props} />;
 });
 
 const LayoutSidebar = () => {
+  const { t } = useTranslation();
   const location = useLocation();
-  const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const { isCollapsed, isMobileOpen, setCollapsed, setMobileOpen } = useSidebarStore();
+  const logout = useAuthStore((state) => state.logout);
+  const { isCollapsed, isMobileOpen, toggleCollapsed, setMobileOpen } = useSidebarStore();
+  const { selectedSections, resetFilter } = useMenuFilterStore();
 
-  // Lọc menu theo quyền (Sử dụng useMemo và tránh mutate mảng gốc)
-  const filteredNavigations = React.useMemo(() => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  // 1. Lọc menu theo quyền người dùng
+  const roleFilteredNavigations = useMemo(() => {
     const userRoles = user?.role || [];
-    return navigations
-      .filter((item) => !item.auth || item.auth.some((r) => userRoles.includes(r)))
-      .map((item) => {
-        if (item.children) {
-          const children = item.children.filter((child) => !child.auth || child.auth.some((r) => userRoles.includes(r)));
-          return {
-            ...item,
-            children
-          };
-        }
-        return item;
-      })
-      // Chỉ giữ lại các menu cha có con (nếu ban đầu có con và chưa bị làm phẳng) hoặc menu đơn lẻ
-      .filter((item) => {
-        const originalItem = navigations.find(n => n.name === item.name);
-        if (originalItem?.children && item.children !== null && item.children?.length === 0) return false;
-        return true;
-      });
+    return navigations.filter(
+      (item) => !item.auth || item.auth.some((r) => userRoles.includes(r))
+    );
   }, [user?.role]);
 
-  // Sử dụng useRef để theo dõi pathname trước đó
-  const lastPathname = React.useRef(location.pathname);
+  // 2. Lọc menu theo phân hệ đã chọn từ App Switcher Popover (nếu có)
+  const sectionFilteredNavigations = useMemo(() => {
+    if (!selectedSections || selectedSections.length === 0) return roleFilteredNavigations;
+    return roleFilteredNavigations.filter((item) => selectedSections.includes(item.section));
+  }, [roleFilteredNavigations, selectedSections]);
 
+  // 3. Lọc menu theo từ khóa tìm kiếm
+  const searchedNavigations = useMemo(() => {
+    if (!searchQuery.trim()) return sectionFilteredNavigations;
+    const q = searchQuery.toLowerCase().trim();
+    return sectionFilteredNavigations.filter((item) => {
+      const nameMatch = t('menu.' + item.name, item.name).toLowerCase().includes(q);
+      const sectionMatch = item.section?.toLowerCase().includes(q);
+      return nameMatch || sectionMatch;
+    });
+  }, [sectionFilteredNavigations, searchQuery, t]);
+
+  // Nhóm menu theo Section Header
+  const groupedNavigations = useMemo(() => {
+    const groups = {};
+    searchedNavigations.forEach((item) => {
+      const sec = item.section || "KHÁC";
+      if (!groups[sec]) groups[sec] = [];
+      groups[sec].push(item);
+    });
+    return groups;
+  }, [searchedNavigations]);
+
+  // Đóng mobile menu khi chuyển route
   useEffect(() => {
-    // Tự động đóng mobile menu khi chuyển trang
     setMobileOpen(false);
+  }, [location.pathname, setMobileOpen]);
 
-    // Chỉ tự động mở rộng khi đường dẫn thực sự thay đổi (chuyển trang)
-    if (lastPathname.current !== location.pathname) {
-      const activeItem = filteredNavigations.find(item => 
-        item.children && item.children.some(child => location.pathname.startsWith(child.path))
-      );
-      if (activeItem) {
-        setExpanded(activeItem.name);
-      }
-      lastPathname.current = location.pathname;
-    }
-  }, [location.pathname, filteredNavigations, setMobileOpen]);
-
-  const handleToggle = useCallback((panel, isExpanded) => {
-    setExpanded(isExpanded ? panel : false);
-  }, []);
-
-  const handleItemClick = useCallback((itemName) => {
-    setCollapsed(false);
-    setExpanded(itemName);
-  }, [setCollapsed]);
+  const handleLogout = useCallback(() => {
+    setShowLogoutConfirm(false);
+    logout();
+  }, [logout]);
 
   return (
     <>
-      {/* Backdrop for mobile */}
+      {/* Mobile Backdrop */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 top-0 z-[55] bg-black/40 md:hidden"
+          className="fixed inset-0 top-0 z-[55] bg-black/50 backdrop-blur-sm md:hidden transition-opacity"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
+      {/* Main Sidebar Wrapper */}
       <div
-        className={`md:bg-sidebar transition-[width,min-width] duration-300 flex-shrink-0
-          ${isCollapsed ? "md:w-[50px] md:min-w-[50px]" : "md:w-[220px] md:min-w-[220px]"}
+        className={`md:bg-sidebar flex-shrink-0
+          ${isCollapsed ? "md:w-[60px] md:min-w-[60px]" : "md:w-[240px] md:min-w-[240px]"}
           w-0`}
       >
         <aside
-          className={`fixed md:sticky top-0 md:top-[48px] z-[60] md:z-40 bg-sidebar select-none transition-[width,min-width,transform] duration-300
-            h-screen md:h-[calc(100vh-48px-40px)]
+          className={`fixed md:sticky top-0 z-[60] md:z-40 bg-sidebar select-none
+            h-screen
             ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-            ${isCollapsed ? "md:w-[50px] md:min-w-[50px]" : "md:w-[220px] md:min-w-[220px]"}
-            w-[240px] min-w-[240px] md:w-full md:min-w-full`}
+            ${isCollapsed ? "md:w-[60px] md:min-w-[60px]" : "md:w-[240px] md:min-w-[240px]"}
+            w-[260px] min-w-[260px] md:w-full md:min-w-full`}
         >
-          <div className="h-full text-sidebar-foreground border-r border-sidebar-border flex flex-col">
-            {/* Mobile Header Logo inside Sidebar */}
-            <div className="h-[48px] flex items-center justify-between px-4 bg-background border-b border-sidebar-border md:hidden">
-              <NavLink to="/" className='bg-gradient-primary text-primary-foreground px-4 py-1 rounded-md font-bold text-[18px] tracking-widest no-underline'>
-                H R M
+
+
+          <div className="h-full text-sidebar-foreground border-r border-sidebar-border flex flex-col justify-between overflow-hidden">
+            
+            {/* Top Logo Header Area inside Sidebar - Always Centered */}
+            <div className="h-[48px] px-3 flex items-center justify-center relative border-b border-sidebar-border bg-sidebar">
+              <NavLink
+                to="/"
+                className="flex items-center justify-center no-underline hover:opacity-90"
+              >
+                {isCollapsed ? (
+                  <img src="/assets/logo/logo-icon.svg" alt="HRM Logo" className="h-7 max-w-[50px] object-contain" />
+                ) : (
+                  <img src="/assets/logo/logo.svg" alt="HRM Logo" className="h-10 max-w-[170px] object-contain" />
+                )}
+
+
               </NavLink>
 
-              <IconButton color="inherit" size="small" onClick={() => setMobileOpen(false)}>
-                <CloseIcon fontSize="small" sx={{ color: 'hsl(var(--foreground))' }} />
+
+              {/* Close Button on Mobile */}
+              <IconButton
+                size="small"
+                onClick={() => setMobileOpen(false)}
+                className="md:hidden text-sidebar-foreground absolute right-2"
+              >
+                <CloseIcon fontSize="small" />
               </IconButton>
             </div>
 
-            <div className="flex-1 overflow-y-auto no-scrollbar">
-              <nav className="flex flex-col">
-                {filteredNavigations.map((item, index) => (
-                  <SidebarItem
-                    key={index}
-                    item={item}
-                    expanded={expanded}
-                    onToggle={handleToggle}
-                    isCollapsed={isMobileOpen ? false : isCollapsed}
-                    onExpandSidebar={() => handleItemClick(item.name)}
-                  />
-                ))}
-              </nav>
+
+            {/* Header / Search Area */}
+            <div>
+              {/* Search Bar in Expanded Mode */}
+              {!isCollapsed && (
+                <div className="p-2.5 border-b border-sidebar-border/60 bg-sidebar/50 flex items-center gap-2">
+                  <div className="relative flex-1 flex items-center">
+                    <SearchIcon
+                      className="absolute left-2.5 text-sidebar-foreground/50 pointer-events-none"
+                      sx={{ fontSize: "19px" }}
+                    />
+                    <input
+                      type="text"
+                      placeholder={t("menu.search_placeholder", "Tìm menu...")}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-8 pr-7 py-1.5 text-[14px] bg-background border border-sidebar-border rounded-lg text-sidebar-foreground placeholder:text-sidebar-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/50"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="absolute right-2 text-sidebar-foreground/50 hover:text-sidebar-foreground text-xs border-none bg-transparent cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Search Button in Collapsed Mode */}
+              {/* {isCollapsed && (
+                <div className="border-b border-sidebar-border/60 flex justify-center">
+                  <Tooltip title={t("menu.search_placeholder", "Tìm menu...")} placement="right" arrow>
+                    <button
+                      onClick={toggleCollapsed}
+                      className="p-2 rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors border-none bg-transparent cursor-pointer"
+                    >
+                      <SearchIcon sx={{ fontSize: "20px" }} />
+                    </button>
+                  </Tooltip>
+                </div>
+              )} */}
             </div>
+
+
+            {/* Menu Body - Scrollable Area */}
+            <div className="flex-1 overflow-y-auto no-scrollbar py-2">
+              {Object.keys(groupedNavigations).length === 0 ? (
+                <div className="p-4 text-center text-sm text-sidebar-foreground/50">
+                  {t("menu.no_result", "Không tìm thấy menu")}
+                </div>
+              ) : (
+                Object.entries(groupedNavigations).map(([sectionName, items], sectionIndex) => (
+                  <div key={sectionName} className="mb-2">
+                    {/* Section Divider Line in Collapsed Mode */}
+                    {isCollapsed && sectionIndex > 0 && (
+                      <div className="w-6 h-[1px] bg-sidebar-foreground/20 my-4 mx-auto" />
+                    )}
+
+                    {/* Section Header Label (Only in Expanded mode) */}
+                    {!isCollapsed && (
+                      <div className="px-3 py-1.5 text-[12px] font-bold tracking-wider text-sidebar-foreground/60 uppercase select-none">
+                        {sectionName}
+                      </div>
+                    )}
+
+                    {/* Section Items (Flat List) */}
+                    <ul className={`list-none p-0 m-0 ${isCollapsed ? "space-y-1.5 px-2" : "space-y-0.5"}`}>
+                      {items.map((item) => {
+                        const isActive = location.pathname.startsWith(item.path);
+
+                        if (isCollapsed) {
+                          return (
+                            <li key={item.path} className="flex justify-center">
+                              <Tooltip
+                                title={t("menu." + item.name, item.name)}
+                                placement="right"
+                                arrow
+                                enterDelay={100}
+                              >
+                                <NavLink
+                                  to={item.path}
+                                  className={`w-9 h-9 rounded-lg border flex items-center justify-center no-underline transition-colors ${
+                                    isActive
+                                      ? "bg-primary text-primary-foreground border-primary shadow-xs font-semibold"
+                                      : "bg-background/40 text-sidebar-foreground/85 border-sidebar-border hover:bg-sidebar-accent/50 hover:border-primary/40 hover:text-sidebar-accent-foreground"
+                                  }`}
+                                >
+                                  <IconMapper iconName={item.icon} style={{ fontSize: "19px" }} />
+                                </NavLink>
+                              </Tooltip>
+                            </li>
+                          );
+                        }
+
+                        return (
+                          <li key={item.path}>
+                            <NavLink
+                              to={item.path}
+                              className={`flex items-center px-3 py-2 mx-2 rounded-lg text-[14px] no-underline ${
+                                isActive
+                                  ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                                  : "text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                              }`}
+                            >
+                              <IconMapper
+                                iconName={item.icon}
+                                className="mr-3"
+                                style={{ fontSize: "19px" }}
+                              />
+                              <span className="flex-1 truncate font-medium">
+                                {t("menu." + item.name, item.name)}
+                              </span>
+                            </NavLink>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))
+              )}
+
+            </div>
+
+            {/* Footer Area: Logout & Quick Action */}
+            <div className="p-2 border-t border-sidebar-border bg-sidebar/30">
+              {isCollapsed ? (
+                <Tooltip title={t("header.logout", "Đăng xuất")} placement="right" arrow>
+                  <button
+                    onClick={() => setShowLogoutConfirm(true)}
+                    className="w-full flex items-center justify-center py-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <LogoutIcon sx={{ fontSize: "20px" }} />
+                  </button>
+                </Tooltip>
+              ) : (
+                <button
+                  onClick={() => setShowLogoutConfirm(true)}
+                  className="w-full flex items-center px-3 py-2 text-[14px] font-medium text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer border-none bg-transparent"
+                >
+                  <LogoutIcon sx={{ fontSize: "19px" }} className="mr-3" />
+                  <span>{t("header.logout", "Đăng xuất")}</span>
+                </button>
+              )}
+            </div>
+
+
+
           </div>
         </aside>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <ConfirmationDialog
+        open={showLogoutConfirm}
+        onConfirmDialogClose={() => setShowLogoutConfirm(false)}
+        title={t("header.logout_confirm_title", "Xác nhận đăng xuất")}
+        text={t("header.logout_confirm_text", "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?")}
+        agree={t("header.logout", "Đăng xuất")}
+        cancel={t("common.cancel", "Hủy")}
+        onYesClick={handleLogout}
+        container={document.getElementById("root")}
+      />
     </>
   );
 };

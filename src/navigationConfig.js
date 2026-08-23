@@ -12,102 +12,184 @@ const {
 const ALL_ROLES = Object.values(ROLES);
 
 export const navigations = [
+  // CÁ NHÂN & TỔNG QUAN
   {
+    section: "CÁ NHÂN & TỔNG QUAN",
     name: "Dashboard",
     path: "/dashboard",
     icon: "assessment",
     auth: [ADMIN]
   },
   {
+    section: "CÁ NHÂN & TỔNG QUAN",
     name: "Trang chủ",
     path: "/home",
     icon: "home",
     auth: ALL_ROLES
   },
   {
-    name: "Thông báo công ty",
+    section: "CÁ NHÂN & TỔNG QUAN",
+    name: "Thông báo",
+    path: "/announcements",
     icon: "campaign",
-    auth: ALL_ROLES,
-    children: [
-      { name: "Thông báo", path: "/announcements", auth: ALL_ROLES },
-      { name: "Quản lý thông báo", path: "/administration/announcements", auth: [ADMIN, HR_MANAGER] },
-    ]
+    auth: ALL_ROLES
   },
+
+  // TỔ CHỨC & NHÂN SỰ
   {
-    name: "Cơ cấu tổ chức",
-    icon: "account_tree",
-    auth: [ADMIN, HR_MANAGER],
-    children: [
-      { name: "Phòng ban", path: "/department", auth: [ADMIN] },
-      { name: "Quản lý vị trí", path: "/category/staff/position", auth: [ADMIN] },
-    ],
-  },
-  {
-    name: "Tuyển dụng",
-    icon: "vertical_split",
-    auth: [ADMIN, HR_MANAGER, HR_RECRUITMENT],
-    children: [
-      { name: "Tin tuyển dụng", path: "/recruitments", auth: [ADMIN, HR_MANAGER, HR_RECRUITMENT] },
-    ],
-  },
-  {
-    name: "Nhân viên",
+    section: "TỔ CHỨC & NHÂN SỰ",
+    name: "Hồ sơ nhân viên",
+    path: "/staff/all",
     icon: "people",
-    auth: [ADMIN, HR_MANAGER],
-    children: [
-      { name: "Hồ sơ nhân viên", path: "/staff/all", auth: [ADMIN, HR_MANAGER] },
-    ],
+    auth: [ADMIN, HR_MANAGER]
   },
   {
-    name: "Chấm công",
+    section: "TỔ CHỨC & NHÂN SỰ",
+    name: "Tin tuyển dụng",
+    path: "/recruitments",
+    icon: "vertical_split",
+    auth: [ADMIN, HR_MANAGER, HR_RECRUITMENT]
+  },
+  {
+    section: "TỔ CHỨC & NHÂN SỰ",
+    name: "Phòng ban",
+    path: "/department",
+    icon: "account_tree",
+    auth: [ADMIN]
+  },
+  {
+    section: "TỔ CHỨC & NHÂN SỰ",
+    name: "Quản lý vị trí",
+    path: "/category/staff/position",
+    icon: "account_tree",
+    auth: [ADMIN]
+  },
+
+  // CHẤM CÔNG & NGHỈ PHÉP
+  {
+    section: "CHẤM CÔNG & NGHỈ PHÉP",
+    name: "Chi tiết chấm công",
+    path: "/time-sheet-detail",
     icon: "access_time",
-    auth: [ADMIN, HR_MANAGER, HR_TIMEKEEPING_MANAGER, HR_EMPLOYEE],
-    children: [
-      { name: "Ngày lễ / Sự kiện", path: "/holidays", auth: [ADMIN, HR_MANAGER] },
-      { name: "Chi tiết chấm công", path: "/time-sheet-detail", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
-      { name: "Phê duyệt chấm công", path: "/check-inout-result", auth: [ADMIN, HR_MANAGER] },
-      { name: "Thống kê công", path: "/time-sheet-summary", auth: [ADMIN, HR_MANAGER, HR_TIMEKEEPING_MANAGER] },
-    ],
+    auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE]
   },
   {
-    name: "Nghỉ phép",
+    section: "CHẤM CÔNG & NGHỈ PHÉP",
+    name: "Phê duyệt chấm công",
+    path: "/check-inout-result",
+    icon: "access_time",
+    auth: [ADMIN, HR_MANAGER]
+  },
+  {
+    section: "CHẤM CÔNG & NGHỈ PHÉP",
+    name: "Thống kê công",
+    path: "/time-sheet-summary",
+    icon: "assessment",
+    auth: [ADMIN, HR_MANAGER, HR_TIMEKEEPING_MANAGER]
+  },
+  {
+    section: "CHẤM CÔNG & NGHỈ PHÉP",
+    name: "Yêu cầu nghỉ phép",
+    path: "/my-leave",
     icon: "event",
-    auth: ALL_ROLES,
-    children: [
-      { name: "Yêu cầu nghỉ phép", path: "/my-leave", auth: ALL_ROLES },
-      { name: "Phê duyệt nghỉ phép", path: "/leave-requests", auth: [ADMIN, HR_MANAGER] },
-      { name: "Số dư phép năm", path: "/leave-balance", auth: [ADMIN, HR_MANAGER] },
-    ],
+    auth: ALL_ROLES
   },
   {
-    name: "Lương thưởng",
+    section: "CHẤM CÔNG & NGHỈ PHÉP",
+    name: "Phê duyệt nghỉ phép",
+    path: "/leave-requests",
+    icon: "event",
+    auth: [ADMIN, HR_MANAGER]
+  },
+  {
+    section: "CHẤM CÔNG & NGHỈ PHÉP",
+    name: "Số dư phép năm",
+    path: "/leave-balance",
+    icon: "event",
+    auth: [ADMIN, HR_MANAGER]
+  },
+  {
+    section: "CHẤM CÔNG & NGHỈ PHÉP",
+    name: "Ngày lễ / Sự kiện",
+    path: "/holidays",
+    icon: "event",
+    auth: [ADMIN, HR_MANAGER]
+  },
+
+  // LƯƠNG THƯỞNG
+  {
+    section: "LƯƠNG THƯỞNG",
+    name: "Phiếu lương cá nhân",
+    path: "/salary/salary-staff-payslip",
     icon: "attach_money",
-    auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT, HR_EMPLOYEE],
-    children: [
-      { name: "Khoản lương", path: "/salary/salary-item", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
-      { name: "Cấu hình lương nhân viên", path: "/salary/staff-salary-config", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
-      { name: "Kỳ lương", path: "/salary/salary-period", auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT] },
-      { name: "Bảng lương", path: "/salary/payrolls", auth: [ADMIN, HR_COMPENSATION_BENEFIT] },
-      { name: "Phiếu lương cá nhân", path: "/salary/salary-staff-payslip", auth: [HR_EMPLOYEE] },
-    ],
+    auth: [HR_EMPLOYEE]
   },
   {
-    name: "Công việc & Dự án",
-    icon: "work",
-    auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE],
-    children: [
-      { name: "Công việc", path: "/tasks", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
-      { name: "Dự án", path: "/projects", auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE] },
-    ],
+    section: "LƯƠNG THƯỞNG",
+    name: "Bảng lương",
+    path: "/salary/payrolls",
+    icon: "attach_money",
+    auth: [ADMIN, HR_COMPENSATION_BENEFIT]
   },
   {
-    name: "Quản trị",
+    section: "LƯƠNG THƯỞNG",
+    name: "Khoản lương",
+    path: "/salary/salary-item",
+    icon: "attach_money",
+    auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT]
+  },
+  {
+    section: "LƯƠNG THƯỞNG",
+    name: "Cấu hình lương nhân viên",
+    path: "/salary/staff-salary-config",
     icon: "settings",
-    auth: [ADMIN],
-    children: [
-      { name: "Tài khoản", path: "/administration/accounts", auth: [ADMIN] },
-      { name: "Vai trò", path: "/administration/roles", auth: [ADMIN] },
-    ],
+    auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT]
+  },
+  {
+    section: "LƯƠNG THƯỞNG",
+    name: "Kỳ lương",
+    path: "/salary/salary-period",
+    icon: "event",
+    auth: [ADMIN, HR_MANAGER, HR_COMPENSATION_BENEFIT]
+  },
+
+  // CÔNG VIỆC & DỰ ÁN
+  {
+    section: "CÔNG VIỆC & DỰ ÁN",
+    name: "Công việc",
+    path: "/tasks",
+    icon: "work",
+    auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE]
+  },
+  {
+    section: "CÔNG VIỆC & DỰ ÁN",
+    name: "Dự án",
+    path: "/projects",
+    icon: "work",
+    auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE]
+  },
+
+  // QUẢN TRỊ HỆ THỐNG
+  {
+    section: "QUẢN TRỊ HỆ THỐNG",
+    name: "Quản lý thông báo",
+    path: "/administration/announcements",
+    icon: "campaign",
+    auth: [ADMIN, HR_MANAGER]
+  },
+  {
+    section: "QUẢN TRỊ HỆ THỐNG",
+    name: "Tài khoản",
+    path: "/administration/accounts",
+    icon: "person",
+    auth: [ADMIN]
+  },
+  {
+    section: "QUẢN TRỊ HỆ THỐNG",
+    name: "Vai trò",
+    path: "/administration/roles",
+    icon: "security",
+    auth: [ADMIN]
   },
 ];
 
@@ -116,26 +198,15 @@ export const getBreadcrumbByPath = (pathname) => {
     return [{ name: "Dashboard", path: "/dashboard" }];
   }
 
-  const findPathInMenu = (items, currentPath) => {
-    for (const item of items) {
-      if (item.path && item.path === currentPath) {
-        return [{ name: item.name, path: item.path }];
-      }
-      
-      if (item.children && item.children.length > 0) {
-        const found = findPathInMenu(item.children, currentPath);
-        if (found) {
-          return [{ name: item.name, path: item.path || null }, ...found];
-        }
-      }
+  for (const item of navigations) {
+    if (item.path && item.path === pathname) {
+      return [
+        { name: item.section, path: null },
+        { name: item.name, path: item.path }
+      ];
     }
-    return null;
-  };
-
-  const result = findPathInMenu(navigations, pathname);
-  if (result) {
-    return result;
   }
 
   return [];
 };
+

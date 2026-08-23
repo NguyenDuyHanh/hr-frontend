@@ -7,29 +7,28 @@ import { Outlet } from 'react-router-dom'
 
 const MainLayout = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Header - Cố định ở trên đầu */}
-      <header className="sticky top-0 z-50">
-        <LayoutHeader />
-      </header>
+    <div className="flex min-h-screen bg-background">
+      {/* Sidebar - Cột bên trái kéo dài full height */}
+      <LayoutSidebar />
 
-      {/* Body - Tự động giãn nở để chiếm phần không gian còn lại */}
-      <div className="flex flex-1">
-        <LayoutSidebar />
+      {/* Cột bên phải: Header + Main Content + Footer */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        {/* Header - Cố định trên cùng của cột bên phải */}
+        <header className="sticky top-0 z-40">
+          <LayoutHeader />
+        </header>
 
         {/* Content - Khu vực nội dung chính */}
-        <main className="flex-1 px-2 sm:px-5 overflow-x-hidden flex flex-col bg-background">
+        <main className="flex-1 px-3 sm:px-6 overflow-x-hidden flex flex-col bg-background">
           <Breadcrumb />
-          {/* div này sẽ chứa nội dung và co giãn theo nội dung, 
-              nhưng nhờ flex-1 ở cha nên footer vẫn bị đẩy xuống đáy */}
           <div className="flex-1 pb-8">
             <Outlet />
           </div>
         </main>
-      </div>
 
-      {/* Footer - Luôn nằm ở cuối */}
-      <LayoutFooter />
+        {/* Footer */}
+        <LayoutFooter />
+      </div>
     </div>
   );
 };
