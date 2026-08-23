@@ -23,6 +23,7 @@ i18n
     react: { useSuspense: false },
     backend: {
       loadPath: "/locales/{{lng}}/translation.json",
+      queryStringParams: { v: Date.now() }
     },
     preload: ["vi", "en"],
     lng: 'vi',
@@ -33,6 +34,5 @@ i18n
       escapeValue: false, // not needed for react as it escapes by default
     }
   });
-
 
 export default i18n;

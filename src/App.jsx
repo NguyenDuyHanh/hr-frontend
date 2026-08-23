@@ -52,6 +52,9 @@ import HolidayPage from "./pages/Holiday/HolidayPage";
 import RolePage from "./pages/Role/RolePage";
 import AnnouncementsPage from "./pages/Annoucement/AnnouncementsPage";
 import AnnouncementsGridPage from "./pages/Annoucement/AnnouncementsGridPage";
+import EthnicPage from "./pages/Category/Ethnic/EthnicPage";
+import BankPage from "./pages/Category/Bank/BankPage";
+import AdministrativeUnitPage from "./pages/Category/AdministrativeUnit/AdministrativeUnitPage";
 
 // Placeholder component for pages
 const PagePlaceholder = ({ title }) => (
@@ -168,6 +171,9 @@ function App() {
     "/department": <DepartmentPage />,
     "/category/staff/position": <PositionPage />,
     "/administration/roles": <RolePage />,
+    "/category/bank": <BankPage />,
+    "/category/ethnic": <EthnicPage />,
+    "/category/administrative-unit": <AdministrativeUnitPage />,
   };
 
   return (
@@ -272,7 +278,7 @@ function App() {
           <Route path="*" element={<RootRedirect />} />
         </Route>
       </Routes>
-      {/* <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} /> */}
+      <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

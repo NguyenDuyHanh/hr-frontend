@@ -169,28 +169,54 @@ export const navigations = [
     auth: [ADMIN, HR_MANAGER, HR_EMPLOYEE]
   },
 
-  // QUẢN TRỊ HỆ THỐNG
+  // QUẢN TRỊ
   {
-    section: "QUẢN TRỊ HỆ THỐNG",
+    section: "QUẢN TRỊ",
     name: "Quản lý thông báo",
     path: "/administration/announcements",
     icon: "campaign",
     auth: [ADMIN, HR_MANAGER]
   },
   {
-    section: "QUẢN TRỊ HỆ THỐNG",
+    section: "QUẢN TRỊ",
     name: "Tài khoản",
     path: "/administration/accounts",
     icon: "person",
     auth: [ADMIN]
   },
   {
-    section: "QUẢN TRỊ HỆ THỐNG",
+    section: "QUẢN TRỊ",
     name: "Vai trò",
     path: "/administration/roles",
     icon: "security",
     auth: [ADMIN]
   },
+  {
+    section: "QUẢN TRỊ",
+    name: "Danh mục chung",
+    icon: "list_alt",
+    auth: [ADMIN, HR_MANAGER],
+    children: [
+      {
+        name: "Ngân hàng",
+        path: "/category/bank",
+        icon: "wallet",
+        auth: [ADMIN, HR_MANAGER]
+      },
+      {
+        name: "Dân tộc",
+        path: "/category/ethnic",
+        icon: "bookmark",
+        auth: [ADMIN, HR_MANAGER]
+      },
+      {
+        name: "Đơn vị hành chính",
+        path: "/category/administrative-unit",
+        icon: "account_tree",
+        auth: [ADMIN, HR_MANAGER]
+      }
+    ]
+  }
 ];
 
 export const getBreadcrumbByPath = (pathname) => {
@@ -199,9 +225,27 @@ export const getBreadcrumbByPath = (pathname) => {
   }
 
   for (const item of navigations) {
-    if (item.path && item.path === pathname) {
+    // 1. Kiểm tra menu con (children) trước
+    if (item.children && item.children.length > 0) {
+      for (const child of item.children) {
+        if (child.path && (child.path === pathname || (pathname.startsWith(child.path) && child.path !== "/"))) {
+          const breadcrumbs = [];
+          if (item.section) {
+            breadcrumbs.push({ name: item.section, path: null });
+          }
+          if (item.name) {
+            breadcrumbs.push({ name: item.name, path: null });
+          }
+          breadcrumbs.push({ name: child.name, path: child.path });
+          return breadcrumbs;
+        }
+      }
+    }
+
+    // 2. Kiểm tra menu cấp 1
+    if (item.path && (item.path === pathname || (pathname.startsWith(item.path) && item.path !== "/"))) {
       return [
-        { name: item.section, path: null },
+        { name: item.section || "HỆ THỐNG", path: null },
         { name: item.name, path: item.path }
       ];
     }
