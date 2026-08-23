@@ -10,12 +10,14 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import PaginationOptionPopup from "./PaginationOptionPopup";
 import PropTypes from "prop-types";
 import { Box, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 /**
  * High-performance Pagination component.
  * Standardized for MUI v5.
  */
 function Pagination(props) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -46,7 +48,7 @@ function Pagination(props) {
 
   const totalElementsText = useMemo(() => (
     <Typography variant="body2" sx={{ display: "flex", alignItems: "center", color: "text.primary" }}>
-      {"Tổng số bản ghi: "}
+      {t("common.total_records", "Tổng số bản ghi:")}{" "}
       <Box component="span" sx={{ 
         ml: 1.5, 
         mr: 1.5, 
@@ -58,7 +60,7 @@ function Pagination(props) {
         {totalElements}
       </Box>
     </Typography>
-  ), [totalElements, isMobile]);
+  ), [totalElements, isMobile, t]);
 
   return (
     <Box sx={{ 
@@ -76,7 +78,9 @@ function Pagination(props) {
             {totalElementsText}
             
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography variant="body2" sx={{ color: "text.primary" }}>Số bản ghi / trang: </Typography>
+              <Typography variant="body2" sx={{ color: "text.primary" }}>
+                {t("common.records_per_page", "Số bản ghi / trang:")}{" "}
+              </Typography>
               <TextField
                 select
                 value={pageSize}

@@ -4,4 +4,5 @@ export * from './staff';
 export * from './recruitment';
 export * from './payroll';
 export * from './notification';
+export * from './administrativeUnit';
 

@@ -26,6 +26,8 @@ import AppsIcon from "@mui/icons-material/Apps";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CloseIcon from "@mui/icons-material/Close";
 import ViewSidebarIcon from "@mui/icons-material/ViewSidebar";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 
@@ -63,8 +65,96 @@ const IconMapper = memo(({ iconName, ...props }) => {
   return <IconComponent {...props} />;
 });
 
+const NavSubGroup = memo(({ item, isCollapsed, location, t, currentLang }) => {
+  const isAnyChildActive = useMemo(() => {
+    return item.children?.some((child) => child.path && location.pathname.startsWith(child.path));
+  }, [item.children, location.pathname]);
+
+  const [isOpen, setIsOpen] = useState(isAnyChildActive);
+
+  useEffect(() => {
+    if (isAnyChildActive) {
+      setIsOpen(true);
+    }
+  }, [isAnyChildActive]);
+
+  if (isCollapsed) {
+    return (
+      <li className="space-y-1.5 flex flex-col items-center my-1">
+        {item.children?.map((child) => {
+          const isActive = child.path && location.pathname.startsWith(child.path);
+          return (
+            <Tooltip
+              key={child.path || child.name}
+              title={`${t("menu." + item.name, item.name)} > ${t("menu." + child.name, child.name)}`}
+              placement="right"
+              arrow
+              enterDelay={100}
+            >
+              <NavLink
+                to={child.path}
+                className={`w-9 h-9 rounded-lg border flex items-center justify-center no-underline transition-colors ${
+                  isActive
+                    ? "bg-primary text-primary-foreground border-primary shadow-xs font-semibold"
+                    : "bg-background/40 text-sidebar-foreground/85 border-sidebar-border hover:bg-sidebar-accent/50 hover:border-primary/40 hover:text-sidebar-accent-foreground"
+                }`}
+              >
+                <IconMapper iconName={child.icon || item.icon} style={{ fontSize: "18px" }} />
+              </NavLink>
+            </Tooltip>
+          );
+        })}
+      </li>
+    );
+  }
+
+  return (
+    <li className="select-none">
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className={`w-full flex items-center px-3 py-2 mx-2 rounded-lg text-[14px] no-underline transition-all duration-150 cursor-pointer border-none ${
+          isAnyChildActive
+            ? "bg-sidebar-accent/60 text-primary font-bold shadow-xs"
+            : "bg-transparent text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+        }`}
+        style={{ width: "calc(100% - 16px)" }}
+      >
+        <IconMapper iconName={item.icon || "list_alt"} className="mr-3" style={{ fontSize: "19px" }} />
+        <span className="flex-1 text-left truncate font-medium">
+          {t("menu." + item.name, item.name)}
+        </span>
+        {isOpen ? <ExpandLessIcon sx={{ fontSize: "18px" }} /> : <ExpandMoreIcon sx={{ fontSize: "18px" }} />}
+      </button>
+
+      {isOpen && (
+        <div className="ml-6 pl-2.5 border-l border-primary/60 my-1 space-y-1 mr-2">
+          {item.children?.map((child) => {
+            const isActive = child.path && location.pathname.startsWith(child.path);
+            return (
+              <NavLink
+                key={child.path || child.name}
+                to={child.path}
+                className={`flex items-center px-3 py-2 rounded-lg text-[13.5px] no-underline transition-all duration-150 ${
+                  isActive
+                    ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                    : "text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground active:scale-[0.98]"
+                }`}
+              >
+                <span className="flex-1 truncate font-medium">
+                  {t("menu." + child.name, child.name)}
+                </span>
+              </NavLink>
+            );
+          })}
+        </div>
+      )}
+    </li>
+  );
+});
+
 const LayoutSidebar = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
@@ -78,9 +168,17 @@ const LayoutSidebar = () => {
   // 1. Lọc menu theo quyền người dùng
   const roleFilteredNavigations = useMemo(() => {
     const userRoles = user?.role || [];
-    return navigations.filter(
-      (item) => !item.auth || item.auth.some((r) => userRoles.includes(r))
-    );
+    return navigations
+      .filter((item) => !item.auth || item.auth.some((r) => userRoles.includes(r)))
+      .map((item) => {
+        if (item.children) {
+          const filteredChildren = item.children.filter(
+            (c) => !c.auth || c.auth.some((r) => userRoles.includes(r))
+          );
+          return { ...item, children: filteredChildren };
+        }
+        return item;
+      });
   }, [user?.role]);
 
   // 2. Lọc menu theo phân hệ đã chọn từ App Switcher Popover (nếu có)
@@ -96,7 +194,10 @@ const LayoutSidebar = () => {
     return sectionFilteredNavigations.filter((item) => {
       const nameMatch = t('menu.' + item.name, item.name).toLowerCase().includes(q);
       const sectionMatch = item.section?.toLowerCase().includes(q);
-      return nameMatch || sectionMatch;
+      const childMatch = item.children?.some((c) =>
+        t('menu.' + c.name, c.name).toLowerCase().includes(q)
+      );
+      return nameMatch || sectionMatch || childMatch;
     });
   }, [sectionFilteredNavigations, searchQuery, t]);
 
@@ -237,18 +338,31 @@ const LayoutSidebar = () => {
                     {/* Section Header Label (Only in Expanded mode) */}
                     {!isCollapsed && (
                       <div className="px-3 py-1.5 text-[12px] font-bold tracking-wider text-sidebar-foreground/60 uppercase select-none">
-                        {sectionName}
+                        {t("menu." + sectionName, sectionName)}
                       </div>
                     )}
 
-                    {/* Section Items (Flat List) */}
+                    {/* Section Items (Flat List / Sub-groups) */}
                     <ul className={`list-none p-0 m-0 ${isCollapsed ? "space-y-1.5 px-2" : "space-y-0.5"}`}>
                       {items.map((item) => {
-                        const isActive = location.pathname.startsWith(item.path);
+                        if (item.children && item.children.length > 0) {
+                          return (
+                            <NavSubGroup
+                              key={item.name}
+                              item={item}
+                              isCollapsed={isCollapsed}
+                              location={location}
+                              t={t}
+                              currentLang={i18n.language}
+                            />
+                          );
+                        }
+
+                        const isActive = item.path && location.pathname.startsWith(item.path);
 
                         if (isCollapsed) {
                           return (
-                            <li key={item.path} className="flex justify-center">
+                            <li key={item.path || item.name} className="flex justify-center">
                               <Tooltip
                                 title={t("menu." + item.name, item.name)}
                                 placement="right"
@@ -271,7 +385,7 @@ const LayoutSidebar = () => {
                         }
 
                         return (
-                          <li key={item.path}>
+                          <li key={item.path || item.name}>
                             <NavLink
                               to={item.path}
                               className={`flex items-center px-3 py-2 mx-2 rounded-lg text-[14px] no-underline ${
