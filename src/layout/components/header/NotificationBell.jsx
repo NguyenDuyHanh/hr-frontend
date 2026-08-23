@@ -257,8 +257,9 @@ const NotificationBell = () => {
     <>
       <div 
         onClick={handleOpen}
-        className="flex items-center justify-center bg-background hover:bg-primary/10 dark:hover:bg-primary/20 text-primary w-9 h-[32px] rounded-md cursor-pointer relative border border-border active:scale-95"
+        className="flex items-center justify-center bg-background hover:bg-muted text-primary w-8 h-8 rounded-xl cursor-pointer relative border border-border shadow-2xs"
       >
+
         <Badge 
           badgeContent={unreadCount} 
           color="error" 

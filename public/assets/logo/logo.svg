@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 120" fill="none">
+  <defs>
+    <!-- Gradient for R and M -->
+    <linearGradient id="rmGradH" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#1E40AF" />
+    </linearGradient>
+
+    <!-- Gradient for Orbital Ring -->
+    <linearGradient id="ringGradH" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA" />
+      <stop offset="50%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+  </defs>
+
+  <!-- Symmetric Group Centered at x=140, y=60 -->
+  <g transform="translate(13, 0)">
+    <!-- Letter H -->
+    <path d="M 25 25 V 95 M 68 25 V 95 M 25 60 H 68" stroke="#1D4ED8" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Letter R -->
+    <path d="M 96 25 V 95 M 96 25 H 125 C 148 25 148 60 125 60 H 96 M 119 60 L 148 95" stroke="url(#rmGradH)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Letter M -->
+    <path d="M 176 95 V 25 L 206 68 L 236 25 V 95" stroke="url(#rmGradH)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Satellite Connection Lines & Dots -->
+    <line x1="48" y1="36" x2="37" y2="25" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" />
+    <circle cx="33" cy="21" r="5" fill="#38BDF8" />
+
+    <line x1="205" y1="80" x2="217" y2="92" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" />
+    <circle cx="221" cy="95" r="5" fill="#38BDF8" />
+
+    <!-- Orbital Ring Ellipse Swoosh - Centered Perfectly -->
+    <ellipse cx="127" cy="60" rx="124" ry="32" transform="rotate(-15 127 60)" stroke="url(#ringGradH)" stroke-width="6" fill="none" stroke-linecap="round" />
+  </g>
+</svg>

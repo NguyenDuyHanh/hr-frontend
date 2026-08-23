@@ -185,7 +185,7 @@
     }
   },
   "home": {
-    "portal_title": "HRM Hub Portal",
+    "portal_title": "HRM Portal",
     "greeting": "Hello, {{name}}!",
     "greeting_default": "Member",
     "welcome_message": "Welcome to the modern human resource management system. Wish you a productive and joyful working day!",

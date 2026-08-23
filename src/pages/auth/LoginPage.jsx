@@ -77,7 +77,7 @@ const LoginPage = () => {
         <button
           type="button"
           onClick={toggleTheme}
-          className="p-2.5 rounded-full bg-card/80 backdrop-blur-md border border-border text-primary shadow-md hover:shadow-lg focus:outline-none transition-all active:scale-95 cursor-pointer flex items-center justify-center"
+          className="p-2.5 rounded-full bg-card/80 backdrop-blur-md border border-border text-primary shadow-md hover:shadow-lg focus:outline-none transition-all cursor-pointer flex items-center justify-center"
           title={mode === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
         >
           {mode === 'light' ? <DarkMode className="text-[18px]" /> : <LightMode className="text-[18px]" />}
