@@ -5,9 +5,7 @@ import ConstantList from '../appConfig';
 import { navigateTo } from '../navigation';
 import * as AuthService from './AuthService';
 
-const HttpService = axios.create({
-    baseURL: ConstantList.API_ENPOINT,
-});
+const HttpService = axios.create();
 
 HttpService.interceptors.request.use(
     (config) => {

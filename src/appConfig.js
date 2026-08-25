@@ -10,7 +10,7 @@ export const getSystemConfig = (key) => {
 
 const ConstantList = {
     ROOT_PATH: import.meta.env.VITE_ROOT_PATH || APPLICATION_PATH,
-    API_ENPOINT: import.meta.env.VITE_API_ENDPOINT || "http://localhost:8080",
+    API_ENPOINT: import.meta.env.VITE_API_ENDPOINT || "http://localhost:8080/api",
 };
 
 export default ConstantList;
