@@ -1,98 +1,185 @@
-import React, { useMemo } from 'react';
-import { useFormik, FormikProvider } from 'formik';
-import * as Yup from 'yup';
-import { Grid, Button, Box, Paper } from '@mui/material';
-import { useModifyStaff } from '../../api';
-import TextField from '../../../../components/ui/TextField';
-import TabAccordion from '../../../../components/ui/Tab/TabAccordion';
+import React, { useState } from 'react';
+import { Box, Button, Typography, Chip, Paper, IconButton } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import Table from '../../../../components/ui/Table';
+import ConfirmationDialog from '../../../../components/ui/ConfirmationDialog';
+import StaffBankAccountFormDialog from './StaffBankAccountFormDialog';
+import { 
+    useStaffBankAccounts, 
+    useSaveStaffBankAccount, 
+    useSetDefaultStaffBankAccount, 
+    useDeleteStaffBankAccount 
+} from '../../api';
 
-const StaffBankInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
-    const modifyStaffMutation = useModifyStaff();
+const StaffBankInfoForm = ({ staffData, isView = false }) => {
+    const staffId = staffData?.id;
+    const [openDialog, setOpenDialog] = useState(false);
+    const [selectedAccount, setSelectedAccount] = useState(null);
+    const [deleteId, setDeleteId] = useState(null);
 
-    const initialValues = useMemo(() => ({
-        bankName: staffData?.bankName || '',
-        bankAccountNumber: staffData?.bankAccountNumber || '',
-        bankAccountName: staffData?.bankAccountName || '',
-        bankBin: staffData?.bankBin || '',
-    }), [staffData]);
+    // TanStack Query
+    const { data: bankAccounts = [], isLoading } = useStaffBankAccounts(staffId);
+    const saveMutation = useSaveStaffBankAccount();
+    const setDefaultMutation = useSetDefaultStaffBankAccount();
+    const deleteMutation = useDeleteStaffBankAccount();
 
-    const validationSchema = Yup.object({});
+    const handleAdd = () => {
+        setSelectedAccount(null);
+        setOpenDialog(true);
+    };
 
-    const formik = useFormik({
-        initialValues: initialValues,
-        enableReinitialize: true,
-        validationSchema: validationSchema,
-        onSubmit: async (values) => {
-            if (!staffData?.id) return;
-            
-            // Merge existing staffData with updated bank info
-            const submitValues = {
-                ...staffData,
-                ...values
-            };
+    const handleEdit = (account) => {
+        setSelectedAccount(account);
+        setOpenDialog(true);
+    };
 
-            await modifyStaffMutation.mutateAsync(submitValues);
-            if (onSaveSuccess) {
-                onSaveSuccess();
-            }
+    const handleSetDefault = (account) => {
+        setDefaultMutation.mutate(account.id);
+    };
+
+    const handleDelete = () => {
+        if (!deleteId) return;
+        deleteMutation.mutate(deleteId, {
+            onSuccess: () => setDeleteId(null),
+        });
+    };
+
+    const handleSave = (dto) => {
+        saveMutation.mutate({ ...dto, staffId }, {
+            onSuccess: () => setOpenDialog(false),
+        });
+    };
+
+    const columns = [
+        {
+            field: 'bankName',
+            title: 'Ngân hàng',
+            minWidth: 250,
+            render: (row) => (
+                <Box display="flex" alignItems="center" gap={1}>
+                    {row.bankLogo && (
+                        <img src={row.bankLogo} alt={row.bankShortName} style={{ width: 24, height: 24, objectFit: 'contain' }} />
+                    )}
+                    <Box>
+                        <Typography variant="body2" fontWeight={600}>
+                            {row.bankShortName || row.bankName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            {row.bankName}
+                        </Typography>
+                    </Box>
+                </Box>
+            )
         },
-    });
-
-    const action = isView ? null : (
-        <>
-            <Button onClick={onClose} variant="outlined" color="inherit" sx={{ color: 'text.secondary', textTransform: 'none' }}>Hủy bỏ</Button>
-            <Button onClick={formik.handleSubmit} color="primary" variant="contained" sx={{ textTransform: 'none', px: 4, ml: 1 }}>Lưu lại</Button>
-        </>
-    );
+        {
+            field: 'accountNumber',
+            title: 'Số tài khoản',
+            minWidth: 160,
+            align: 'center',
+        },
+        {
+            field: 'accountName',
+            title: 'Chủ tài khoản',
+            minWidth: 180,
+            align: 'center',
+            render: (row) => row.accountName?.toUpperCase() || '—'
+        },
+        {
+            field: 'branchName',
+            title: 'Chi nhánh',
+            minWidth: 160,
+            render: (row) => row.branchName || '—'
+        },
+        {
+            field: 'isDefault',
+            title: 'Trạng thái',
+            minWidth: 130,
+            align: 'center',
+            render: (row) => row.isDefault ? (
+                <Chip label="Mặc định" color="success" size="small" variant="filled" />
+            ) : (
+                <Chip label="Phụ" color="default" size="small" variant="outlined" />
+            )
+        },
+        {
+            field: 'actions',
+            title: 'Thao tác',
+            minWidth: 140,
+            align: 'center',
+            render: (row) => !isView && (
+                <Box display="flex" alignItems="center" justifyContent="center">
+                    {!row.isDefault && (
+                        <IconButton size="small" color="warning" onClick={() => handleSetDefault(row)} title="Đặt làm mặc định">
+                            <StarBorderIcon fontSize="small" />
+                        </IconButton>
+                    )}
+                    {row.isDefault && (
+                        <IconButton size="small" color="warning" disabled title="Tài khoản mặc định">
+                            <StarIcon fontSize="small" />
+                        </IconButton>
+                    )}
+                    <IconButton size="small" color="primary" onClick={() => handleEdit(row)}>
+                        <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton size="small" color="error" onClick={() => setDeleteId(row.id)}>
+                        <DeleteIcon fontSize="small" />
+                    </IconButton>
+                </Box>
+            )
+        }
+    ];
 
     return (
-        <FormikProvider value={formik}>
-            <div className="space-y-6 pb-4">
-                <TabAccordion title="Thông tin tài khoản ngân hàng" open={true}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField 
-                                label="Tên ngân hàng" 
-                                name="bankName" 
-                                fullWidth
-                                disabled={isView}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField 
-                                label="Số tài khoản" 
-                                name="bankAccountNumber" 
-                                fullWidth
-                                disabled={isView}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField 
-                                label="Chủ tài khoản" 
-                                name="bankAccountName" 
-                                fullWidth
-                                disabled={isView}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField 
-                                label="Mã BIN ngân hàng" 
-                                name="bankBin" 
-                                fullWidth
-                                disabled={isView}
-                            />
-                        </Grid>
-                    </Grid>
-                </TabAccordion>
-
-                {/* Form actions */}
-                {action && (
-                    <Box display="flex" justifyContent="flex-end" mt={4} className="pt-4 border-t border-border">
-                        {action}
-                    </Box>
+        <Paper elevation={0} className='p-4 border border-border rounded-lg shadow-sm mb-4'>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography variant="h6" fontWeight="bold">
+                    Danh sách tài khoản ngân hàng
+                </Typography>
+                {!isView && (
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        size="small"
+                        onClick={handleAdd}
+                        sx={{ textTransform: 'none' }}
+                    >
+                        Thêm tài khoản
+                    </Button>
                 )}
-            </div>
-        </FormikProvider>
+            </Box>
+
+            <Table
+                columns={columns}
+                data={bankAccounts}
+                loading={isLoading}
+                emptyText="Chưa có tài khoản ngân hàng nào"
+                nonePagination={true}
+            />
+
+            {openDialog && (
+                <StaffBankAccountFormDialog
+                    open={openDialog}
+                    onClose={() => setOpenDialog(false)}
+                    bankAccountData={selectedAccount}
+                    staffDisplayName={staffData?.displayName}
+                    onSave={handleSave}
+                />
+            )}
+
+            {!!deleteId && (
+                <ConfirmationDialog
+                    open={!!deleteId}
+                    onClose={() => setDeleteId(null)}
+                    onConfirm={handleDelete}
+                    title="Xác nhận xóa"
+                    message="Bạn có chắc chắn muốn xóa tài khoản ngân hàng này không?"
+                />
+            )}
+        </Paper>
     );
 };
 

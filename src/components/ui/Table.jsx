@@ -241,7 +241,9 @@ function Table(props) {
             return item[key] === rowData[key];
           });
         });
-        return (page - 1) * pageSize + (idx !== -1 ? idx : 0) + 1;
+        const safePage = typeof page === 'number' && !isNaN(page) ? page : 1;
+        const safePageSize = typeof pageSize === 'number' && !isNaN(pageSize) ? pageSize : 10;
+        return (safePage - 1) * safePageSize + (idx !== -1 ? idx : 0) + 1;
       },
     };
 
@@ -470,7 +472,7 @@ function Table(props) {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ position: "relative", width: "100%", minHeight: 180 }}>
+      <Box sx={{ position: "relative", width: "100%", minHeight: "auto" }}>
         {/* Desktop Spinner Overlay: Only on Desktop view when loading */}
         {loading && !isMobileSize && (
           <Box

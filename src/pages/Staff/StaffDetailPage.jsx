@@ -3,10 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Box, Paper, Typography, Button, Grid, Avatar } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonIcon from '@mui/icons-material/Person';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import HistoryIcon from '@mui/icons-material/History';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import SecurityIcon from '@mui/icons-material/Security';
+import SchoolIcon from '@mui/icons-material/School';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { toast } from 'sonner';
@@ -17,6 +14,7 @@ import TabComponent from '../../components/ui/Tab/TabComponent';
 import StaffGeneralInfoForm from './components/StaffTabs/StaffGeneralInfoForm';
 import StaffSalaryConfigForm from './components/StaffTabs/StaffSalaryConfigForm';
 import StaffBankInfoForm from './components/StaffTabs/StaffBankInfoForm';
+import StaffCertificateTab from './components/StaffTabs/StaffCertificateTab';
 import { getStaffById } from '../../services/StaffService';
 
 const StaffDetailPage = () => {
@@ -78,6 +76,18 @@ const StaffDetailPage = () => {
                         isView={isView}
                         onClose={() => navigate(isProfile ? '/home' : '/staff/all')} 
                         onSaveSuccess={handleSaveSuccess} 
+                    />
+                </Box>
+            )
+        },
+        {
+            label: 'Bằng cấp & Chứng chỉ',
+            icon: <SchoolIcon />,
+            content: (
+                <Box mt={2}>
+                    <StaffCertificateTab 
+                        staffId={id} 
+                        isView={isView}
                     />
                 </Box>
             )
@@ -148,47 +158,12 @@ const StaffDetailPage = () => {
                 </Box>
             ) : (
                 <Typography variant="h5" fontWeight="bold" className="text-text-primary px-1">
-                    Hồ sơ cá nhân
+                    Trang cá nhân
                 </Typography>
             )}
 
-            {/* Profile Overview Card */}
-            {/* <Paper elevation={0} className="p-6 border border-border">
-                <Grid container spacing={3} alignItems="center">
-                    <Grid item>
-                        <Avatar 
-                            sx={{ width: 80, height: 80, bgcolor: 'primary.light', fontSize: '2rem' }}
-                        >
-                            {staff?.displayName ? staff.displayName.charAt(0).toUpperCase() : 'N'}
-                        </Avatar>
-                    </Grid>
-                    <Grid item xs={12} sm>
-                        <Box className="space-y-1">
-                            <Typography variant="h5" fontWeight="bold" className="text-text-primary">
-                                {staff?.displayName || 'Nhân viên mới'}
-                                {staff?.staffCode && (
-                                    <Typography component="span" variant="subtitle1" color="text.secondary" className="ml-2 font-mono">
-                                        ({staff.staffCode})
-                                    </Typography>
-                                )}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" className="flex flex-wrap gap-x-3 gap-y-1">
-                                {staff?.departmentName && <span>Phòng ban: <strong>{staff.departmentName}</strong></span>}
-                                {staff?.departmentName && staff?.positionName && <span>•</span>}
-                                {staff?.positionName && <span>Chức danh: <strong>{staff.positionName}</strong></span>}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" className="flex flex-wrap gap-x-3 gap-y-1">
-                                {staff?.email && <span>Email: {staff.email}</span>}
-                                {staff?.email && staff?.phoneNumber && <span>•</span>}
-                                {staff?.phoneNumber && <span>SĐT: {staff.phoneNumber}</span>}
-                            </Typography>
-                        </Box>
-                    </Grid>
-                </Grid>
-            </Paper> */}
-
-            {/* Tab view */}
-            <Paper elevation={0} className="px-4 border border-border">
+            {/* Main Content Tabs */}
+            <Paper elevation={0} className='px-4 border border-border'>
                 <TabComponent 
                     tabList={tabList} 
                     value={tabValue} 

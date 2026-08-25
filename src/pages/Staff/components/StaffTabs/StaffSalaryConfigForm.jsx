@@ -19,7 +19,7 @@ import Table from '../../../../components/ui/Table';
 import Autocomplete from '../../../../components/ui/Autocomplete';
 import VNDCurrencyInput from '../../../../components/ui/VNDCurrencyInput';
 
-import { getAllSalaryItems, getStaffSalaryItems, saveStaffSalaryItems } from '../../../../services/salaryItemService';
+import { useAllSalaryItems, useStaffSalaryItems, useSaveStaffSalaryItems } from '../../api';
 import { SalaryItemType, SalaryCalculationType } from '../../../../constants';
 import { NumericFormat } from 'react-number-format';
 
@@ -81,42 +81,23 @@ const InlineAmountInput = ({ value, onChange, disabled }) => {
 };
 
 const StaffSalaryConfigForm = ({ staffId, isView }) => {
-    const [allSalaryItems, setAllSalaryItems] = useState([]);
     const [configuredItems, setConfiguredItems] = useState([]);
-    const [loading, setLoading] = useState(false);
 
-    const loadData = async () => {
-        if (!staffId || staffId === 'new') return;
-        try {
-            setLoading(true);
-            const [allItemsRes, configRes] = await Promise.all([
-                getAllSalaryItems(),
-                getStaffSalaryItems(staffId)
-            ]);
-
-            if (allItemsRes && allItemsRes.data) {
-                setAllSalaryItems(allItemsRes.data.data || allItemsRes.data || []);
-            }
-            if (configRes && configRes.data) {
-                const configItems = configRes.data.data || configRes.data || [];
-                setConfiguredItems(configItems.map(item => ({
-                    ...item,
-                    isNew: false
-                })));
-            }
-        } catch (error) {
-            console.error('Failed to load staff salary config:', error);
-            toast.error('Không thể tải cấu hình lương nhân viên');
-        } finally {
-            setLoading(false);
-        }
-    };
+    // TanStack Query
+    const { data: allSalaryItems = [] } = useAllSalaryItems();
+    const { data: staffSalaryItems = [], isLoading } = useStaffSalaryItems(staffId);
+    const saveMutation = useSaveStaffSalaryItems();
 
     useEffect(() => {
-        loadData();
-    }, [staffId]);
+        if (staffSalaryItems) {
+            setConfiguredItems(staffSalaryItems.map(item => ({
+                ...item,
+                isNew: false
+            })));
+        }
+    }, [staffSalaryItems]);
 
-    const handleSaveConfig = async (values) => {
+    const handleSaveConfig = (values) => {
         if (!staffId || staffId === 'new') {
             toast.error('Vui lòng lưu thông tin nhân viên trước khi cấu hình lương');
             return;
@@ -133,16 +114,7 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
             amount: parseFloat(item.amount) || 0
         }));
 
-        try {
-            const response = await saveStaffSalaryItems(staffId, itemsToSave);
-            if (response && response.data) {
-                toast.success('Lưu cấu hình lương nhân viên thành công');
-                loadData();
-            }
-        } catch (error) {
-            console.error('Failed to save staff salary configuration:', error);
-            toast.error('Lỗi khi lưu cấu hình lương nhân viên');
-        }
+        saveMutation.mutate({ staffId, items: itemsToSave });
     };
 
     // Formik Setup
@@ -350,8 +322,9 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
                                 color="primary" 
                                 startIcon={<SaveIcon />}
                                 onClick={formik.handleSubmit}
+                                disabled={saveMutation.isPending}
                             >
-                                Lưu cấu hình
+                                {saveMutation.isPending ? 'Đang lưu...' : 'Lưu cấu hình'}
                             </Button>
                         </Box>
                     </Box>
@@ -361,6 +334,7 @@ const StaffSalaryConfigForm = ({ staffId, isView }) => {
                 <Table 
                     columns={columns} 
                     data={formik.values.configuredItems} 
+                    loading={isLoading || saveMutation.isPending}
                     totalElements={formik.values.configuredItems.length}
                     page={1}
                     pageSize={formik.values.configuredItems.length || 10}
