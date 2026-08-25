@@ -135,6 +135,9 @@ const MyAsyncAutocomplete = React.forwardRef(({
   const handleChange = (_, value) => {
     if (readOnly) return;
     setFieldValue(name, value ? value : null);
+    if (otherProps.onChange) {
+      otherProps.onChange(_, value);
+    }
   };
 
   const defaultGetOptionLabel = (option) => {

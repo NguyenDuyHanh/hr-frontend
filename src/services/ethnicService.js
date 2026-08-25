@@ -9,7 +9,7 @@ export const pagingEthnics = async (searchDto) => {
 };
 
 export const getAllEthnics = async () => {
-    const response = await axios.get(`${API_PATH}/all`);
+    const response = await axios.get(API_PATH);
     return response.data;
 };
 

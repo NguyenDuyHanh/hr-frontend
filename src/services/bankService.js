@@ -9,7 +9,7 @@ export const pagingBanks = async (searchDto) => {
 };
 
 export const getAllBanks = async () => {
-    const response = await axios.get(`${API_PATH}/all`);
+    const response = await axios.get(API_PATH);
     return response.data;
 };
 

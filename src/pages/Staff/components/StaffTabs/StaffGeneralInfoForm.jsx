@@ -6,36 +6,23 @@ import { useAddStaff, useModifyStaff } from '../../api';
 import TextField from '../../../../components/ui/TextField';
 import SelectInput from '../../../../components/ui/SelectInput';
 import DateTimePicker from '../../../../components/ui/DateTimePicker';
-import Autocomplete from '../../../../components/ui/Autocomplete';
+import AsyncAutocomplete from '../../../../components/ui/AsyncAutocomplete';
 import TabAccordion from '../../../../components/ui/Tab/TabAccordion';
 import ImageUpload from '../../../../components/ui/ImageUpload';
+import AddressSelectGroup from '../AddressSelectGroup';
 import { 
     WorkingStatusOptions,
-    GenderOptions
+    GenderOptions,
+    EducationDegreeOptions
 } from '../../../../constants';
 import { getDepartments, getPositions } from '../../../../services/StaffService';
+import { getAllEthnics } from '../../../../services/ethnicService';
 import { format } from 'date-fns';
 import { getLeaveBalance } from '../../../../services/leaveService';
 
 const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => {
     const addStaffMutation = useAddStaff();
     const modifyStaffMutation = useModifyStaff();
-    const [departments, setDepartments] = useState([]);
-    const [positions, setPositions] = useState([]);
-
-    useEffect(() => {
-        const loadRefs = async () => {
-            try {
-                const depRes = await getDepartments();
-                setDepartments(depRes?.data || []);
-                const posRes = await getPositions();
-                setPositions(posRes?.data || []);
-            } catch (err) {
-                console.error("Failed to load departments or positions", err);
-            }
-        };
-        loadRefs();
-    }, []);
 
     const initialValues = useMemo(() => ({
         id: staffData?.id || null,
@@ -57,15 +44,25 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
         avatarUrl: staffData?.avatarUrl || '',
         birthPlace: staffData?.birthPlace || '',
         nationality: staffData?.nationality || '',
-        ethnics: staffData?.ethnics || '',
+        ethnic: staffData?.ethnicId ? { id: staffData.ethnicId, name: staffData.ethnicName } : null,
         religion: staffData?.religion || '',
-        educationDegree: staffData?.educationDegree || '',
+        educationDegree: staffData?.educationDegree || 'BACHELOR',
 
-        // 2. Address
-        province: staffData?.province || '',
-        commune: staffData?.commune || '',
-        permanentResidence: staffData?.permanentResidence || '',
-        currentResidence: staffData?.currentResidence || '',
+        // 2. Address - Permanent
+        permanentProvince: staffData?.permanentProvinceName ? { name: staffData.permanentProvinceName } : null,
+        permanentAdministrativeUnit: (staffData?.permanentAdministrativeUnitId || staffData?.permanentWardId) ? { 
+            id: staffData.permanentAdministrativeUnitId || staffData.permanentWardId, 
+            name: staffData.permanentAdministrativeUnitName || staffData.permanentWardName 
+        } : null,
+        permanentAddressDetail: staffData?.permanentAddressDetail || '',
+
+        // 2. Address - Current
+        currentProvince: staffData?.currentProvinceName ? { name: staffData.currentProvinceName } : null,
+        currentAdministrativeUnit: (staffData?.currentAdministrativeUnitId || staffData?.currentWardId) ? { 
+            id: staffData.currentAdministrativeUnitId || staffData.currentWardId, 
+            name: staffData.currentAdministrativeUnitName || staffData.currentWardName 
+        } : null,
+        currentAddressDetail: staffData?.currentAddressDetail || '',
 
         // 3. Legal Docs
         idNumberIssueDate: staffData?.idNumberIssueDate ? new Date(staffData.idNumberIssueDate) : null,
@@ -81,7 +78,8 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
     }), [staffData]);
 
     const validationSchema = Yup.object({
-        // Validation schemas
+        displayName: Yup.string().required('Họ và tên là bắt buộc'),
+        workingStatus: Yup.string().required('Trạng thái làm việc là bắt buộc'),
     });
 
     const formik = useFormik({
@@ -93,8 +91,19 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                 ...values,
                 departmentId: values.department?.id || null,
                 positionId: values.position?.id || null,
+                ethnicId: values.ethnic?.id || null,
+                educationDegree: values.educationDegree ? values.educationDegree : null,
+                permanentAdministrativeUnitId: values.permanentAdministrativeUnit?.id || values.permanentWard?.id || null,
+                currentAdministrativeUnitId: values.currentAdministrativeUnit?.id || values.currentWard?.id || null,
                 department: undefined,
                 position: undefined,
+                ethnic: undefined,
+                permanentProvince: undefined,
+                permanentAdministrativeUnit: undefined,
+                permanentWard: undefined,
+                currentProvince: undefined,
+                currentAdministrativeUnit: undefined,
+                currentWard: undefined,
                 usedDays: undefined,
                 remainingDays: undefined
             };
@@ -144,11 +153,6 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
         fetchBalance();
     }, [staffData, setFieldValue]);
 
-    const filteredPositions = useMemo(() => {
-        if (!values.department?.id) return positions;
-        return positions.filter(pos => pos.department?.id === values.department.id);
-    }, [positions, values.department?.id]);
-
     const action = isView ? null : (
         <>
             <Button onClick={onClose} variant="outlined" color="inherit" sx={{ color: 'text.secondary', textTransform: 'none' }}>Hủy bỏ</Button>
@@ -168,7 +172,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                         <Grid item xs={12} md={9} sx={{ marginTop: 2 }}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <TextField label="Họ và tên" name="displayName"  fullWidth disabled={isView} />
+                                    <TextField label="Họ và tên" name="displayName" fullWidth disabled={isView} required />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
                                     <SelectInput label="Giới tính" name="gender" options={GenderOptions} fullWidth disabled={isView} />
@@ -183,48 +187,64 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                                     <TextField label="Quốc tịch" name="nationality" fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <TextField label="Dân tộc" name="ethnics" fullWidth disabled={isView} />
+                                    <AsyncAutocomplete
+                                        label="Dân tộc"
+                                        name="ethnic"
+                                        api={getAllEthnics}
+                                        displayData="name"
+                                        value={formik.values.ethnic || null}
+                                        readOnly={isView}
+                                        disabled={isView}
+                                        formik={formik}
+                                        placeholder="Chọn Dân tộc"
+                                    />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
                                     <TextField label="Tôn giáo" name="religion" fullWidth disabled={isView} />
                                 </Grid>
                                 <Grid item xs={12} sm={6} lg={4}>
-                                    <TextField label="Trình độ học vấn" name="educationDegree" fullWidth disabled={isView} />
+                                    <SelectInput
+                                        label="Trình độ học vấn cao nhất"
+                                        name="educationDegree"
+                                        options={EducationDegreeOptions}
+                                        fullWidth
+                                        disabled={isView}
+                                    />
                                 </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
                 </TabAccordion>
 
-                {/* 2. Địa chỉ thường trú / tạm trú */}
-                <TabAccordion title="Địa chỉ thường trú / tạm trú" open={false}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} lg={3}>
-                            <TextField 
-                                label="Tỉnh thường trú" 
-                                name="province" 
-                                fullWidth 
-                                disabled={isView}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6} lg={3}>
-                            <TextField 
-                                label="Xã thường trú" 
-                                name="commune" 
-                                fullWidth 
-                                disabled={isView}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField label="Chi tiết thường trú" name="permanentResidence" multiline rows={2} fullWidth disabled={isView} />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField label="Tạm trú" name="currentResidence" multiline rows={2} fullWidth disabled={isView} />
-                        </Grid>
-                    </Grid>
+                {/* 2. Địa chỉ thường trú */}
+                <TabAccordion title="Địa chỉ thường trú" open={false}>
+                    <AddressSelectGroup
+                        provinceFieldName="permanentProvince"
+                        unitFieldName="permanentAdministrativeUnit"
+                        detailFieldName="permanentAddressDetail"
+                        provinceLabel="Tỉnh / Thành phố thường trú"
+                        unitLabel="Đơn vị hành chính thường trú (Xã / Phường / Thị trấn)"
+                        detailLabel="Địa chỉ chi tiết thường trú (Số nhà, Tên đường...)"
+                        formik={formik}
+                        isView={isView}
+                    />
                 </TabAccordion>
 
-                {/* 3. Giấy tờ pháp lý */}
+                {/* 3. Địa chỉ tạm trú (Nơi ở hiện tại) */}
+                <TabAccordion title="Tạm trú (Nơi ở hiện tại)" open={false}>
+                    <AddressSelectGroup
+                        provinceFieldName="currentProvince"
+                        unitFieldName="currentAdministrativeUnit"
+                        detailFieldName="currentAddressDetail"
+                        provinceLabel="Tỉnh / Thành phố tạm trú"
+                        unitLabel="Đơn vị hành chính tạm trú (Xã / Phường / Thị trấn)"
+                        detailLabel="Địa chỉ chi tiết tạm trú (Số nhà, Tên đường...)"
+                        formik={formik}
+                        isView={isView}
+                    />
+                </TabAccordion>
+
+                {/* 4. Giấy tờ pháp lý */}
                 <TabAccordion title="Giấy tờ pháp lý" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={4}>
@@ -239,7 +259,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                     </Grid>
                 </TabAccordion>
 
-                {/* 4. Thông tin hồ sơ nhân viên */}
+                {/* 5. Thông tin hồ sơ nhân viên */}
                 <TabAccordion title="Thông tin hồ sơ nhân viên" open={true}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
@@ -280,44 +300,43 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                     </Grid>
                 </TabAccordion>
 
-                {/* 5. Tổ chức */}
-                <TabAccordion title="Phòng ban" open={false}>
+                {/* 6. Tổ chức */}
+                <TabAccordion title="Phòng ban & Vị trí" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={6}>
-                            <Autocomplete 
+                            <AsyncAutocomplete 
                                 label="Phòng ban" 
                                 name="department" 
-                                options={departments}
-                                getOptionLabel={(option) => option?.name || ''}
-                                onChange={(event, val) => {
+                                api={getDepartments}
+                                displayData="name"
+                                value={formik.values.department || null}
+                                onChange={(_, val) => {
                                     setFieldValue('department', val);
-                                    if (val && values.position) {
-                                        const posFull = positions.find(p => p.id === values.position.id);
-                                        if (posFull && posFull.department?.id !== val.id) {
-                                            setFieldValue('position', null);
-                                        }
-                                    } else if (!val) {
-                                        setFieldValue('position', null);
-                                    }
+                                    setFieldValue('position', null);
                                 }}
-                                fullWidth
+                                readOnly={isView}
                                 disabled={isView}
+                                formik={formik}
+                                placeholder="Chọn Phòng ban"
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} lg={6}>
-                            <Autocomplete 
+                            <AsyncAutocomplete 
                                 label="Vị trí" 
                                 name="position" 
-                                options={filteredPositions}
-                                getOptionLabel={(option) => option?.name || ''}
-                                fullWidth
+                                api={getPositions}
+                                displayData="name"
+                                value={formik.values.position || null}
+                                readOnly={isView}
                                 disabled={isView}
+                                formik={formik}
+                                placeholder="Chọn Vị trí"
                             />
                         </Grid>
                     </Grid>
                 </TabAccordion>
 
-                {/* 6. Thông tin liên hệ */}
+                {/* 7. Thông tin liên hệ */}
                 <TabAccordion title="Thông tin liên hệ" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={3}>
@@ -329,7 +348,7 @@ const StaffGeneralInfoForm = ({ staffData, onClose, onSaveSuccess, isView }) => 
                     </Grid>
                 </TabAccordion>
 
-                {/* 7. Thuế & bảo hiểm */}
+                {/* 8. Thuế & bảo hiểm */}
                 <TabAccordion title="Thuế & bảo hiểm" open={false}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} lg={4}>

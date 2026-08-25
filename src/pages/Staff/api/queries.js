@@ -1,11 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { pagingStaffs, generateStaffCode, getStaffById } from '../../../services/StaffService';
+import { pagingStaffs, generateStaffCode, getStaffById, getCertificatesByStaffId, getBankAccountsByStaffId } from '../../../services/StaffService';
+import { getAllSalaryItems, getStaffSalaryItems } from '../../../services/salaryItemService';
 
 export const staffKeys = {
   all: ['staffs'],
   list: (params) => [...staffKeys.all, 'list', params],
   detail: (id) => [...staffKeys.all, 'detail', id],
   code: ['staffs', 'generate-code'],
+  certificates: (staffId, type) => ['staff-certificates', staffId, type || 'ALL'],
+  bankAccounts: (staffId) => ['staff-bank-accounts', staffId],
+  salaryConfig: (staffId) => ['staff-salary-config', staffId],
+  masterSalaryItems: ['master-salary-items'],
 };
 
 // 1. Danh sách nhân viên: staleTime 30 giây (Tránh spam API khi bấm nhanh, giữ UI mượt)
@@ -44,6 +49,60 @@ export const useStaffDetail = (id) => {
       return res?.data || null;
     },
     enabled: !!id,
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+// 4. Danh sách Bằng cấp / Chứng chỉ của nhân viên theo loại (TanStack Query)
+export const useStaffCertificates = (staffId, type) => {
+  return useQuery({
+    queryKey: staffKeys.certificates(staffId, type),
+    queryFn: async () => {
+      if (!staffId) return [];
+      const res = await getCertificatesByStaffId(staffId, type);
+      return res?.data || res || [];
+    },
+    enabled: !!staffId,
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+// 5. Danh sách tài khoản ngân hàng của nhân viên (TanStack Query)
+export const useStaffBankAccounts = (staffId) => {
+  return useQuery({
+    queryKey: staffKeys.bankAccounts(staffId),
+    queryFn: async () => {
+      if (!staffId || staffId === 'new') return [];
+      const res = await getBankAccountsByStaffId(staffId);
+      return res?.data || res || [];
+    },
+    enabled: !!staffId && staffId !== 'new',
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+// 6. Danh mục tất cả khoản lương
+export const useAllSalaryItems = () => {
+  return useQuery({
+    queryKey: staffKeys.masterSalaryItems,
+    queryFn: async () => {
+      const res = await getAllSalaryItems();
+      return res?.data?.data || res?.data || [];
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+// 7. Cấu hình lương & phụ cấp của nhân viên (TanStack Query)
+export const useStaffSalaryItems = (staffId) => {
+  return useQuery({
+    queryKey: staffKeys.salaryConfig(staffId),
+    queryFn: async () => {
+      if (!staffId || staffId === 'new') return [];
+      const res = await getStaffSalaryItems(staffId);
+      return res?.data?.data || res?.data || [];
+    },
+    enabled: !!staffId && staffId !== 'new',
     staleTime: 1000 * 60 * 2,
   });
 };
