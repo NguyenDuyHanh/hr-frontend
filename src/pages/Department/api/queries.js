@@ -1,12 +1,25 @@
 import { useQuery } from '@tanstack/react-query';
 import { pagingDepartments, generateDepartmentCode } from '../../../services/departmentService';
-import { pagingPositions } from '../../../services/positionService';
+import { getDepartments } from '../../../services/StaffService';
 
 export const departmentKeys = {
   all: ['departments'],
   list: (params) => [...departmentKeys.all, 'list', params],
   code: ['departments', 'generate-code'],
-  positions: (deptId, params) => [...departmentKeys.all, 'positions', deptId, params],
+  allDepts: ['departments', 'all'],
+};
+
+// Hook lấy toàn bộ danh sách phòng ban dùng chung cho combobox/select
+export const useDepartmentsQuery = (options = {}) => {
+  return useQuery({
+    queryKey: departmentKeys.allDepts,
+    queryFn: async () => {
+      const res = await getDepartments();
+      return res?.data?.data || res?.data || [];
+    },
+    staleTime: 1000 * 60 * 5,
+    ...options,
+  });
 };
 
 export const useDepartments = (params) => {
@@ -30,18 +43,5 @@ export const useDepartmentCode = (open, selectedDepartment) => {
     },
     enabled: !!open && !selectedDepartment,
     staleTime: 0,
-  });
-};
-
-export const useDepartmentPositions = (deptId, params, enabled = true) => {
-  return useQuery({
-    queryKey: departmentKeys.positions(deptId, params),
-    queryFn: async () => {
-      if (!deptId) return { content: [], totalElements: 0 };
-      const res = await pagingPositions({ ...params, departmentId: deptId });
-      return res?.data || { content: [], totalElements: 0 };
-    },
-    enabled: !!deptId && enabled,
-    placeholderData: (previousData) => previousData,
   });
 };

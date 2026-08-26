@@ -2,15 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { 
     getAllPayrolls, 
     getPayrollsByPeriod, 
-    getPayrollDetails, 
-    getMyPayslip 
-} from '../../../services/payrollService';
+    getPayrollDetails 
+} from '../../../../services/payrollService';
 
 export const salaryKeys = {
   all: ['salary'],
   payrolls: (periodId) => [...salaryKeys.all, 'payrolls', periodId],
   details: (payrollId) => [...salaryKeys.all, 'details', payrollId],
-  myPayslip: (periodId) => [...salaryKeys.all, 'my-payslip', periodId],
 };
 
 export const usePayrolls = (periodId) => {
@@ -42,18 +40,5 @@ export const usePayrollDetails = (payrollId) => {
     enabled: !!payrollId,
     placeholderData: (previousData) => previousData,
     staleTime: 1000 * 30,
-  });
-};
-
-export const useMyPayslip = (periodId) => {
-  return useQuery({
-    queryKey: salaryKeys.myPayslip(periodId),
-    queryFn: async () => {
-      if (!periodId) return null;
-      const response = await getMyPayslip(periodId);
-      return response?.data?.data || response?.data || null;
-    },
-    enabled: !!periodId,
-    staleTime: 1000 * 60 * 2,
   });
 };

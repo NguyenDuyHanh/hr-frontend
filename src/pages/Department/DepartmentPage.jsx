@@ -18,7 +18,8 @@ import ListToolbar from '../../components/ui/ListToolbar';
 import Popup from '../../components/ui/Popup';
 import DepartmentForm from './components/DepartmentForm';
 import useDepartmentStore from '../../store/departmentStore';
-import { useDepartments, useDeleteDepartment, useDepartmentPositions } from './api';
+import { useDepartments, useDeleteDepartment } from './api';
+import { useDepartmentPositions } from '../Position/api';
 
 const DepartmentPage = () => {
     const { t } = useTranslation();

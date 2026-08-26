@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { pagingStaffs, generateStaffCode, getStaffById, getCertificatesByStaffId, getBankAccountsByStaffId } from '../../../services/StaffService';
-import { getAllSalaryItems, getStaffSalaryItems } from '../../../services/salaryItemService';
+import { getAllSalaryItems } from '../../../services/salaryItemService';
+import { getStaffSalaryItems } from '../../../services/staffSalaryItemService';
 
 export const staffKeys = {
   all: ['staffs'],

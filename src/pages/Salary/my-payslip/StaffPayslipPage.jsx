@@ -14,11 +14,11 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { toast } from 'sonner';
 import { Formik, FormikProvider } from 'formik';
 
-import usePayrollStore from '../../store/usePayrollStore';
-import usePeriodStore from '../../store/usePeriodStore';
-import SelectInput from '../../components/ui/SelectInput';
-import Table from '../../components/ui/Table';
-import PayslipDetailDialog from './components/PayslipDetailDialog';
+import usePayrollStore from '../../../store/usePayrollStore';
+import usePeriodStore from '../../../store/usePeriodStore';
+import SelectInput from '../../../components/ui/SelectInput';
+import Table from '../../../components/ui/Table';
+import PayslipDetailDialog from '../payroll/components/PayslipDetailDialog';
 
 const StaffPayslipPage = () => {
     const { t } = useTranslation();

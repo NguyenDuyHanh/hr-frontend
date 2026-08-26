@@ -17,7 +17,8 @@ import SelectInput from '../../components/ui/SelectInput';
 import PositionForm from './components/PositionForm';
 import { getActiveFilterCount } from '../../LocalFunction';
 import usePositionStore from '../../store/positionStore';
-import { usePositions, useDeletePosition, useAllDepartmentsQuery } from './api';
+import { usePositions, useDeletePosition } from './api';
+import { useDepartmentsQuery } from '../Department/api';
 
 const PositionPage = () => {
     const {
@@ -43,7 +44,7 @@ const PositionPage = () => {
         ...filters
     });
     const deletePositionMutation = useDeletePosition();
-    const { data: departments = [] } = useAllDepartmentsQuery();
+    const { data: departments = [] } = useDepartmentsQuery();
 
     const [filterOpen, setFilterOpen] = useState(false);
     const [searchDraft, setSearchDraft] = useState(keyword || '');

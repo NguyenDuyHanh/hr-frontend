@@ -13,21 +13,21 @@ import {
     IconButton,
     Tooltip
 } from '@mui/material';
-import TextField from '../../components/ui/TextField';
-import Popup from '../../components/ui/Popup';
+import TextField from '../../../components/ui/TextField';
+import Popup from '../../../components/ui/Popup';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import { toast } from 'sonner';
 import { Formik } from 'formik';
 
-import Table from '../../components/ui/Table';
-import ListToolbar from '../../components/ui/ListToolbar';
-import SelectInput from '../../components/ui/SelectInput';
-import { PayrollStatus, PayrollStatusConfig } from '../../constants';
-import usePayrollStore from '../../store/usePayrollStore';
-import usePeriodStore from '../../store/usePeriodStore';
-import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
+import Table from '../../../components/ui/Table';
+import ListToolbar from '../../../components/ui/ListToolbar';
+import SelectInput from '../../../components/ui/SelectInput';
+import { PayrollStatus, PayrollStatusConfig } from '../../../constants';
+import usePayrollStore from '../../../store/usePayrollStore';
+import usePeriodStore from '../../../store/usePeriodStore';
+import ConfirmationDialog from '../../../components/ui/ConfirmationDialog';
 
 const PayrollListPage = () => {
     const { t } = useTranslation();

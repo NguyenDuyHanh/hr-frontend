@@ -2,18 +2,20 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Paper, Grid, IconButton, Tooltip, Stack, Typography } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
-import Popup from '../../components/ui/Popup';
+import Popup from '../../../components/ui/Popup';
 
-import Table from '../../components/ui/Table';
-import ListToolbar from '../../components/ui/ListToolbar';
-import FilterPanel from '../../components/ui/FilterPanel';
+import Table from '../../../components/ui/Table';
+import ListToolbar from '../../../components/ui/ListToolbar';
+import FilterPanel from '../../../components/ui/FilterPanel';
 import { Formik } from 'formik';
-import Autocomplete from '../../components/ui/Autocomplete';
-import SelectInput from '../../components/ui/SelectInput';
-import { getDepartments, getPositions, pagingStaffs } from '../../services/StaffService';
-import { WorkingStatusOptions } from '../../constants';
-import { getLabelFromOptions } from '../../LocalFunction';
-import StaffSalaryConfigForm from '../Staff/components/StaffTabs/StaffSalaryConfigForm';
+import Autocomplete from '../../../components/ui/Autocomplete';
+import SelectInput from '../../../components/ui/SelectInput';
+import { useDepartmentsQuery } from '../../Department/api/queries';
+import { usePositionsQuery } from '../../Position/api/queries';
+import { pagingStaffs } from '../../../services/StaffService';
+import { WorkingStatusOptions } from '../../../constants';
+import { getLabelFromOptions } from '../../../LocalFunction';
+import StaffSalaryConfigForm from './StaffSalaryConfigForm';
 
 const StaffSalaryConfigList = () => {
     const { t } = useTranslation();
@@ -25,8 +27,10 @@ const StaffSalaryConfigList = () => {
     const [keyword, setKeyword] = useState('');
     const [filters, setFilters] = useState({});
 
-    const [departments, setDepartments] = useState([]);
-    const [positions, setPositions] = useState([]);
+    // TanStack Query for metadata
+    const { data: departments = [] } = useDepartmentsQuery();
+    const { data: positions = [] } = usePositionsQuery();
+
     const [filterOpen, setFilterOpen] = useState(false);
     const [searchDraft, setSearchDraft] = useState('');
 
@@ -35,20 +39,6 @@ const StaffSalaryConfigList = () => {
     const [selectedStaff, setSelectedStaff] = useState(null);
 
     const formikRef = useRef();
-
-    useEffect(() => {
-        const fetchRefs = async () => {
-            try {
-                const depRes = await getDepartments();
-                setDepartments(depRes?.data || []);
-                const posRes = await getPositions();
-                setPositions(posRes?.data || []);
-            } catch (err) {
-                console.error("Failed to load filter metadata:", err);
-            }
-        };
-        fetchRefs();
-    }, []);
 
     const loadStaffData = async () => {
         setLoading(true);
@@ -219,14 +209,7 @@ const StaffSalaryConfigList = () => {
                                             getOptionLabel={(option) => option?.name || ''}
                                             onChange={(event, val) => {
                                                 setFieldValue('department', val);
-                                                if (val && values.position) {
-                                                     const posFull = positions.find(p => p.id === values.position.id);
-                                                     if (posFull && posFull.department?.id !== val.id) {
-                                                         setFieldValue('position', null);
-                                                     }
-                                                } else if (!val) {
-                                                     setFieldValue('position', null);
-                                                }
+                                                setFieldValue('position', null);
                                             }}
                                         />
                                     </Grid>
@@ -236,7 +219,7 @@ const StaffSalaryConfigList = () => {
                                             label={t('position.name', 'Vị trí')}
                                             options={
                                                 values.department?.id
-                                                    ? positions.filter(pos => pos.department?.id === values.department.id)
+                                                    ? positions.filter(pos => pos.department?.id === values.department.id || pos.departmentId === values.department.id)
                                                     : positions
                                             }
                                             getOptionLabel={(option) => option?.name || ''}

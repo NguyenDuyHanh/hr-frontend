@@ -1,21 +1,20 @@
 import HttpService from './HttpService';
+import ConstantList from '../appConfig';
+
+const API_PATH = ConstantList.API_ENPOINT + '/salary-items';
 
 export const getAllSalaryItems = () => {
-    return HttpService.get('/salary-items');
+    return HttpService.get(API_PATH);
 };
 
 export const saveSalaryItem = (item) => {
-    return HttpService.post('/salary-items', item);
+    return HttpService.post(API_PATH, item);
 };
 
 export const deleteSalaryItem = (id) => {
-    return HttpService.delete(`/salary-items/${id}`);
+    return HttpService.delete(`${API_PATH}/${id}`);
 };
 
-export const getStaffSalaryItems = (staffId) => {
-    return HttpService.get(`/staff-salary-items/staff/${staffId}`);
-};
+export { getStaffSalaryItems, saveStaffSalaryItems } from './staffSalaryItemService';
 
-export const saveStaffSalaryItems = (staffId, items) => {
-    return HttpService.post(`/staff-salary-items/staff/${staffId}`, items);
-};
+

@@ -1,12 +1,26 @@
 import { useQuery } from '@tanstack/react-query';
 import { pagingPositions, generatePositionCode } from '../../../services/positionService';
-import { getAllDepartments } from '../../../services/departmentService';
+import { getPositions } from '../../../services/StaffService';
 
 export const positionKeys = {
   all: ['positions'],
   list: (params) => [...positionKeys.all, 'list', params],
   code: ['positions', 'generate-code'],
-  allDepts: ['departments', 'all'],
+  byDepartment: (deptId, params) => [...positionKeys.all, 'department', deptId, params],
+  allPositions: ['positions', 'all'],
+};
+
+// Hook lấy toàn bộ danh sách vị trí dùng chung cho combobox/select
+export const usePositionsQuery = (options = {}) => {
+  return useQuery({
+    queryKey: positionKeys.allPositions,
+    queryFn: async () => {
+      const res = await getPositions();
+      return res?.data?.data || res?.data || [];
+    },
+    staleTime: 1000 * 60 * 5,
+    ...options,
+  });
 };
 
 export const usePositions = (params) => {
@@ -33,14 +47,16 @@ export const usePositionCode = (open, selectedPosition) => {
   });
 };
 
-export const useAllDepartmentsQuery = (enabled = true) => {
+// Hook lấy danh sách vị trí thuộc về một phòng ban
+export const useDepartmentPositions = (deptId, params, enabled = true) => {
   return useQuery({
-    queryKey: positionKeys.allDepts,
+    queryKey: positionKeys.byDepartment(deptId, params),
     queryFn: async () => {
-      const res = await getAllDepartments();
-      return res?.data || [];
+      if (!deptId) return { content: [], totalElements: 0 };
+      const res = await pagingPositions({ ...params, departmentId: deptId });
+      return res?.data || { content: [], totalElements: 0 };
     },
-    enabled,
-    staleTime: 1000 * 60 * 10, // 10 mins cache for department reference list
+    enabled: !!deptId && enabled,
+    placeholderData: (previousData) => previousData,
   });
 };

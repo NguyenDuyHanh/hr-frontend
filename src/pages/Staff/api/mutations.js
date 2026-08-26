@@ -8,7 +8,7 @@ import {
   setDefaultStaffBankAccount,
   deleteStaffBankAccount
 } from '../../../services/StaffService';
-import { saveStaffSalaryItems } from '../../../services/salaryItemService';
+import { saveStaffSalaryItems } from '../../../services/staffSalaryItemService';
 import { toast } from 'sonner';
 import { staffKeys } from './queries';
 

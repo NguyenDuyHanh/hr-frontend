@@ -6,7 +6,7 @@ import {
     unconfirmPayroll,
     deletePayroll,
     updatePayslip
-} from '../../../services/payrollService';
+} from '../../../../services/payrollService';
 import { toast } from 'sonner';
 import { salaryKeys } from './queries';
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import { generateBankTransferQr } from '../../../services/payrollService';
+import { generateBankTransferQr } from '../../../../services/payrollService';
 
 // Format currency
 const formatVND = (value) => {
