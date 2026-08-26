@@ -27,16 +27,18 @@ import UndoIcon from '@mui/icons-material/Undo';
 import { toast } from 'sonner';
 import { Formik } from 'formik';
 
-import Table from '../../components/ui/Table';
-import ListToolbar from '../../components/ui/ListToolbar';
-import FilterPanel from '../../components/ui/FilterPanel';
-import SelectInput from '../../components/ui/SelectInput';
-import { getActiveFilterCount } from '../../LocalFunction';
-import { getDepartments, getPositions } from '../../services/StaffService';
-import usePayrollStore from '../../store/usePayrollStore';
-import { SalaryItemType } from '../../constants';
+import Table from '../../../components/ui/Table';
+import ListToolbar from '../../../components/ui/ListToolbar';
+import FilterPanel from '../../../components/ui/FilterPanel';
+import SelectInput from '../../../components/ui/SelectInput';
+import Autocomplete from '../../../components/ui/Autocomplete';
+import { useDepartmentsQuery } from '../../Department/api/queries';
+import { usePositionsQuery } from '../../Position/api/queries';
+import { getActiveFilterCount } from '../../../LocalFunction';
+import usePayrollStore from '../../../store/usePayrollStore';
+import { SalaryItemType } from '../../../constants';
 import PayslipDetailDialog from './components/PayslipDetailDialog';
-import ConfirmationDialog from '../../components/ui/ConfirmationDialog';
+import ConfirmationDialog from '../../../components/ui/ConfirmationDialog';
 
 const PayrollDetailPage = () => {
     const { t } = useTranslation();
@@ -60,7 +62,6 @@ const PayrollDetailPage = () => {
     } = usePayrollStore();
 
     // Local states
-    const [departments, setDepartments] = useState([]);
     const [openDetailDialog, setOpenDetailDialog] = useState(false);
     const [selectedDetail, setSelectedDetail] = useState(null);
 
@@ -69,7 +70,9 @@ const PayrollDetailPage = () => {
     const [openUnconfirmPayroll, setOpenUnconfirmPayroll] = useState(false);
     const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
 
-    const [positions, setPositions] = useState([]);
+    // TanStack Queries
+    const { data: departments = [] } = useDepartmentsQuery();
+    const { data: positions = [] } = usePositionsQuery();
 
     // Search, Filter & Pagination
     const [searchKeyword, setSearchKeyword] = useState('');
@@ -81,25 +84,7 @@ const PayrollDetailPage = () => {
     const formikRef = useRef();
 
     useEffect(() => {
-        const loadDepartments = async () => {
-            try {
-                const response = await getDepartments();
-                setDepartments(response?.data || []);
-            } catch (error) {
-                console.error('Failed to load departments:', error);
-            }
-        };
-        const loadPositions = async () => {
-            try {
-                const response = await getPositions();
-                setPositions(response?.data || []);
-            } catch (error) {
-                console.error('Failed to load positions:', error);
-            }
-        };
         loadAllPayrolls();
-        loadDepartments();
-        loadPositions();
     }, []);
 
     useEffect(() => {
@@ -422,7 +407,7 @@ const PayrollDetailPage = () => {
                         setFilterPaidStatus(values.paidStatus);
                     }}
                 >
-                    {() => (
+                    {({ values, setFieldValue }) => (
                         <>
                             <ListToolbar
                                 searchDraft={searchDraft}
@@ -446,23 +431,27 @@ const PayrollDetailPage = () => {
                             >
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={4}>
-                                        <SelectInput
+                                        <Autocomplete
                                             label={t('department.name', 'Phòng ban')}
                                             name="department"
-                                            options={departmentOptions}
-                                            keyValue="value"
-                                            displayvalue="name"
-                                            hideNullOption={true}
+                                            options={departments}
+                                            getOptionLabel={(option) => option?.name || ''}
+                                            onChange={(event, val) => {
+                                                setFieldValue('department', val);
+                                                setFieldValue('position', null);
+                                            }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={4}>
-                                        <SelectInput
+                                        <Autocomplete
                                             label={t('position.name', 'Vị trí')}
                                             name="position"
-                                            options={positionOptions}
-                                            keyValue="value"
-                                            displayvalue="name"
-                                            hideNullOption={true}
+                                            options={
+                                                values.department?.id
+                                                    ? positions.filter(pos => pos.department?.id === values.department.id || pos.departmentId === values.department.id)
+                                                    : positions
+                                            }
+                                            getOptionLabel={(option) => option?.name || ''}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={4}>

@@ -45,7 +45,7 @@ jobs:
             set -e
             
             # Navigate to the project directory on VPS
-            cd /opt/hrm/hr-frontend
+            cd /opt/apps/hrm/hr-frontend
             
             # Pull and checkout develop branch cleanly
             git fetch origin
@@ -53,7 +53,7 @@ jobs:
             git reset --hard origin/develop
             
             # Refresh Docker container
-            cd /opt/hrm
+            cd /opt/apps/hrm
             docker compose up -d --build --force-recreate --no-deps hr-frontend
             
             # Clean up old images

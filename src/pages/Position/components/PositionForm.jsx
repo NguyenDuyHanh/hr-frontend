@@ -6,7 +6,8 @@ import Popup from '../../../components/ui/Popup';
 import TextField from '../../../components/ui/TextField';
 import SelectInput from '../../../components/ui/SelectInput';
 import usePositionStore from '../../../store/positionStore';
-import { useAddPosition, useModifyPosition, usePositionCode, useAllDepartmentsQuery } from '../api';
+import { useAddPosition, useModifyPosition, usePositionCode } from '../api';
+import { useDepartmentsQuery } from '../../Department/api';
 
 const PositionForm = () => {
     const {
@@ -18,7 +19,7 @@ const PositionForm = () => {
     const addPositionMutation = useAddPosition();
     const modifyPositionMutation = useModifyPosition();
     const { data: autoCode } = usePositionCode(openForm, selectedPosition);
-    const { data: departments = [] } = useAllDepartmentsQuery(openForm);
+    const { data: departments = [] } = useDepartmentsQuery({ enabled: openForm });
 
     const saving = addPositionMutation.isPending || modifyPositionMutation.isPending;
 

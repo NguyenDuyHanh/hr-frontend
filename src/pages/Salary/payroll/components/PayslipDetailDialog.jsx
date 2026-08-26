@@ -9,21 +9,21 @@ import {
     Tooltip,
     CircularProgress
 } from '@mui/material';
-import Popup from '../../../components/ui/Popup';
+import Popup from '../../../../components/ui/Popup';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import SaveIcon from '@mui/icons-material/Save';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import InfoIcon from '@mui/icons-material/Info';
 import { toast } from 'sonner';
 import { Formik, FormikProvider } from 'formik';
-import CustomTextField from '../../../components/ui/TextField';
-import SelectInput from '../../../components/ui/SelectInput';
-import { SalaryCalculationType } from '../../../constants';
-import usePayrollStore from '../../../store/usePayrollStore';
+import CustomTextField from '../../../../components/ui/TextField';
+import SelectInput from '../../../../components/ui/SelectInput';
+import { SalaryCalculationType } from '../../../../constants';
+import usePayrollStore from '../../../../store/usePayrollStore';
 import BankTransferQrCard from './BankTransferQrCard';
-import { generateBankTransferQr } from '../../../services/payrollService';
-import useAuthStore from '../../../store/useAuthStore';
-import { ROLES } from '../../../constants/roles';
+import { generateBankTransferQr } from '../../../../services/payrollService';
+import useAuthStore from '../../../../store/useAuthStore';
+import { ROLES } from '../../../../constants/roles';
 
 const PayslipDetailDialog = ({
     open,
@@ -52,6 +52,8 @@ const PayslipDetailDialog = ({
     const [openQrModal, setOpenQrModal] = useState(false);
     const [qrModalImage, setQrModalImage] = useState(null);
     const [qrModalLoading, setQrModalLoading] = useState(false);
+
+    const defaultBankAcc = detail?.staff?.bankAccounts?.find(b => b.isDefault) || detail?.staff?.bankAccounts?.[0] || detail?.staff?.bankAccount;
 
     // Sync local state when detail changes
     useEffect(() => {
@@ -111,9 +113,11 @@ const PayslipDetailDialog = ({
     const handleOpenQrModal = async (payslipDetail) => {
         if (!payslipDetail) return;
         
-        const bankBin = payslipDetail.staff?.bankBin;
-        const bankAccountNumber = payslipDetail.staff?.bankAccountNumber;
-        const bankAccountName = payslipDetail.staff?.bankAccountName || payslipDetail.staff?.displayName;
+        const defaultBankAcc = payslipDetail.staff?.bankAccounts?.find(b => b.isDefault) || payslipDetail.staff?.bankAccounts?.[0] || payslipDetail.staff?.bankAccount;
+        
+        const bankBin = defaultBankAcc?.bankBin || payslipDetail.staff?.bankBin;
+        const bankAccountNumber = defaultBankAcc?.accountNumber || payslipDetail.staff?.bankAccountNumber;
+        const bankAccountName = defaultBankAcc?.accountName || payslipDetail.staff?.bankAccountName || payslipDetail.staff?.displayName;
         
         if (!bankBin || !bankAccountNumber) {
             toast.error(t('salary.payslip.bank_account_missing_error', 'Nhân viên chưa cấu hình thông tin tài khoản ngân hàng hoặc mã BIN!'));
@@ -423,10 +427,10 @@ const PayslipDetailDialog = ({
                             <>
                                 <Box mb={2} mt={3}>
                                     <BankTransferQrCard
-                                        bankName={detail.staff?.bankName || ''}
-                                        bankAccountNumber={detail.staff?.bankAccountNumber || ''}
-                                        bankAccountName={removeAccents(detail.staff?.bankAccountName || detail.staff?.displayName || '')}
-                                        bankBin={detail.staff?.bankBin || ''}
+                                        bankName={defaultBankAcc?.bankName || detail.staff?.bankName || ''}
+                                        bankAccountNumber={defaultBankAcc?.accountNumber || detail.staff?.bankAccountNumber || ''}
+                                        bankAccountName={removeAccents(defaultBankAcc?.accountName || detail.staff?.bankAccountName || detail.staff?.displayName || '')}
+                                        bankBin={defaultBankAcc?.bankBin || detail.staff?.bankBin || ''}
                                         amount={detail.netSalary}
                                         note={getTransferContent(detail)}
                                         onClick={() => handleOpenQrModal(detail)}
@@ -569,7 +573,7 @@ const PayslipDetailDialog = ({
                                 border: '1px solid #ffe0b2',
                                 backgroundColor: '#fff8e1',
                                 display: 'flex',
-                                  alignItems: 'center',
+                                alignItems: 'center',
                                 gap: 1
                             }}
                         >

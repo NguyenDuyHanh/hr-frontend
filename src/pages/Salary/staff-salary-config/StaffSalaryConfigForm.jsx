@@ -15,12 +15,13 @@ import { toast } from 'sonner';
 import { useFormik, FormikProvider } from 'formik';
 
 // Common Components
-import Table from '../../../../components/ui/Table';
-import Autocomplete from '../../../../components/ui/Autocomplete';
-import VNDCurrencyInput from '../../../../components/ui/VNDCurrencyInput';
+import Table from '../../../components/ui/Table';
+import Autocomplete from '../../../components/ui/Autocomplete';
+import VNDCurrencyInput from '../../../components/ui/VNDCurrencyInput';
 
-import { useAllSalaryItems, useStaffSalaryItems, useSaveStaffSalaryItems } from '../../api';
-import { SalaryItemType, SalaryCalculationType } from '../../../../constants';
+import { useAllSalaryItems, useStaffSalaryItems } from './api/queries';
+import { useSaveStaffSalaryItems } from './api/mutations';
+import { SalaryItemType, SalaryCalculationType } from '../../../constants';
 import { NumericFormat } from 'react-number-format';
 
 const NumericFormatCustom = React.forwardRef((props, ref) => {

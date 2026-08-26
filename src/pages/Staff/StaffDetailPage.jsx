@@ -12,7 +12,7 @@ import useAuthStore from '../../store/useAuthStore';
 
 import TabComponent from '../../components/ui/Tab/TabComponent';
 import StaffGeneralInfoForm from './components/StaffTabs/StaffGeneralInfoForm';
-import StaffSalaryConfigForm from './components/StaffTabs/StaffSalaryConfigForm';
+import StaffSalaryConfigForm from '../Salary/staff-salary-config/StaffSalaryConfigForm';
 import StaffBankInfoForm from './components/StaffTabs/StaffBankInfoForm';
 import StaffCertificateTab from './components/StaffTabs/StaffCertificateTab';
 import { getStaffById } from '../../services/StaffService';
