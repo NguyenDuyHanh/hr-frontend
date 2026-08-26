@@ -54,7 +54,7 @@ jobs:
             
             # Refresh Docker container
             cd /opt/apps/hrm
-            docker compose up -d --build --force-recreate --no-deps hr-frontend
+            docker compose up -d --build --force-recreate --no-deps frontend
             
             # Clean up old images
             docker image prune -f
